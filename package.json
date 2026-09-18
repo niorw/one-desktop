@@ -1,0 +1,44 @@
+{
+  "name": "onedesktop",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
+    "test:e2e:update": "playwright test --config e2e/playwright.config.ts --update-snapshots",
+    "check:kernel": "bash scripts/check-kernel-purity.sh",
+    "check:rust": "cd src-tauri && cargo check",
+    "check:ts": "tsc --noEmit",
+    "check": "npm run check:kernel && npm run check:rust && npm run check:ts && npm run check:css-tokens",
+    "test:rust": "cd src-tauri && cargo test --lib",
+    "test:approval-loop": "bash scripts/test-approval-loop.sh",
+    "check:css-tokens": "bash scripts/check-css-tokens.sh"
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "^1.1.8",
+    "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/plugin-dialog": "^2.7.2",
+    "@tauri-apps/plugin-opener": "^2.5.4",
+    "@xyflow/react": "^12.11.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.1",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.49.1",
+    "@tauri-apps/cli": "^2.2.0",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.49.1",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.0"
+  }
+}

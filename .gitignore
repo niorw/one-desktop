@@ -1,0 +1,97 @@
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/schemas/
+src-tauri/.tauri/
+*.rs.bk
+
+# Node / Vite
+node_modules/
+dist/
+build/
+.vite/
+
+# Playwright
+test-results/
+test-results-local/
+
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+*.DS_Store?
+.AppleDouble
+.LSOverride
+Icon?
+._*
+Thumbs.db
+
+# OS artifacts
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Env / Secrets
+.env
+.env.*
+*.local
+
+# Logs
+*.log
+logs/
+src-tauri/target/debug/.cargo-lock
+
+# Build artifacts
+*.o
+*.dylib
+*.dll
+*.exe
+*.pdb
+
+# Accidental / temp artifacts (do not commit)
+src-tauri/python3:
+src-tauri/some\ path
+src-tauri/link_game.html
+
+# Local working memory (project data, not product code)
+.workbuddy/
+
+# Scratch artifacts — not product code, not referenced by any source
+.test-evidence/
+generated-images/
+
+# One-off migration/split scripts (underscore-prefixed = temporary, never committed)
+scripts/_*.py
+
+# App icons — keep tracked. NOTE: the macOS `Icon?` rule above matches the
+# `icons` directory name case-insensitively (`Icon` + `s`), which would exclude
+# the whole app-icon folder. Re-include it explicitly so the icon assets ship.
+!src-tauri/icons/
+!src-tauri/icons/**
+
+# ── Local-only: personal workflow, runtime state, session metadata ──────────
+# These stay on disk for the author's own workflow but are NOT part of the
+# published repository (they carry absolute local paths, session tokens,
+# and personal work logs).
+.one-desktop/
+.superpowers/
+docs/superpowers/
+docs/handoff/
+
+# Internal iteration retrospectives — local notes, not project documentation
+overview.md
+overview-frontend-ai-smell.md
+overview-inputbar-context-card.md

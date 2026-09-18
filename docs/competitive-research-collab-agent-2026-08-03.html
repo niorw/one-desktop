@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>团队协作 Agent 竞品调研 · OneDesktop 差距分析（2026-08-03）</title>
+<style>
+:root{
+  --bg-primary:#ffffff; --bg-secondary:#f5f5f7; --bg-tertiary:#ebebf0; --bg-elevated:#ffffff;
+  --text-primary:#1d1d1f; --text-secondary:#4a4a4f; --text-tertiary:#8e8e93; --text-inverse:#ffffff;
+  --border-light:#e5e5ea; --border-medium:#d1d1d6; --border-heavy:#c7c7cc;
+  --accent:#006edb; --accent-soft:#eaf3ff; --accent-strong:#006edb;
+  --p0:#d70015; --p0-soft:#fdeced;
+  --p1:#b45309; --p1-soft:#fdf3e7;
+  --p2:#005bb5; --p2-soft:#eaf3ff;
+  --ok:#1a7f37; --ok-soft:#eaf7ee;
+  --warn:#b45309; --warn-soft:#fdf3e7;
+  --new:#6b3fa0; --new-soft:#f3edfb;
+  --space-xs:4px; --space-sm:8px; --space-md:12px; --space-lg:16px; --space-xl:24px; --space-2xl:40px;
+  --radius-sm:6px; --radius-md:10px; --radius-lg:14px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 2px 12px rgba(0,0,0,.07);
+  --content-max:1080px;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font); background:var(--bg-secondary); color:var(--text-primary);
+  font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--content-max);margin:0 auto;padding:0 var(--space-xl) 80px}
+
+/* ---------- hero ---------- */
+.hero{background:var(--bg-primary);border-bottom:1px solid var(--border-light);padding:56px 0 40px;margin-bottom:var(--space-2xl)}
+.hero-inner{max-width:var(--content-max);margin:0 auto;padding:0 var(--space-xl)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:640;margin-bottom:var(--space-md)}
+h1{font-size:34px;line-height:1.25;letter-spacing:-.02em;font-weight:680;margin-bottom:var(--space-lg)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:var(--space-lg);font-size:13px;color:var(--text-tertiary);margin-bottom:var(--space-xl)}
+.hero-meta span{display:inline-flex;align-items:center;gap:6px}
+.verdict{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:var(--space-lg) var(--space-xl)}
+.verdict p{font-size:15.5px;color:var(--text-primary)}
+.verdict p + p{margin-top:var(--space-sm)}
+
+/* ---------- toc ---------- */
+.toc{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-lg) var(--space-xl);margin-bottom:var(--space-2xl);box-shadow:var(--shadow-sm)}
+.toc h4{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:var(--space-md);font-weight:640}
+.toc ol{list-style:none;counter-reset:toc;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px var(--space-lg)}
+.toc li{counter-increment:toc;font-size:14px}
+.toc li::before{content:counter(toc,decimal-leading-zero);color:var(--text-tertiary);font-family:var(--mono);font-size:11px;margin-right:8px}
+.toc a{color:var(--text-secondary);text-decoration:none;padding:3px 0;display:inline-block}
+.toc a:hover{color:var(--accent)}
+
+/* ---------- sections ---------- */
+section{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-xl) 32px 32px;margin-bottom:var(--space-xl);box-shadow:var(--shadow-sm)}
+h2{font-size:22px;font-weight:660;letter-spacing:-.01em;margin-bottom:var(--space-lg);padding-bottom:var(--space-md);border-bottom:1px solid var(--border-light);display:flex;align-items:baseline;gap:var(--space-md)}
+h2 .num{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:600}
+h3{font-size:17px;font-weight:640;margin:var(--space-xl) 0 var(--space-md);letter-spacing:-.005em}
+h4{font-size:15px;font-weight:640;margin:var(--space-lg) 0 var(--space-sm)}
+p{margin-bottom:var(--space-md);color:var(--text-secondary)}
+p strong,li strong{color:var(--text-primary);font-weight:620}
+ul,ol{margin:0 0 var(--space-md) 20px;color:var(--text-secondary)}
+li{margin-bottom:6px}
+code{font-family:var(--mono);font-size:12.5px;background:var(--bg-tertiary);padding:1px 5px;border-radius:4px;color:var(--text-primary)}
+a{color:var(--accent)}
+.lead{font-size:15.5px;color:var(--text-secondary);margin-bottom:var(--space-lg)}
+
+/* ---------- chips ---------- */
+.chip{display:inline-flex;align-items:center;font-size:11.5px;font-weight:620;padding:2px 8px;border-radius:20px;letter-spacing:.01em;white-space:nowrap;vertical-align:middle}
+.chip-p0{background:var(--bg-secondary);color:var(--p0);border:1px solid color-mix(in srgb,var(--p0) 35%,transparent)}
+.chip-p1{background:var(--bg-secondary);color:var(--p1);border:1px solid color-mix(in srgb,var(--p1) 35%,transparent)}
+.chip-p2{background:var(--bg-secondary);color:var(--p2);border:1px solid color-mix(in srgb,var(--p2) 35%,transparent)}
+.chip-ok{background:var(--bg-secondary);color:var(--ok);border:1px solid color-mix(in srgb,var(--ok) 35%,transparent)}
+.chip-warn{background:var(--bg-secondary);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent)}
+.chip-new{background:var(--bg-secondary);color:var(--new);border:1px solid color-mix(in srgb,var(--new) 35%,transparent)}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;margin:var(--space-lg) 0;border:1px solid var(--border-light);border-radius:var(--radius-md)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;background:var(--bg-primary)}
+th{background:var(--bg-secondary);text-align:left;font-weight:620;padding:10px 14px;border-bottom:1px solid var(--border-medium);color:var(--text-primary);white-space:nowrap;font-size:12.5px}
+td{padding:10px 14px;border-bottom:1px solid var(--border-light);color:var(--text-secondary);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--bg-secondary)}
+td.c,th.c{text-align:center}
+.od-col{background:var(--accent-soft)!important}
+.nb-col{background:var(--warn-soft)!important}
+.dot{font-size:15px;line-height:1}
+.d-full{color:var(--ok)}
+.d-half{color:var(--warn)}
+.d-none{color:var(--text-tertiary)}
+
+/* ---------- cards ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--space-lg);margin:var(--space-lg) 0}
+.card{border:1px solid var(--border-light);border-radius:var(--radius-md);padding:var(--space-lg);background:var(--bg-primary)}
+.card h5{font-size:14.5px;font-weight:660;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card p{font-size:13.5px;margin-bottom:8px;line-height:1.7}
+.card .tag{font-size:11px;color:var(--text-tertiary);font-family:var(--mono)}
+.card ul{margin-left:16px;font-size:13.5px}
+
+/* ---------- gap item ---------- */
+.gap{border:1px solid var(--border-light);border-radius:var(--radius-md);margin-bottom:var(--space-lg);overflow:hidden}
+.gap-h{background:var(--bg-secondary);padding:12px var(--space-lg);display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border-light)}
+.gap-h .t{font-size:15px;font-weight:640;color:var(--text-primary)}
+.gap-b{padding:var(--space-lg)}
+.gap-b dl{display:grid;grid-template-columns:76px 1fr;gap:6px var(--space-md);font-size:13.5px}
+.gap-b dt{color:var(--text-tertiary);font-weight:600;font-size:12.5px;padding-top:2px}
+.gap-b dd{color:var(--text-secondary)}
+.gap-b dd code{font-size:12px}
+
+/* ---------- callout ---------- */
+.callout{border-radius:var(--radius-md);padding:var(--space-md) var(--space-lg);margin:var(--space-lg) 0;font-size:14px;border-left:3px solid}
+.co-warn{background:var(--warn-soft);border-color:var(--warn)}
+.co-ok{background:var(--ok-soft);border-color:var(--ok)}
+.co-info{background:var(--accent-soft);border-color:var(--accent)}
+.callout strong{display:block;margin-bottom:4px;color:var(--text-primary)}
+.callout p{margin:0;font-size:13.5px}
+
+/* ---------- refs ---------- */
+.refs{columns:2;column-gap:var(--space-xl);font-size:12.5px}
+.refs li{break-inside:avoid;margin-bottom:5px;color:var(--text-tertiary)}
+.refs a{color:var(--text-secondary);text-decoration:none}
+.refs a:hover{color:var(--accent);text-decoration:underline}
+@media(max-width:760px){
+  .refs{columns:1}
+  .wrap,.hero-inner{padding-left:var(--space-lg);padding-right:var(--space-lg)}
+  section{padding:var(--space-lg)}
+  h1{font-size:26px}
+  .gap-b dl{grid-template-columns:1fr}
+}
+footer{text-align:center;color:var(--text-tertiary);font-size:12.5px;padding:var(--space-xl) 0}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Competitive Research · Multi-Agent Collaboration</div>
+    <h1>团队协作 Agent 设计工具调研<br>与 OneDesktop 功能 / 交互差距分析</h1>
+    <div class="hero-meta">
+      <span>2026-08-03</span>
+      <span>覆盖 20 款产品 · 3 类协议标准</span>
+      <span>对照基线：<code>architecture-adjustment-plan.md</code></span>
+      <span class="chip chip-warn" style="vertical-align:middle">2026-08-03 修订：补入 AgentTeams / AgentSpace</span>
+    </div>
+    <div class="verdict">
+      <p><strong>结论一（已修订）：方向正确，但赛道已不空。</strong>初版判断"组织隐喻派几乎无人做"<strong>需要下修</strong>——2026 年 6 月起两个重量级开源同类密集入场：阿里 <strong>AgentTeams</strong>（原 HiClaw，Apache-2.0，K8s 原生 CRD + Matrix 群聊 + Manager/Team/Worker/Human 四类声明式资源）和香港大学 HKUDS <strong>AgentSpace</strong>（Apache-2.0，数字员工 + AgentRouter 多 harness 归一化 + 审批/预算/看板）。两者都在做"让 Agent 像组织一样运转"，且都比 OneDesktop 走得更远。<strong>OneDesktop 剩余的独占位收窄为一条——单机原生桌面、零基础设施、单人开箱即用。</strong></p>
+      <p><strong>结论二：短板不在架构，在交互层。</strong>现有架构方案已覆盖引擎正确性、权限、A2A、执行器多态；但<em>运行期的可见性与可干预性</em>几乎空白——没有 trace 回放、没有成本可见、没有 Worker 侧审批 UI、没有产出物 diff、没有全局待办收敛。这恰是 Claude Code Agent Teams / Devin / CrewAI Traces / LangGraph Studio 建立体验壁垒的地方。</p>
+      <p><strong>结论三：三条最高杠杆的改动。</strong>① Worker 侧 HITL 冒泡到群主会话（当前 Ask 退化为 Deny，工具能力被阉割）；② MCP 从"探活"打通到 <code>tools/call</code>（生态入口，投入产出比最高）；③ 席位卡片 + 运行摘要条上并列"耗时 / token / 预估成本 / 历史成功率"。<strong>这三条在补入两个新对手后依然成立，且更紧迫</strong>——AgentTeams 与 AgentSpace 均已内建其中全部三项。</p>
+      <p><strong>结论四（新增）：不要跟进它们的重基础设施，要放大单机的不可复制性。</strong>AgentTeams 起步需 Docker + Matrix homeserver + MinIO + Higress 网关（最低 2C4G），AgentSpace 需 Node 24 + PostgreSQL 16 + Google 登录——两者本质是<strong>服务端多租户治理平台</strong>，面向企业 IT。OneDesktop 若跟着做 RBAC / 多租户 / 网关，会在自己最弱的战场上迎战；正确的做法是<strong>把"零部署、本地文件系统直连、离线可用、系统级常驻"做到它们结构上做不到的程度</strong>，同时把它们已验证的<em>产品语义</em>（通信拓扑策略、审批深度、诊断视图、记忆分层）低成本移植过来。</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h4>目录</h4>
+  <ol>
+    <li><a href="#s1">市场格局与 OneDesktop 坐标</a></li>
+    <li><a href="#s2">OneDesktop 现状盘点（代码级）</a></li>
+    <li><a href="#s3">竞品能力全景（20 款，含 AgentTeams / AgentSpace）</a></li>
+    <li><a href="#s4">能力矩阵横向对比</a></li>
+    <li><a href="#s5">功能差距与改进建议</a></li>
+    <li><a href="#s6">交互差距与改进建议</a></li>
+    <li><a href="#s7">与现有架构方案的对齐</a></li>
+    <li><a href="#s8">建议路线图</a></li>
+    <li><a href="#s9">不要做什么（反面教训）</a></li>
+    <li><a href="#s10">参考来源</a></li>
+  </ol>
+</nav>
+
+<!-- ========== 1 ========== -->
+<section id="s1">
+<h2><span class="num">01</span>市场格局与 OneDesktop 坐标</h2>
+
+<p class="lead">把 2026 年的多 Agent 工具摊开看，"如何设计一个 Agent 团队"这件事已经分化成三条互不相同的路线，各自的表达力上限和适用人群差异极大。</p>
+
+<div class="tw">
+<table>
+<thead><tr><th style="width:15%">路线</th><th style="width:26%">代表产品</th><th>设计载体与编排范式</th><th style="width:24%">上限与代价</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>画布派</strong></td>
+  <td>Dify、Coze、Flowise AgentFlow V2、Langflow、n8n、OpenAI Agent Builder</td>
+  <td>节点图拖拽连线；多 Agent = 多个 Agent 节点 + 条件分支 / 跳转条件 / Tool Mode 端口</td>
+  <td>上手快、流程可视；但复杂 Agent 的循环、递归、动态成员难以表达。<strong>OpenAI 已宣布 Agent Builder 于 2026-11-30 关停</strong></td>
+</tr>
+<tr>
+  <td><strong>配置代码派</strong></td>
+  <td>CrewAI（JSONC/YAML）、AG2、LangGraph、OpenAI Agents SDK</td>
+  <td>代码或声明式配置定义 agent 与拓扑；范式为 sequential / hierarchical / group chat pattern / handoff / state machine</td>
+  <td>表达力最强、可版本化；但非工程用户无法参与，调试依赖专门工具</td>
+</tr>
+<tr>
+  <td><strong>组织隐喻派</strong></td>
+  <td>CrewAI（role/goal/backstory）、Relevance AI（AI Workforce）、Claude Code Agent Teams、Copilot Studio（child/connected agent）、<strong>阿里 AgentTeams</strong>、<strong>港大 AgentSpace</strong>、<strong>OneDesktop</strong></td>
+  <td>用"角色 / 席位 / 汇报线 / 群聊 / 派活"组织成员，调度隐含在角色关系中</td>
+  <td>心智负担最低、非技术用户友好；<strong>但运行期可观测性最难做</strong>——这是所有该派产品的共同软肋。<strong>2026 年 6 月起该派人口密度骤增</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout co-warn">
+<strong>站位判断（2026-08-03 修订）：空位被填了一半</strong>
+<p>初版写的是"桌面端 + 本地文件系统 + 组织隐喻的多 Agent 是一个真实存在的空位"。补入两个新对手后，这句话<strong>只有"桌面端"三个字还站得住</strong>：</p>
+<ul style="margin-top:8px;margin-left:18px;font-size:13.5px">
+  <li><strong>组织隐喻</strong>——AgentTeams 把 Manager / Team / Worker / Human 做成了 K8s CRD，连人类都有 L1/L2/L3 权限层级和 <code>accessibleTeams</code> 字段；AgentSpace 把 Agent 定义为"数字员工"，有 owner、readiness、技能绑定，甚至有跨部门<strong>借调申请（borrow / transfer request）</strong>流程。两者的组织建模都比 OneDesktop 的 <code>SeatType</code> 更完整。</li>
+  <li><strong>群聊 + 派活</strong>——AgentTeams 的 TeamAdmin → TeamLeader → Workers 链路加 Matrix Room，与 OneDesktop 的圆桌几乎同构，且已接入钉钉 / 企微 / 飞书。</li>
+  <li><strong>本地文件系统</strong>——AgentSpace 的 remote daemon 直接在目标主机上跑 Claude Code / Codex，本地文件能力等价；AgentTeams 用 MinIO 做<strong>共享文件系统，明确目的是"降低多智能体 token 消耗"</strong>。</li>
+</ul>
+<p style="margin-top:10px">真正剩下的差异是<strong>形态与门槛</strong>：AgentTeams 最小依赖是 Docker + Tuwunel(Matrix) + MinIO + Higress 网关，生产形态是 K8s + Helm；AgentSpace 需要 Node.js 24 + PostgreSQL 16 + Google 登录 + 可选远程 daemon。<strong>两者都假设"存在一个团队和一套基础设施"。OneDesktop 假设"存在一个人和一台电脑"</strong>——这个假设差异才是真正的护城河，也应该是后续所有取舍的第一判据。</p>
+</div>
+
+<h3>三个跨产品的收敛趋势</h3>
+<ul>
+  <li><strong>转移目标（handoff）成为通用语言。</strong>AG2 的 <code>Transition Target</code> 枚举、OpenAI 的 <code>transfer_to_&lt;agent&gt;</code> 工具、Coze 的自然语言"跳转条件"、Copilot Studio 把 connected agent 当带描述的工具——本质都是"把可转移目标做成带描述的选项交给 LLM 挑"。OneDesktop 的"群主 @ 派活"是同一机制的人工版，缺的是<strong>让 Worker 之间也能直接转移</strong>。</li>
+  <li><strong>共享状态正在从自由字典走向受约束 schema。</strong>Flowise 要求在 Start 节点预声明所有 Flow State key（其他节点只能改不能新建）；LangGraph 用 state schema 自动生成输入表单；AG2 的 ContextVariables 支持 <code>${retry_count} &gt; 3</code> 表达式条件。OneDesktop 的 <code>build_worker_seed</code> 目前是"灌历史"，尚无结构化黑板。</li>
+  <li><strong>成本已是一等公民。</strong>CrewAI Traces 头条显示 total/prompt/completion tokens + 预估成本 + 执行时长；Relevance AI 的 Workforce 看板把"平均每任务成本"和"模型 / eval 通过率"同排展示，让降本与降质同屏权衡。OneDesktop 的 metrics 目前只是内存原子计数，重启即丢。</li>
+</ul>
+</section>
+
+<!-- ========== 2 ========== -->
+<section id="s2">
+<h2><span class="num">02</span>OneDesktop 现状盘点（代码级）</h2>
+<p class="lead">以下为走查 <code>src-tauri/src/</code>（71 个 Rust 文件）与 <code>src/</code>（36 个前端文件）后的事实性盘点，作为差距分析的基线。</p>
+
+<div class="tw">
+<table>
+<thead><tr><th style="width:15%">维度</th><th style="width:45%">已实现</th><th>边界 / 缺口</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>群协作</strong></td>
+<td>圆桌双模式（<code>group/roundtable.rs</code>）：<code>post()</code> 按 <code>mentions</code> 扇出并发跑多个 Worker 全部回贴；<code>broadcast()</code> 全员竞速，<code>AtomicBool</code> CAS 决出首个有效回复、取消其余，落选方案存 <code>roundtable_alternatives</code>。Worker 上下文隔离用固定 session <code>rt:&lt;group&gt;:&lt;worker&gt;</code>，<code>RT_TURN_LOCKS</code> 每 Worker 串行防交错，历史上限 40 条溢出压缩。</td>
+<td>Worker 之间不能互相转移任务（只有群主能派）；无结构化共享黑板；<code>summarize()</code> 只有一次性汇总，无增量。</td>
+</tr>
+<tr>
+<td><strong>席位与派活</strong></td>
+<td><code>SeatType</code>(Static/Dynamic/Capability) + <code>WorkerPool</code> pick/acquire/release；<code>TaskScheduler</code> 批次派活，<code>depends_on</code> 构成 DAG，依赖全 Completed 才释放；<code>dispatch_lock</code> 原子认领防重复。</td>
+<td>DAG 仅表单录入（复选框选依赖），<strong>无可视化拓扑、无看板拖拽</strong>；无任务超时 / 心跳，Worker 卡死则依赖链永久阻塞。</td>
+</tr>
+<tr>
+<td><strong>Agent 定义</strong></td>
+<td><code>AgentProfile</code>（<code>group/agent_profile.rs</code> + <code>agents</code> 表）含 name / model / system_prompt / capabilities / skills / mcp / tools / token_budget / provider；<code>capabilities_block()</code> 把能力注入 system prompt 的 <code>[Capabilities]</code> 段。</td>
+<td><strong>无模板、无市场、无导入导出</strong>，复用仅限库内 CRUD；无法从 <code>.claude/agents</code> 等既有生态导入。</td>
+</tr>
+<tr>
+<td><strong>工具与扩展</strong></td>
+<td>内置仅三类：filesystem（Read/Write/ListDir，已有 <code>resolve_fs_path</code> workspace 强制隔离）、shell（RunShell）、memory（UpdateMemory）。Skill 支持 local/url/builtin 三源，解析 SKILL.md frontmatter。</td>
+<td><strong>MCP 只做了连通性探活</strong>（<code>mcp/client.rs</code> 的 initialize + list 三件套），全仓无 <code>tools/call</code> 调用路径——外部工具生态实际未打通。Plugin 仅 UI 占位。定时任务的 skill action 明确未接通。</td>
+</tr>
+<tr>
+<td><strong>HITL</strong></td>
+<td>三态权限（<code>agent/permission.rs</code>）：Allow/Deny/Ask × SessionKind(User/Worker) fail-closed 矩阵，覆盖存 <code>tool_permissions</code> 表。用户会话 Ask 会弹审批。</td>
+<td><strong>Worker 侧无审批 UI，Ask 退化为 Deny</strong>；群内 Worker 的 <code>run_shell</code> / <code>update_memory</code> 默认直接 Deny，工具能力被阉割。无 edit-args、无超时兜底、无审批审计。</td>
+</tr>
+<tr>
+<td><strong>可观测性</strong></td>
+<td><code>telemetry/metrics.rs</code> 的 <code>Metrics</code> 原子计数（agent_loops / tool_calls / total_tokens）；前端 <code>ProcessPanel.tsx</code> 渲染工具步骤 + 审批按钮 + shell 输出 <code>&lt;pre&gt;</code>。</td>
+<td><strong>不持久化、重启即丢、无 per-conversation 成本</strong>；无 trace 树、无步骤时间线、无回放、无失败下钻。</td>
+</tr>
+<tr>
+<td><strong>前端形态</strong></td>
+<td><code>App.tsx</code> 导航 NavKey(chat/tasks) × ChatMode(session/group)；<code>GroupsPage.tsx</code>（2327 行）三视图：GroupRoundtable（消息 + @ 选择器 + 摘要）/ GroupDispatch（任务草稿表单）/ GroupDeliverables（产出物抽屉），订阅实时刷新。</td>
+<td>无可视化编排画布；无 diff / 文件预览 / 交互终端；产出物只能看不能比对；无跨群的全局待办视图。</td>
+</tr>
+<tr>
+<td><strong>数据模型</strong></td>
+<td>SQLite（WAL + <code>Mutex&lt;Connection&gt;</code>）16 张表：sessions / messages / session_summaries / agents / groups / workers / tasks / roundtable_* ×3 / scheduled_tasks / mcp_servers / skills / worker_metrics / tool_permissions / settings。</td>
+<td>单连接全局串行（已在架构方案 P1-8 列为资源治理项）；无 trace / run 表，无成本记账表。</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ========== 3 ========== -->
+<section id="s3">
+<h2><span class="num">03</span>竞品能力全景</h2>
+<p class="lead">按"能给 OneDesktop 提供什么可抄的东西"排序，只记功能点与交互形态，略去营销叙述。</p>
+
+<h3>A 组 · 编排设计工具</h3>
+<div class="grid">
+
+<div class="card">
+  <h5>LangGraph Studio / Agent Inbox <span class="chip chip-ok">调试交互标杆</span></h5>
+  <p class="tag">LangChain · 代码定义 + 可视化只读渲染</p>
+  <p>不做双向同步的画布，而是<strong>代码定义图、Studio 渲染并提供强交互调试</strong>——这个折中避免了画布与代码同步的地狱。</p>
+  <ul>
+    <li><strong>节点级断点</strong>：Interrupt 按钮可选任一节点并指定 before/after</li>
+    <li><strong>Edit state → Fork</strong> 与 <strong>Re-run from here</strong> 拆成两个明确动作（改状态分叉 vs 换配置重跑）</li>
+    <li><strong>信息密度滑杆</strong>：一根滑杆控制 trace 展开层级（turn → node → state key）</li>
+    <li>输入区按 state schema 自动生成表单，可切 View Raw</li>
+    <li><strong>Agent Inbox</strong>：Gmail 式收件箱收敛所有待审批，条目可"Open in Studio"跳回现场</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h5>Claude Code · Subagents + Agent Teams <span class="chip chip-ok">最接近 OneDesktop</span></h5>
+  <p class="tag">Anthropic · Markdown frontmatter 定义 + 终端 UI</p>
+  <p>与 OneDesktop 的席位模型几乎同构，成熟度更高，是最直接的对标对象。</p>
+  <ul>
+    <li>Agent 定义 <code>.claude/agents/*.md</code>：仅 name/description 必填，可选 <code>tools</code>/<code>disallowedTools</code>/<code>model(inherit)</code>/<code>permissionMode</code> 七态/<code>maxTurns</code>/<code>skills</code>/<code>mcpServers</code>/<code>hooks</code>/<code>memory</code>/<strong><code>isolation: worktree</code></strong>/<code>color</code></li>
+    <li>Teams 四组件：Lead / Teammates（各自完整会话）/ <strong>共享任务列表（三态 + 依赖自动解锁 + 文件锁防重复认领）</strong> / Mailbox（SendMessage 点对点 + broadcast）</li>
+    <li><strong>权限冒泡</strong>：Teammate 的审批统一冒到 Lead 会话；Teammate 不能代用户批准；被拒操作不能转交他人绕过；Plan 审批由 Lead 直接批不打扰用户</li>
+    <li>UI：单栏 in-process（Shift+↓ 轮播 teammate，Enter 进入，Esc 打断，<strong>Ctrl+T 叠加共享任务列表</strong>）+ 可选分屏</li>
+    <li>Skills 三级预算：L1 元数据常驻约 100 token / L2 正文 &lt;5k / L3 捆绑文件按需（未读 = 0 token）</li>
+    <li>Hooks 30+ 事件，<code>PreToolUse</code> 可返回 <code>allow|deny|ask|defer</code> 并用 <code>updatedInput</code> <strong>改写参数后放行</strong></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h5>CrewAI / CrewAI AMP <span class="chip chip-ok">组织隐喻 + 成本可视</span></h5>
+  <p class="tag">JSONC/YAML 配置 · Visual Agent Builder</p>
+  <ul>
+    <li>Agent 三件套必填 role / goal / backstory；可选 <code>max_iter</code>(20) / <code>max_rpm</code> / <code>max_execution_time</code> / <code>allow_delegation</code> / <code>reasoning</code> / <code>respect_context_window</code>（超窗自动摘要）/ <code>knowledge_sources</code> / <code>step_callback</code></li>
+    <li>两种 Process：<code>sequential</code>（前步输出成为后步 context）与 <code>hierarchical</code>（必须配 manager_llm，任务不预分配、manager 规划委派校验）</li>
+    <li><strong>Traces 页可直接移植</strong>：头条固定 total/prompt/completion tokens、请求数、耗时、<strong>预估成本</strong>；下方任务级甘特时间线，可按任务下钻看 Agent / LLM / 输入 / 输出 / 状态</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h5>AutoGen Studio / AG2</h5>
+  <p class="tag">Microsoft · 拖拽 + 声明式 JSON 双向编辑</p>
+  <ul>
+    <li>四界面：Team Builder / Playground / Gallery（社区组件导入）/ Deployment（导出 Python、Docker）</li>
+    <li>Playground 用 <strong>control transition graph 可视化"发言权转移"</strong>，运行中可 pause/stop</li>
+    <li>AG2 五种 Pattern：Auto（LLM 选下一发言者）/ RoundRobin / Random / <strong>Manual（人工选下一个发言者）</strong> / Default</li>
+    <li>Transition Target 语义丰富：AgentTarget / RevertToUser / Terminate / Stay / AskUser / NestedChat / GroupChatTarget</li>
+    <li>官方自标"原型工具、非生产就绪"</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h5>Coze（扣子）</h5>
+  <p class="tag">字节 · 多 Agent 作为一等模式开关</p>
+  <ul>
+    <li>Single ↔ Multiple agents mode 一键切换，页面变四区（编排面板 / Agent 画布 / 预览调试）</li>
+    <li>节点内 <strong>Jump Condition 用自然语言描述适用场景</strong>，由前序节点判断切换；另有全局跳转节点（上限 5，优先级更高）</li>
+    <li>每个 Agent 独立模型 / 提示词 / 插件 / 知识库 / 工作流，支持"创建副本"</li>
+    <li><strong>回复气泡上带绿色标签标明"由哪个 Agent 回答"</strong>，可单独调试某个节点</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h5>Flowise AgentFlow V2 / Langflow / n8n</h5>
+  <p class="tag">开源画布三件套</p>
+  <ul>
+    <li><strong>Flowise Flow State</strong>：必须在 Start 节点预声明所有 key 与默认值，其他节点只能更新不能新建——给多 Agent 黑板加 schema 约束</li>
+    <li><strong>Flowise Human Input 节点有 proceed / reject 两个输出锚点</strong>，把人类决策变成显式分支；工具可单独设"执行前需人工许可"</li>
+    <li><strong>Langflow Tool Mode</strong>：任意组件（含另一个 Agent、MCP Server）打开后长出 Toolset 端口，拖一根线即完成 agent-as-tool</li>
+    <li><strong>n8n Wait 节点</strong>：内置表单构建器（Text/Number/Date/Dropdown + 必填）+ <strong>Limit Wait Time 超时自动继续</strong>——审批超时兜底的现成范式</li>
+  </ul>
+</div>
+
+</div>
+
+<h3>B 组 · 协作型 Agent 产品</h3>
+<div class="grid">
+
+<div class="card">
+  <h5>Devin（Cognition） <span class="chip chip-ok">长任务可见性标杆</span></h5>
+  <p class="tag">云端 · 组织知识资产化</p>
+  <ul>
+    <li><strong>Work Log 折叠手风琴</strong>：每步带 🟢/🟠/🔴 自评等级 + 时间戳 + 耗时，能直接跳到出问题的那一步——长任务信息密度最高的呈现方式</li>
+    <li><strong>Global Work Diff</strong>：任意时间点的全部改动汇总 + 单文件编辑历史 + 跨所有 shell 的 Command History</li>
+    <li><strong>Playbooks</strong>：可复用的步骤 + 成功标准 + 护栏文档，组织内共享，有"Past runs"看同事怎么用，发送前可 inline 编辑并选择"更新库中版本"或"另存为新 Playbook"</li>
+    <li><strong>Knowledge</strong>：按 trigger 条件注入的组织常识（如 trigger="改 API 路由" → "我们用 Fastify 不是 Express"）</li>
+    <li>Machine Snapshots（环境存档 + 启动命令序列）、Devin Wiki（自动索引仓库生成带架构图的文档）</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h5>Manus <span class="chip chip-warn">含重要反面教训</span></h5>
+  <p class="tag">云 VM 沙箱 · 任务回放</p>
+  <ul>
+    <li>每 session 一台专属 VM，典型任务约 50 次工具调用；三层动作空间：&lt;20 个原子 function → sandbox CLI 工具 → Python 脚本调预授权 API</li>
+    <li>工具结果有 <strong>full / compact 两种表示</strong>：full 存沙箱，compact 只留文件路径引用；对陈旧结果做 compaction，收益递减后再做 summarization</li>
+    <li>检索靠 glob/grep，<strong>不用向量库</strong></li>
+    <li><strong>教训</strong>：<code>todo.md</code> 最初用于对抗 lost-in-the-middle，后来发现<strong>约 1/3 的动作都花在更新 todo 上</strong>，改为 planner agent + executor 子 agent + knowledge manager。子 agent 的目的被明确定义为<strong>隔离上下文，而非模仿人类分工</strong></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h5>Cursor 2.0</h5>
+  <p class="tag">并行隔离 + 评审瓶颈</p>
+  <ul>
+    <li>界面<strong>围绕 agent 而非文件</strong>重构（可切回经典 IDE）；并行 agent 用 <strong>git worktree 或远程机器</strong>隔离</li>
+    <li>官方把"代码评审"和"变更测试"列为 agent 时代的两个新瓶颈，因此内置 browser tool 让 agent 自测，并简化"快速审阅全部改动"的 UI</li>
+    <li>diff 随 agent 工作<strong>实时渲染</strong>，方向错了可随时 Stop 改道，不必等跑完；<code>@Branch</code> 给 agent 当前分支完整 diff；Source Control 可跑 Agent Review 对 main 整体审查</li>
+  </ul>
+  <p style="font-size:12.5px;color:var(--text-tertiary);margin-top:8px">注：三方博客流传的"8 个并行 agent""best-of-n 提升 20%"未在官方文档确认。</p>
+</div>
+
+<div class="card">
+  <h5>Relevance AI <span class="chip chip-ok">运营看板可直接抄</span></h5>
+  <p class="tag">AI Workforce 组织隐喻</p>
+  <ul>
+    <li>Agent 职位化命名（Lead Researcher / Inbound Qualifier / Deal Reviewer）+ 头像 + 绑定 app 图标</li>
+    <li>三种构建路径共用同一 runtime 与同一套 eval 门禁：拖拽画布（agents + tools + <strong>approvals 节点</strong>）、Build with AI、<strong>Build with MCP</strong>（工程师从 Claude Code / Cursor 里经 MCP 建 agent）</li>
+    <li><strong>Workforce 看板</strong>：每 agent 一行，列出 Task / 工具图标 / 所用模型 / Eval 通过率 / <strong>平均每任务成本</strong>；顶部汇总 Tasks run/mo、Spend/mo、Avg cost/task；按 2% 采样 live runs 画通过率曲线侦测 drift</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h5>Lindy AI</h5>
+  <p class="tag">Societies of Lindies</p>
+  <ul>
+    <li>多 Agent 机制朴素但可抄：接收方挂 <strong>Agent Message Received 触发器</strong>，发送方加 <strong>Agent Send Message 动作</strong>，下拉只列有触发器的 agent，<strong>并可选择传递哪部分上下文</strong>（明确以降 token 为目的）</li>
+    <li>任务面板运维交互完整：可搜索、按"报错/未读"过滤、单动作一键 retry、右键 terminate（同时阻断后续联动）、<strong>任意任务生成公开分享链接</strong></li>
+    <li>Loop 步骤支持 Max Cycles + Max Concurrent；提供 <code>Task Completed</code> 触发器与 <code>Get Task List</code>/<code>Disable Agent</code> 让 agent 监控 agent</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h5>OpenHands / Copilot Studio / Zapier Agents</h5>
+  <p class="tag">补充观察</p>
+  <ul>
+    <li><strong>OpenHands</strong>：技能合并优先级 public &lt; user &lt; organization &lt; project &lt; sandbox（同名后者覆盖）；启动是<strong>显式状态机</strong>——WAITING_FOR_SANDBOX → PREPARING_REPOSITORY → RUNNING_SETUP_SCRIPT → SETTING_UP_SKILLS → READY，冷启动体验很值得桌面端参考</li>
+    <li><strong>Copilot Studio</strong>：给出经验阈值——主 agent 可选动作（工具 + topic + agent）<strong>超过 30–40 个时表现退化</strong>，这是拆分子 agent 的信号；痛点是每个 connected agent 生成独立 transcript，需靠 telemetry ID 关联父子会话</li>
+    <li><strong>Zapier Agents</strong>：反面案例——审批历史<strong>只存在会话中、不持久化为审计轨迹</strong>（三方实测）；正面是 AI Guardrails 内置输入侧 PII / prompt injection 筛查</li>
+  </ul>
+</div>
+
+</div>
+
+<h3>B+ 组 · 开源同类：与 OneDesktop 正面重叠的两个对手 <span class="chip chip-warn">2026-08-03 补录</span></h3>
+
+<p class="lead">这两个项目都在 2026 年年中开源，都用"组织 / 员工 / 团队"作为核心隐喻，都是 Apache-2.0，都在高频迭代。它们不是"参考对象"而是<strong>正面对手</strong>，因此单独成组、逐项拆解。</p>
+
+<div class="grid">
+
+<div class="card" style="border-left:3px solid var(--warn)">
+  <h5>阿里 AgentTeams（原 HiClaw） <span class="chip chip-warn">组织建模最彻底</span></h5>
+  <p class="tag">Apache-2.0 · <code>github.com/agentscope-ai/AgentTeams</code> · 2026-07-17 完成从 HiClaw 更名 · AgentScope 生态</p>
+  <ul>
+    <li><strong>把组织结构做成了 K8s CRD。</strong><code>apiVersion: hiclaw.io/v1beta1</code> 下四种 Kind：<code>Manager</code>（平台管控，建 Team / 建 Human / 配权限，<strong>不进 Team Room、不 @ Worker</strong>）、<code>Team</code>（一个 TeamAdmin + 一个 TeamLeader + N 个 Worker）、<code>Worker</code>（最小执行单元 = 容器 + Matrix 账号 + MinIO 空间 + Gateway Consumer）、<code>Human</code>（真人 + L1/L2/L3 权限 + <code>accessibleTeams</code>/<code>accessibleWorkers</code>）。业务协作链路是 <strong>TeamAdmin（真人）→ TeamLeader（协调型 Worker）→ Workers</strong>，"老板不越级管理"被做成房间拓扑约束。</li>
+    <li><strong>"谁能跟谁说话"是策略不是约定。</strong>Worker 之间能否互 @ 由 Team 的 <code>peerMentions</code> 字段控制，能否跨 Team @ 由各自的 <code>channelPolicy</code> 控制。<span class="chip chip-new">OneDesktop 完全没有这一层</span></li>
+    <li><strong>Worker 携带四份声明式文件</strong>：<code>SOUL.md</code> / <code>AGENT.md</code> / <code>MEMORY.md</code> / <code>USER.md</code>，能力边界写在 AGENT.md 里由 <code>hiclaw-controller</code> 运行时 reconcile。</li>
+    <li><strong>Matrix 作为通信底座</strong>（Tuwunel homeserver + Element Web），并桥接钉钉 / 企微 / 飞书。协议级解耦带来一个关键能力：<strong>一个 Team 内可混编异构运行时</strong>——OpenClaw(Node) / QwenPaw(Python，原 CoPaw) / Hermes（带终端沙箱与持久记忆），Manager 也可选运行时。</li>
+    <li><strong>凭证零信任</strong>：Higress AI Gateway 持有真实凭证，每个 Worker 只拿<strong>可吊销的 Consumer Token</strong>，网关做 per-route <code>allowedConsumers</code> 授权；派生凭证自带 Tenant / Team / Worker 三级标签，MCP 凭证按需下发、用后销毁、不可转发不可持久化。</li>
+    <li><strong>三层记忆（ReMe）</strong>：L1 短期写 <code>session/dialog/</code>，<code>auto_memory</code> hook 每次回复后把事实卡片 / 摘要写入 <code>daily/</code>；L2 长期整理为 <code>digest/{personal, procedure, wiki}/</code>；L3 <code>auto_dream</code> 定时任务对当日 daily 做<strong>蒸馏 / 纠错 / 去重 / 合并</strong>并输出"醒来报告"。Worker 退役时 <code>cleanup</code> hook <strong>整体归档或销毁其 workspace 目录，防止残留泄漏</strong>。</li>
+    <li>可观测性基于 OpenTelemetry Trace，token 成本按 <strong>Team / Agent / Model 三个维度</strong>拆账。共享文件系统（MinIO/OSS）的官方定位是"<strong>降低多智能体 token 消耗</strong>"。</li>
+    <li>部署：本地 <code>curl | bash</code> 一键起（Docker，2C4G 起）或 K8s + Helm；商业版跑在独立云账号 / VPC / 安全沙箱。阿里内部已用它跑 15 个 Agent、4 个闭环场景（研发全链路 / 7×24 值班答疑 / 开源流水线 / 经营驾驶舱）。</li>
+  </ul>
+</div>
+
+<div class="card" style="border-left:3px solid var(--warn)">
+  <h5>港大 AgentSpace（HKUDS） <span class="chip chip-warn">运行时归一化 + 治理面最完整</span></h5>
+  <p class="tag">Apache-2.0 · <code>github.com/HKUDS/AgentSpace</code> · 首提交 2026-06-22，约一个月 142 commits · Next.js + PostgreSQL</p>
+  <ul>
+    <li><strong>核心创新是 AgentRouter</strong>——"provider harness normalization layer"。原文定位：<em>"It does not replace the workspace or own the business queue. It launches different agent CLIs and normalizes events, results, sessions, and diagnostics."</em> 关键点是<strong>Agent 的身份、指令、技能、知识、权限保持不变，只有执行 harness 变化</strong>。<span class="chip chip-ok">与 OneDesktop P2-13 的 CliExecutor/CliAdapter 是同一思路，强力验证了该方向</span></li>
+    <li><strong>已支持 8 种运行时，且每种都有独立诊断策略</strong>：Claude Code（stream-json 事件 + session fallback + <strong>tool approval bridge</strong>）、Codex CLI（JSON 事件 + 运行时工具能力诊断）、Antigravity CLI（<code>agy -p</code> prompt 模式 + 会话复用 + timeout/nonzero/empty 诊断）、OpenCode（session 传播）、OpenClaw（<strong>health / preflight</strong> + auth/profile/model/tool/protocol 五类诊断）、Hermes（可执行文件兼容性检查）、Gemini CLI 与 NanoBot 走 legacy one-shot 回退。</li>
+    <li><strong>治理面已完整落地</strong>（非 roadmap）：多租户工作区 + owner/admin/member + 邀请链接 / 加入码 / 邀请历史；频道准入与私聊隐私；<strong>runtime grants、daemon API token 可创建可吊销</strong>；文档权限；面向 Agent 的 Google Workspace OAuth 委托（缺权限时<strong>自动触发审批工作流</strong>）。</li>
+    <li><strong>诊断即一等公民</strong>：权限控制面里专门有 Diagnostics 维度，列出 <em>missing grants / revoked credentials / orphaned grants / unavailable providers</em>。<span class="chip chip-new">这是个很聪明的产品设计——把"为什么这个 Agent 干不了活"变成可枚举清单</span></li>
+    <li><strong>审批做成了快循环</strong>：原文 <em>"High-impact actions route directly into human approvals, with a fast TabTabTab-style approval loop"</em>；风险动作在发生<em>之前</em>被标记——tool use / document access / external sends / <strong>budget-sensitive actions</strong>。</li>
+    <li><strong>数字员工可签名导出</strong>：<code>agent-space employee export-persona --name &lt;employee&gt; --sign</code> 导出为 <strong>signed OpenAgent persona-card</strong>；<strong>operator instructions、skills、owner identity 默认脱敏</strong>，需显式 <code>--include-sensitive</code> 才嵌入。</li>
+    <li>另有：知识库 + 全局搜索、任务看板、<strong>预算 / 成本 / 绩效仪表盘</strong>、附件与可靠通知、远程 daemon 与 runtime 共享。</li>
+    <li>Roadmap（尚未实现）：更强的 AgentRouter 平台会话、<strong>多 Agent 隔离与沙箱策略层</strong>、完整集成适配器契约、<strong>运行时工具市场</strong>、更严格的附件签名 URL 与存储隔离。</li>
+  </ul>
+</div>
+
+</div>
+
+<div class="tw">
+<table>
+<thead><tr><th style="width:15%">对照维度</th><th style="width:28%">阿里 AgentTeams</th><th style="width:28%">港大 AgentSpace</th><th>对 OneDesktop 的含义</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>基础设施假设</strong></td>
+  <td>Docker（2C4G 起）或 K8s + Helm；须跑 Matrix homeserver、MinIO、Higress 网关</td>
+  <td>Node.js 24 + PostgreSQL 16 + Google 登录；可选远程 daemon</td>
+  <td><strong>OneDesktop 唯一且最大的结构性优势：零依赖、双击即用。</strong>这条不能丢，任何引入常驻服务的设计都要重新掂量</td>
+</tr>
+<tr>
+  <td><strong>目标用户</strong></td>
+  <td>企业 IT / 平台团队（有 L1 Admin 这个角色本身就说明问题）</td>
+  <td>组织内的团队（多租户工作区 + 成员邀请）</td>
+  <td>OneDesktop 是<strong>单人多 Agent</strong>，不是多人多 Agent。别去补 RBAC / 多租户，那是它们的主场</td>
+</tr>
+<tr>
+  <td><strong>异构运行时</strong></td>
+  <td>OpenClaw / QwenPaw / Hermes 三种，靠 Matrix 协议解耦</td>
+  <td><strong>8 种</strong>，靠 AgentRouter 归一化事件/会话/诊断</td>
+  <td>P2-13 方向被双重验证。但 OneDesktop 的 <code>CliAdapter</code> 目前只做"能跑"，<strong>缺 AgentSpace 那层 per-provider 诊断与健康预检</strong>（见 F11）</td>
+</tr>
+<tr>
+  <td><strong>通信拓扑</strong></td>
+  <td><code>peerMentions</code> / <code>channelPolicy</code> 字段，策略化</td>
+  <td>频道准入 + 私聊隐私范围</td>
+  <td>OneDesktop 的圆桌是<strong>全员扇出</strong>，没有拓扑策略。这是低成本高收益的补齐项（见 F12）</td>
+</tr>
+<tr>
+  <td><strong>凭证治理</strong></td>
+  <td>网关持真凭证，Worker 只拿可吊销 Consumer Token</td>
+  <td>runtime grants + daemon token 可吊销 + OAuth 委托</td>
+  <td>单机场景可极简化：<strong>凭证留主进程，Worker 不注入环境变量</strong>（见 F13）</td>
+</tr>
+<tr>
+  <td><strong>记忆体系</strong></td>
+  <td>ReMe 三层 + <code>auto_dream</code> 定时蒸馏 + 退役 cleanup</td>
+  <td>知识库 + 全局搜索 + 知识提案审批</td>
+  <td>OneDesktop 的 memory 工具是<strong>平的</strong>，无分层、无蒸馏、无退役清理（见 F14）</td>
+</tr>
+<tr>
+  <td><strong>成本可见</strong></td>
+  <td>OTel Trace，按 Team / Agent / Model 拆账</td>
+  <td>预算 / 成本 / 绩效仪表盘，预算敏感动作触发审批</td>
+  <td><strong>两家都有，OneDesktop 一项没有。</strong>再次印证 F3 应从 P2 提到 P0</td>
+</tr>
+<tr>
+  <td><strong>Agent 可移植</strong></td>
+  <td>TeamSpec 模板化（角色配置 + 技能组合 + 协作策略 = 可复用团队蓝图）</td>
+  <td><strong>签名 persona-card 导出，敏感字段默认脱敏</strong></td>
+  <td>F4 应升级：不只导入 <code>.claude/agents</code>，还要能<strong>导出整个"群蓝图"</strong>且默认脱敏</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout co-info">
+<strong>从 AgentTeams 偷到的最有价值的一条：不是技术，是判断标准</strong>
+<p>阿里在博客里明确写了"<strong>并非所有 Agent 场景都需要群聊</strong>"：<em>"If it's just writing a piece of code, looking up a document, or generating an image, a single chat is a more direct and lower-cost option. The cost of introducing group chats is non-trivial."</em> 并给出三条正向判据——<strong>① 跨域协作与长时工作流；② 多 Agent 治理（需要清晰的信任边界、归属、授权、计费）；③ 组织级知识沉淀</strong>。同时给出了群聊的本质定义：<em>"group chat ≠ the sum of multiple individuals chatting with a bot separately"</em>——如果每个人都有自己的 session，那只是并行的单聊。</p>
+<p style="margin-top:8px"><strong>对 OneDesktop 的直接启示：</strong>群协作是重型工具，不该是默认入口。当前产品里"建群"的心智成本明显高于"发一句话"，但两者之间<strong>没有平滑升级路径</strong>。应该做的是：普通会话里当任务复杂到需要多 Agent 时，提供"<strong>把这个会话升级为群</strong>"的一键操作，把已有上下文作为群的初始共享状态带过去——而不是让用户先想清楚要几个席位再开始。</p>
+</div>
+
+<h3>C 组 · 协议与标准（影响演进路线）</h3>
+
+<div class="callout co-warn">
+<strong>MCP 版本时效提醒（重要）</strong>
+<p>截至 2026-08-03，MCP 当前规范版本是 <code>2026-07-28</code>（刚发布），含破坏性变更：<strong>删除 <code>initialize</code> 握手与 <code>Mcp-Session-Id</code>，协议无状态化</strong>；新增强制 <code>server/discover</code>；所有 result 必须带 <code>resultType</code>（complete / input_required）。更要命的是——<strong><code>sampling</code> / <code>roots</code> / <code>logging</code> 在该版本已标记 Deprecated（SEP-2577）</strong>，官方建议 sampling 改为直接对接 LLM Provider API。<strong>建议 OneDesktop 按 <code>2025-06-18</code> 打底、<code>2025-11-25</code> 增强落地（SDK 生态成熟），但不要新建 sampling/roots 实现</strong>，并把"会话"抽象成可丢弃对象为无状态化预留。</p>
+</div>
+
+<div class="tw">
+<table>
+<thead><tr><th style="width:16%">标准</th><th>对 OneDesktop 的可执行结论</th></tr></thead>
+<tbody>
+<tr><td><strong>MCP tools/call</strong></td><td>入参 <code>{name, arguments}</code>；工具名 1–128 字符仅 <code>A-Za-z0-9_-.</code>，<strong>多服务器聚合时客户端自己加前缀消歧</strong>（server name 不保证唯一）。必须区分两类错误：协议错误走 JSON-RPC <code>error</code>（未知工具 <code>-32602</code>），<strong>工具执行错误走 <code>result.isError=true</code> 并把内容喂回模型让它自愈</strong>。客户端 SHOULD 为每次调用实现超时；实现 <code>notifications/progress</code> 与 <code>notifications/cancelled</code>；建议现在就做 list 缓存层（2026 版改为显式 <code>subscriptions/listen</code> + <code>ttlMs</code>）。</td></tr>
+<tr><td><strong>tool annotations</strong></td><td><code>readOnlyHint</code>(默认 false) / <code>destructiveHint</code>(<strong>默认 true</strong>) / <code>idempotentHint</code> / <code>openWorldHint</code>。规范原文强调"除非来自受信服务器，客户端 MUST 视 annotations 为不可信"——<strong>只能用于降级默认策略的建议值（如 readOnlyHint=true 默认 Allow），绝不能自动提权</strong>；未声明即按危险处理。这与 OneDesktop 的三态权限矩阵天然契合。</td></tr>
+<tr><td><strong>MCP elicitation</strong></td><td>保留且值得做。<code>form</code> 模式（扁平对象、基础类型 + minLength/format/default）与 <code>url</code> 模式（敏感凭证必须走 URL，客户端不得预取、必须展示完整域名）。响应三态 accept / decline / cancel，<strong>与 Allow/Deny/Ask 是正交两层，不要混用</strong>。</td></tr>
+<tr><td><strong>OAuth</strong></td><td>MCP Server = OAuth 2.1 Resource Server，MUST 实现 RFC 9728 Protected Resource Metadata；客户端 MUST 实现 RFC 8707 <code>resource</code> 参数与 RFC 9207 <code>iss</code> 校验。<strong>DCR 已弃用，优先 Client ID Metadata Documents（client_id 就是指向自管 JSON 的 URL）——对桌面应用极友好</strong>。stdio 传输 SHOULD NOT 走 OAuth，从环境变量取凭证。</td></tr>
+<tr><td><strong>A2A v1.0</strong></td><td>已在现有架构方案 P2-14 覆盖。补充两点：v1.0 用 <code>supportedInterfaces</code>（有序列表，首项优先）<strong>取代了 v0.x 的 <code>url</code>/<code>preferredTransport</code></strong>，且新增 Signed Agent Card（JWS）；<code>Message</code> 用于交互、<strong><code>Artifact</code> 才是任务输出</strong>，OneDesktop 的 deliverables 应映射到 Artifact 而非 Message。</td></tr>
+<tr><td><strong>AGENTS.md</strong></td><td>OpenAI 2025-08 发布，<strong>60,000+ 仓库采用</strong>，2025-12 捐入 Agentic AI Foundation。纯 Markdown 无强制 schema，monorepo 用嵌套文件就近优先。<strong>成本极低、收益确定：OneDesktop 应把 AGENTS.md 作为项目级上下文的读取入口</strong>。</td></tr>
+<tr><td><strong>Agent 定义格式</strong></td><td><strong>不存在可移植标准</strong>，各家碎片化（Claude Code <code>.claude/agents/*.md</code>、Cursor、Codex TOML、Kiro JSON…）。建议：内部定义规范化 Agent Manifest，再写<strong>双向适配器</strong>导入/导出 <code>.claude/agents</code>；对外互操作用 A2A AgentCard（目前唯一有标准地位的描述格式，但只描述对外服务契约、不含 system prompt）。</td></tr>
+<tr><td><strong>HITL schema</strong></td><td>LangGraph <code>HumanInterrupt{action_request, config{allow_accept/edit/respond/ignore}, description}</code> + <code>HumanResponse{type, args}</code> 是事实标准。约定：四项全 false 时 UI 默认允许 ignore，<strong>防止线程卡死</strong>。注意 LangGraph 的最大坑——<strong>恢复时整个节点从头重放</strong>，interrupt 之前的副作用必须幂等。</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ========== 4 ========== -->
+<section id="s4">
+<h2><span class="num">04</span>能力矩阵横向对比</h2>
+<p class="lead"><span class="dot d-full">●</span> 完整支持 &nbsp;·&nbsp; <span class="dot d-half">◐</span> 部分/有限 &nbsp;·&nbsp; <span class="dot d-none">○</span> 缺失。产品选择依据是"与 OneDesktop 有真实可比性"。</p>
+
+<div class="tw">
+<table>
+<thead>
+<tr>
+  <th style="width:22%">能力维度</th>
+  <th class="c od-col">OneDesktop</th>
+  <th class="c nb-col">阿里<br>AgentTeams</th>
+  <th class="c nb-col">港大<br>AgentSpace</th>
+  <th class="c">Claude&nbsp;Code<br>Teams</th>
+  <th class="c">CrewAI<br>AMP</th>
+  <th class="c">LangGraph<br>Studio</th>
+  <th class="c">AutoGen<br>Studio</th>
+  <th class="c">Coze</th>
+  <th class="c">Relevance<br>AI</th>
+  <th class="c">Devin</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>组织隐喻（席位/角色/群聊）</td>
+  <td class="c od-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-none">○</span></td></tr>
+<tr><td>编排范式（扇出/竞速/DAG）</td>
+  <td class="c od-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-half">◐</span></td><td class="c nb-col"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-none">○</span></td></tr>
+<tr><td>Agent 间直接通信 / handoff</td>
+  <td class="c od-col"><span class="dot d-none">○</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-none">○</span></td></tr>
+<tr><td>共享任务列表 / 看板</td>
+  <td class="c od-col"><span class="dot d-half">◐</span></td><td class="c nb-col"><span class="dot d-half">◐</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td></tr>
+<tr><td>Agent 定义可移植（模板/市场/导入导出）</td>
+  <td class="c od-col"><span class="dot d-none">○</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td></tr>
+<tr><td>外部工具生态（MCP tools/call）</td>
+  <td class="c od-col"><span class="dot d-none">○</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td></tr>
+<tr><td>运行期 trace / 步骤时间线</td>
+  <td class="c od-col"><span class="dot d-none">○</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td></tr>
+<tr><td>成本 / token 可见与记账</td>
+  <td class="c od-col"><span class="dot d-none">○</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td></tr>
+<tr><td>HITL 深度（accept/edit/respond/ignore）</td>
+  <td class="c od-col"><span class="dot d-half">◐</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td></tr>
+<tr><td>产出物 diff / 变更集审阅</td>
+  <td class="c od-col"><span class="dot d-none">○</span></td><td class="c nb-col"><span class="dot d-none">○</span></td><td class="c nb-col"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-full">●</span></td></tr>
+<tr><td>长任务进度可见性</td>
+  <td class="c od-col"><span class="dot d-half">◐</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td></tr>
+<tr><td>本地文件系统 / shell 原生</td>
+  <td class="c od-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-half">◐</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-half">◐</span></td></tr>
+<tr><td>零基础设施 / 单人开箱即用<span class="chip chip-ok" style="margin-left:6px">OneDesktop 独占</span></td>
+  <td class="c od-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-none">○</span></td><td class="c nb-col"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td></tr>
+<tr><td>并行隔离（worktree / 沙箱）</td>
+  <td class="c od-col"><span class="dot d-none">○</span></td><td class="c nb-col"><span class="dot d-full">●</span></td><td class="c nb-col"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-none">○</span></td><td class="c"><span class="dot d-half">◐</span></td><td class="c"><span class="dot d-full">●</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<p style="font-size:12.5px;color:var(--text-tertiary);margin-top:-8px">评分口径说明：AgentTeams / AgentSpace 两列基于官方 README、规范文档与厂商技术博客评估，<strong>未经实机验证</strong>。其中"HITL 深度"一项，两者均具备完整审批链路与人在房间内自然语言干预能力，故记 ●，但<strong>是否严格实现 accept/edit/respond/ignore 四态 schema 未见明确文档</strong>；"MCP tools/call"一项，AgentSpace 的工具能力经由 Claude Code / Codex 等 harness 间接获得（其自身的 runtime tool marketplace 仍在 roadmap）。</p>
+
+<h3>从矩阵读出的五个洞察</h3>
+<ol>
+  <li><strong>OneDesktop 强在"编排语义"，弱在"运行期"。</strong>组织隐喻 + 三种派发语义（扇出 / 竞速 / DAG）在整张表里名列前茅——<strong>竞速择优这一项，连两个新对手也都没有</strong>（AgentTeams 是 Leader 单点分派，AgentSpace 是队列路由，均无并行择优）。但从"运行期 trace"往下的五行几乎全是空白。<strong>产品的说服力发生在运行期，而不是配置期。</strong></li>
+  <li><strong>MCP 依然是唯一的"生态断点"，且现在更刺眼。</strong>这是全表唯一一个"人人都有、只有 OneDesktop 没有"的能力，两个新对手也不例外——AgentTeams 做到了声明式 MCP + 网关托管 + REST 零代码转 MCP，AgentSpace 直接继承 harness 的工具生态。它不是加分项而是入场券。</li>
+  <li><strong>Agent 定义不可移植是复用性天花板，且对手已经走到了"签名导出"。</strong>竞品普遍有模板库 / Gallery / Playbook / 组织级共享；AgentTeams 的 TeamSpec 把"角色配置 + 技能组合 + 协作策略"打包成可复用团队蓝图，AgentSpace 能把数字员工导出为<strong>签名的 persona-card 且敏感字段默认脱敏</strong>。OneDesktop 的 AgentProfile 还只能库内 CRUD。<strong>桌面端的杀手锏依然是"从 <code>.claude/agents</code> 一键导入"</strong>——这是云端与服务端产品都做不到的本地生态红利。</li>
+  <li><strong>补入两列后，OneDesktop 的"绝对领先项"归零，"绝对独占项"只剩一个。</strong>原本靠"组织隐喻 + 本地文件系统"支撑的差异化，被 AgentTeams（组织建模更深）和 AgentSpace（本地 daemon + 8 种 harness）分别覆盖。<strong>唯一保住满分独占的是最后一行——零基础设施、单人开箱即用。</strong>这不是安慰奖：它意味着 OneDesktop 面向的是"一个人想指挥一队 Agent"，而不是"一个公司想治理一群 Agent"，这两件事的产品形态、默认值和交互密度都应该不同。</li>
+  <li><strong>产出物 diff 是全表公认的空白（仅 Devin 一家满分）。</strong>包括两个新对手在内，10 个产品里 8 个是 ○。当 Agent 真的动了本地文件，"它到底改了什么"是用户唯一真正关心的问题。<strong>桌面端天然握着本地文件与 git，做变更集审阅的成本远低于任何云端或容器化产品——这是被整个市场忽略、而 OneDesktop 有结构性优势的一格。</strong></li>
+</ol>
+</section>
+
+<!-- ========== 5 ========== -->
+<section id="s5">
+<h2><span class="num">05</span>功能差距与改进建议</h2>
+<p class="lead">每项标注优先级与"和现有 <code>architecture-adjustment-plan.md</code> 的关系"。<span class="chip chip-ok">计划内</span> 表示方案已覆盖、此处只补充细节；<span class="chip chip-warn">需扩展</span> 表示方案有骨架但缺产品层；<span class="chip chip-new">新增</span> 表示方案未涉及。</p>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p0">P0</span><span class="chip chip-new">新增</span><span class="t">F1 · MCP 从"探活"打通到 tools/call</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd><code>mcp/client.rs</code> 只做 <code>initialize → tools/list → resources/list → prompts/list</code> 握手验证连通性，全仓无 <code>tools/call</code> 路径。已配置的 MCP Server 在 Agent 循环里实际不可用。</dd>
+      <dt>影响</dt><dd>这是能力矩阵里唯一"人人都有、只有我们没有"的项。Agent 被锁死在 filesystem / shell / memory 三个内置工具上，席位再多也无米下锅。<strong>投入产出比全表最高。</strong></dd>
+      <dt>做法</dt><dd>把 MCP 工具注册进 <code>ToolRegistry</code>，实现 <code>ExecutableTool</code> 的 MCP 适配器。四个必须做对的点：① 多服务器聚合时<strong>客户端自己加前缀消歧</strong>（<code>mcp__&lt;server&gt;__&lt;tool&gt;</code>，同时兼容 Claude Code 的授权模式匹配语法）；② <strong>区分协议错误与工具执行错误</strong>——后者走 <code>isError=true</code> 把内容喂回模型自愈，不要当异常抛；③ 每次调用实现超时 + <code>notifications/cancelled</code>（可复用 P0-4 已落地的异步工具取消机制）；④ 加 tools list 缓存层，为 2026-07-28 的 <code>subscriptions/listen</code> + <code>ttlMs</code> 预留。</dd>
+      <dt>落点</dt><dd><code>src-tauri/src/mcp/client.rs</code>、<code>agent/tool_registry.rs</code>、<code>agent/tools/mod.rs</code></dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p0">P0</span><span class="chip chip-warn">需扩展</span><span class="t">F2 · Worker 侧 HITL 冒泡与四态响应</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd>三态权限矩阵已有，但 Worker 会话的 Ask <strong>因为没有审批 UI 而退化为 Deny</strong>；群协作路径为了避免挂死统一传 <code>auto_approve_override: Some(true)</code>（2026-08-02 的挂死修复）。等于在"全放行"和"全拒绝"之间二选一。</dd>
+      <dt>参考</dt><dd>Claude Code Agent Teams 的权限设计几乎是为这个问题量身定做：<strong>Teammate 的权限提示统一冒泡到 Lead 会话中审批</strong>；Teammate 不能代替用户批准；<strong>被拒的操作不能转交别的 Teammate 绕过</strong>；auto 模式下把"另一个 agent 转述的批准"视为不可信输入。Plan 类审批则由 Lead 直接批、不打扰用户。</dd>
+      <dt>做法</dt><dd>① 把 Worker 的 Ask 请求冒泡到群主会话，UI 上标明"Worker X 请求执行 Y"；② 审批契约升级为 LangGraph Agent Inbox 的 schema——<code>config{allow_accept, allow_edit, allow_respond, allow_ignore}</code> 决定渲染哪几个按钮，响应 <code>accept / edit / respond / ignore</code>，<strong>其中 edit（改参数后放行）是当前完全缺失但价值最高的一态</strong>；③ 四项全 false 时默认允许 ignore 防卡死；④ 按 tool annotation 分级设 TTL（<code>readOnlyHint</code> 长、<code>destructiveHint</code> 短），<strong>超时默认 Deny（fail-closed）</strong>并把超时作为 ignore 写入审计。</dd>
+      <dt>落点</dt><dd><code>agent/permission.rs</code>、<code>agent/engine.rs</code>（<code>auto_approve_override</code> 处）、<code>group/roundtable.rs</code>、前端 <code>ProcessPanel.tsx</code> + 新的审批组件</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p0">P0</span><span class="chip chip-warn">需扩展</span><span class="t">F3 · 运行记账：trace 与成本持久化</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd><code>telemetry/metrics.rs</code> 只有内存 <code>AtomicU64</code> 计数，重启即丢；无 per-conversation / per-worker / per-task 的 token 与成本。架构方案 P2-11 列了"可观测性"但定位为独立小项。</dd>
+      <dt>建议</dt><dd><strong>升级为 P0 并前移</strong>——理由：F2 的审批审计、后面所有交互改进（运行摘要条、席位成本、事前预估）都依赖这份数据，它是底座而非叶子。</dd>
+      <dt>做法</dt><dd>新增 <code>runs</code> / <code>run_steps</code> 两张表：run 记录 group / task / worker / 起止时间 / stop_reason（P0-1 已有 <code>AgentRunOutcome</code>，直接落库）/ prompt&amp;completion tokens / 预估成本；step 记录工具名 / 入参摘要 / 耗时 / 成功失败 / 审批决策。成本用 provider × model 的单价表本地换算。</dd>
+      <dt>落点</dt><dd><code>telemetry/metrics.rs</code>、<code>storage/connection.rs</code>、<code>agent/engine.rs</code>（复用 P0-1 的 <code>AgentRunOutcome</code>）</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="chip chip-new">新增</span><span class="t">F4 · Agent 定义可移植：Manifest + 双向适配器 + 模板库</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd><code>AgentProfile</code> 只能库内 CRUD，无模板、无导入导出。</dd>
+      <dt>参考</dt><dd>行业<strong>不存在可移植的 Agent 描述格式</strong>（Claude Code md / Cursor / Codex toml / Kiro json 各自为政），但 Claude Code 的 <code>.claude/agents/*.md</code> 事实上覆盖面最广，且字段与 AgentProfile 高度同构：<code>name</code> / <code>description</code> / <code>tools</code> / <code>disallowedTools</code> / <code>model(inherit)</code> / <code>permissionMode</code> / <code>maxTurns</code> / <code>skills</code> / <code>mcpServers</code> / 正文即 system prompt。</dd>
+      <dt>做法</dt><dd>① 定义内部 Agent Manifest（现有 AgentProfile 加 <code>disallowedTools</code> / <code>permissionMode</code> / <code>maxTurns</code> / <code>isolation</code> 即可）；② 写 <code>.claude/agents</code> ↔ Manifest 双向适配器，扩展页加"导入本地 Agent"——<strong>这是桌面端独有的红利，云端产品做不到</strong>；③ 内置一批席位模板（研究员 / 评审员 / 执行者 / 汇总者），对标 AutoGen Studio 的 Gallery。</dd>
+      <dt>落点</dt><dd><code>group/agent_profile.rs</code>、<code>skill/manager.rs</code>（已有 frontmatter 解析能力可复用）、<code>extensibility/ExtensibilityPage.tsx</code></dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="chip chip-new">新增</span><span class="t">F5 · Worker 间直接通信与转移</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd>只有"群主 @ 派活"这一条边，Worker 之间无法直接对话或转移任务。星形拓扑，群主是唯一枢纽。</dd>
+      <dt>参考</dt><dd>Claude Code 的 <strong>Mailbox（SendMessage 点对点 + broadcast，消息自动投递无需轮询，空闲/报错自动通知 Lead）</strong>；Lindy 的 Agent Message Received 触发器 + <strong>可选择传递哪部分上下文</strong>（明确以降 token 为目的）；AG2 的 Transition Target 枚举。</dd>
+      <dt>做法</dt><dd>加一个 <code>send_to_worker</code> 内置工具（目标从群成员名册中选、附带上下文范围选项）。注意 Claude Code 的成本警告：<strong>broadcast 成本随团队规模成倍增长</strong>，UI 上要对广播做显式二次确认。同时补 Worker 空闲/失败自动通知群主。</dd>
+      <dt>落点</dt><dd><code>agent/tools/</code> 新增工具、<code>group/roundtable.rs</code>（复用现有 <code>RoundtableBus</code>）</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="chip chip-new">新增</span><span class="t">F6 · 任务心跳与依赖链防死锁</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd>DAG 依赖靠"前置全 Completed 才释放"，但无超时、无心跳。Worker 卡死或漏标完成 → 后继任务永久阻塞。</dd>
+      <dt>参考</dt><dd>Claude Code Agent Teams 官方已知限制里明确列了这一条：<strong>"任务状态可能滞后导致依赖卡死"</strong>——说明这是该模式的固有陷阱，不是实现瑕疵。n8n 的 <code>Limit Wait Time</code> 给出了兜底范式。</dd>
+      <dt>做法</dt><dd>任务加 <code>heartbeat_at</code> 与 <code>deadline</code>；调度器 tick 时检测超时任务 → 标 Failed 并通知群主 → 提供"重试 / 改派他人 / 跳过依赖"三个动作。<code>TeammateIdle</code> 式的空闲检测也归入此处。</dd>
+      <dt>落点</dt><dd><code>group/scheduler.rs</code>、<code>group/task_board.rs</code>、<code>scheduler/engine.rs</code>（1 秒 ticker 可复用）</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="chip chip-warn">需扩展</span><span class="t">F7 · 结构化共享黑板</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd><code>build_worker_seed</code>（2026-08-03 落地）把群共享日志灌给 Worker，解决了"完全失忆"；P0-2 又加了任务卡注入。但共享状态仍是<strong>自由文本</strong>，没有结构。</dd>
+      <dt>参考</dt><dd>Flowise 的 <strong>Flow State：Start 节点预声明所有 key 与默认值，其他节点只能更新不能新建</strong>；AG2 的 ContextVariables 支持 <code>${retry_count} &gt; 3</code> 表达式条件；LangGraph 用 state schema 自动生成输入表单。</dd>
+      <dt>做法</dt><dd>群级增加 <code>shared_state</code>（建群时声明 key + 类型 + 默认值），Worker 通过工具读写但<strong>不能新建 key</strong>。收益有三：Worker 之间传递结构化结论而非叙述；条件派活可写表达式；前端能把黑板渲染成表格实时展示。这也顺带解决 A2A 映射时 Artifact 的结构化问题。</dd>
+      <dt>落点</dt><dd><code>group/group.rs</code>、<code>group/roundtable.rs</code>（<code>build_worker_seed</code> 处）、新增内置工具</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="chip chip-warn">需扩展</span><span class="t">F8 · Skill 三级预算加载 + 调度 skill action 接通</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd>Skill 支持 local/url/builtin 三源并解析 frontmatter，但加载策略未分级；<code>scheduler/engine.rs</code> 的 skill action 明确记录"Skill 执行暂未接通"。</dd>
+      <dt>参考</dt><dd>Claude Code 的 progressive disclosure 三级预算：<strong>L1 元数据常驻约 100 token / L2 正文 &lt;5k token / L3 捆绑文件按需读取（未访问 = 0 token）</strong>，脚本"只进输出不进上下文"。约束：description 必须同时写清 what + when。</dd>
+      <dt>做法</dt><dd>把 <code>capabilities_block()</code> 的 skill 注入改为只注 L1 元数据，命中后才读正文；捆绑脚本走 shell 执行只回收输出。<strong>对多 Worker 场景收益被放大 N 倍</strong>——每个 Worker 都有独立上下文，省的 token 是乘法关系。同时补齐 scheduler 的 skill action。</dd>
+      <dt>落点</dt><dd><code>skill/manager.rs</code>、<code>group/agent_profile.rs</code>（<code>capabilities_block</code>）、<code>scheduler/engine.rs</code></dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p2">P2</span><span class="chip chip-new">新增</span><span class="t">F9 · 组织知识资产：Playbook + 条件注入 Knowledge</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>参考</dt><dd>Devin 的双资产设计：<strong>Playbook</strong>（可复用的步骤 + 成功标准 + 护栏，"像程序但没有严格语法"，有 Past runs 看别人怎么用，发送前可 inline 编辑并选择更新库中版本或另存为新的）；<strong>Knowledge</strong>（按 trigger 条件注入，如 trigger="改 API 路由" → "我们用 Fastify"）。</dd>
+      <dt>为什么值得</dt><dd>OneDesktop 已有 <code>task.reasoning</code>（任务卡拆解依据）和 <code>roundtable_summaries</code>，<strong>离"把一次成功的派活固化成 Playbook"只差一步</strong>：给成功的群任务加"存为 Playbook"按钮，下次建群时可一键套用成员配置 + 任务 DAG + 拆解依据。这是把一次性执行变成组织资产的最短路径。</dd>
+      <dt>顺带</dt><dd>低成本高确定性的一项：<strong>把 <code>AGENTS.md</code> 作为项目级上下文的读取入口</strong>（60,000+ 仓库已采用，已捐入 Agentic AI Foundation），workspace 内有该文件就自动注入。</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p2">P2</span><span class="chip chip-new">新增</span><span class="t">F10 · 并行隔离与变更集</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd>多 Worker 并发写同一 workspace，无隔离。<code>resolve_fs_path</code> 防的是越界，不防互相覆盖。</dd>
+      <dt>参考</dt><dd>行业已收敛到 <strong>git worktree 隔离 + 延迟到显式合并点</strong>：Cursor 2.0 用 worktree/远程机器隔离并行 agent，Claude Code 把 <code>isolation: worktree</code> 做成 frontmatter 字段并配 <code>WorktreeCreate</code>/<code>WorktreeRemove</code> hook。另一条纪律是<strong>给每个 worker 分配互不相交的文件集</strong>（Claude Code 明确警告同文件并发编辑会互相覆盖）。</dd>
+      <dt>做法</dt><dd>分两步：① 短期——派活表单支持声明"文件范围"，调度器检测重叠并警告；② 中期——git 仓库场景走 worktree，非 git 场景自建"变更集 = 文件级快照 + 可回滚"抽象（OneDesktop 面对的文档 / 表格场景 worktree 不适用，这点必须自研）。</dd>
+    </dl>
+  </div>
+</div>
+
+<h3 style="margin-top:var(--space-2xl)">补录：来自 AgentTeams / AgentSpace 的四项 <span class="chip chip-warn">2026-08-03</span></h3>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="chip chip-warn">需扩展</span><span class="t">F11 · CLI 执行器的可诊断性（对标 AgentRouter）</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd>架构方案 P2-13 已有 <code>CliExecutor</code> / <code>CliAdapter</code>，覆盖 codex / opencode / pi / claude。方向正确，但目前只解决"能把外部 CLI 跑起来"。</dd>
+      <dt>参考</dt><dd>AgentSpace 的 <strong>AgentRouter</strong> 是同一思路的成熟版，且明确划清了边界：<em>"It does not replace the workspace or own the business queue. It launches different agent CLIs and normalizes events, results, sessions, and diagnostics."</em> 关键在于它<strong>为每个 provider 单独定义了诊断策略</strong>：Claude Code 解析 stream-json 事件并做 session fallback、还架了 <strong>tool approval bridge</strong>；Codex 有 runtime tool capability diagnostics；OpenClaw 有 <strong>health / preflight 预检</strong>与 auth/profile/model/tool/protocol 五类错误分类；Antigravity / OpenCode / Hermes 各有 timeout / nonzero-exit / empty-response 三态诊断。</dd>
+      <dt>做法</dt><dd>给 <code>CliAdapter</code> trait 补三个方法：① <code>preflight()</code> —— 启动前检查可执行文件存在性、版本兼容、认证状态、模型可用性，<strong>把失败前置到席位配置时而不是任务执行到一半</strong>；② <code>classify_failure()</code> —— 把退出码 / 空输出 / 超时归一化为可枚举原因，而不是抛一坨 stderr；③ <code>session_fallback()</code> —— 会话 ID 丢失时降级为一次性调用而不是整轮失败。<strong>另外把 Claude Code 的 tool approval bridge 接进来，让外部 CLI 的权限请求也能走 F2 的冒泡审批</strong>，否则外部席位会成为权限体系的黑洞。</dd>
+      <dt>落点</dt><dd><code>agent/executor/cli.rs</code>（P2-13 落点）、<code>agent/permission.rs</code></dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="chip chip-new">新增</span><span class="t">F12 · 通信拓扑策略化："谁能跟谁说话"不该是硬编码</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd><code>roundtable.rs</code> 的 <code>post()</code> 是<strong>全员扇出</strong>——每条消息广播给群内所有席位。拓扑固定为星形，唯一变量是群主决定 @ 谁。席位之间的可见性、能否互相触发，都没有表达方式。</dd>
+      <dt>参考</dt><dd>AgentTeams 把这件事做成了 CRD 字段：Worker 之间能否互 @ 由 Team 的 <code>peerMentions</code> 控制，能否跨 Team @ 由各自 <code>channelPolicy</code> 控制；Human 侧有 <code>accessibleTeams</code> / <code>accessibleWorkers</code>。产品原话是"<strong>一切'谁能跟谁说话'都是策略，不是约定</strong>"。它甚至把"老板不越级管理"（TeamAdmin 只在 Leader DM Room 里与 TeamLeader 对话）做成房间拓扑层面的约束。AgentSpace 对应的是频道准入 + 私聊隐私范围。</dd>
+      <dt>为什么值得</dt><dd>三重收益，且改动量小：① <strong>省 token</strong>——扇出规模是多 Agent 成本的主要来源，Claude Code 官方也警告 broadcast 成本随团队规模成倍增长；② <strong>降噪</strong>——席位不必读与自己无关的消息，上下文更干净；③ <strong>是 F5（Worker 间直接通信）的前置</strong>——没有拓扑策略就放开互相 @，会立刻退化成消息风暴。<strong>建议 F12 先于 F5 落地。</strong></dd>
+      <dt>做法</dt><dd>群配置增加 <code>peer_mentions: bool</code>（默认 false）与席位级 <code>visible_to: Vec&lt;SeatId&gt;</code>（默认全体，可收窄）；<code>post()</code> 按策略过滤投递目标。UI 上在建群页给一个"协作拓扑"的三选一预设：<strong>星形（默认，群主中枢）/ 全连通 / 自定义</strong>，不要一上来就暴露字段。</dd>
+      <dt>落点</dt><dd><code>group/group.rs</code>、<code>group/roundtable.rs</code>（<code>post()</code> / <code>broadcast()</code>）、<code>GroupsPage.tsx</code> 建群弹窗</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p2">P2</span><span class="chip chip-new">新增</span><span class="t">F13 · 凭证不落 Worker（单机版零信任）</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>参考</dt><dd>AgentTeams 的做法值得注意，因为它是<strong>被真实企业安全需求逼出来的</strong>：Higress AI Gateway 持有全部上游真凭证（LLM API Key、MCP 上游 Token、内部服务账号），每个 Worker <strong>只拿一个可吊销的 Consumer Token</strong>，网关做 per-route <code>allowedConsumers</code> 授权；派生凭证自带 Tenant / Team / Worker 三级标签，"blast radius is strictly limited"；MCP 凭证<strong>按需下发、用后销毁、不可转发不可持久化</strong>。AgentSpace 对应的是 runtime grants + 可吊销 daemon API token + agent-scoped OAuth 委托。</dd>
+      <dt>对单机的翻译</dt><dd>不需要网关，但<strong>核心原则可以极低成本地照搬</strong>：① 凭证只留在 Rust 主进程，<strong>不通过环境变量注入外部 CLI 子进程</strong>（当前 <code>CliExecutor</code> 很可能是直接透传 env，这是最容易被忽略的泄漏面——子进程的 <code>/proc/&lt;pid&gt;/environ</code> 和崩溃日志都可能带出 key）；② 席位级声明"可访问哪些 MCP Server / 哪些 Provider"，在 <code>ToolRegistry</code> 层做准入而不是靠 prompt 约束；③ 每个凭证的使用记录进 F3 的 <code>run_steps</code>，做到"哪个席位在什么时候用了哪个 key"可查。</dd>
+      <dt>落点</dt><dd><code>agent/executor/cli.rs</code>、<code>mcp/client.rs</code>、<code>agent/tool_registry.rs</code>、<code>storage/</code></dd>
+    </dl>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p2">P2</span><span class="chip chip-new">新增</span><span class="t">F14 · 记忆分层、定时蒸馏与席位退役清理</span></div>
+  <div class="gap-b">
+    <dl>
+      <dt>现状</dt><dd>内置 memory 工具是<strong>扁平的</strong>：一个平面的键值/文本存储，无分层、无衰减、无蒸馏。多 Worker 场景下，每个席位往里写、所有席位一起读，随时间只会越来越脏。Worker 从 <code>WorkerPool</code> 退出时也没有 workspace 清理动作。</dd>
+      <dt>参考</dt><dd>AgentTeams 的 <strong>ReMe 三层</strong>值得整体借鉴：<strong>L1 短期</strong>——原始对话流写 <code>session/dialog/</code>，<code>auto_memory</code> hook 在每次回复后把事实卡片 / 对话摘要 / 资源阅读笔记写入当日 <code>daily/</code>，<em>"只关心今天发生了什么，结构化可审计，不直接参与在线召回"</em>；<strong>L2 长期</strong>——整理为 <code>digest/{personal, procedure, wiki}/</code> 三类结构化目录，后端可插拔；<strong>L3 Dream</strong>——<code>auto_dream</code> 定时任务对当日 daily 做备份、扫描、<strong>用 LLM 蒸馏 / 纠错 / 去重 / 合并进 digest</strong>，并输出一份"醒来报告"。另有一条容易被忽略但很关键的纪律：<strong>Worker 退役时用 <code>cleanup</code> hook 整体归档或销毁其 workspace 目录，防止残留向量泄漏。</strong></dd>
+      <dt>做法</dt><dd>① 记忆分成"当次会话 / 项目长期"两层就够了（不必上三层），当次会话的事实卡片在群任务结束时批量蒸馏一次写入项目层；② 蒸馏动作复用现有 <code>scheduler</code> 的 ticker，做成可关闭的后台任务并给出"蒸馏报告"（这个报告本身就是很好的产品瞬间——<strong>让用户看见 Agent 在"整理笔记"，信任感的性价比极高</strong>）；③ 补 Worker 退役时的 workspace 归档/清理，与 F10 的变更集抽象共用一套快照机制。</dd>
+      <dt>落点</dt><dd><code>agent/tools/memory.rs</code>、<code>group/worker_pool.rs</code>、<code>scheduler/engine.rs</code></dd>
+    </dl>
+  </div>
+</div>
+</section>
+
+<!-- ========== 6 ========== -->
+<section id="s6">
+<h2><span class="num">06</span>交互差距与改进建议</h2>
+
+<div class="callout co-info">
+<strong>为什么这一章是重点</strong>
+<p>现有 <code>architecture-adjustment-plan.md</code> 把 14 项调整全部落在后端（引擎 / 上下文 / 权限 / 异步 / A2A / 执行器多态），<strong>交互层几乎没有条目</strong>。但组织隐喻派产品的共同软肋恰恰是运行期可观测性——用户看不见 Agent 在干什么，就不会信任它，也不会把重要任务交给它。<strong>下面 17 项全部是纯前端 + 少量数据支撑，不动架构骨架。</strong>其中 D 组三项为 2026-08-03 补录，来自 AgentTeams / AgentSpace 的对照。</p>
+</div>
+
+<h3>A · 让"谁在干什么"一眼可见</h3>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p0">P0</span><span class="t">IX-1 · 席位卡片承载运行态与成本</span></div>
+  <div class="gap-b">
+    <p>Relevance AI 的 Workforce 看板把<strong>每个 agent 一行，同排展示 Task / 工具图标 / 所用模型 / Eval 通过率 / 平均每任务成本</strong>——让"降本"和"降质"在同一屏权衡，这是目前最成熟的呈现方式。</p>
+    <p><strong>做法：</strong>群成员列表的席位卡片从"静态名片"升级为"运行仪表"：当前状态（空闲 / 思考中 / 调工具 <em>ToolName</em> / 等审批 / 失败）、本次任务耗时与 token、历史成功率、累计成本。<strong>状态文案要具体到工具名</strong>，"正在运行 <code>run_shell</code>"远比"处理中"有信息量。数据来自 F3 的 <code>runs</code> 表。</p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p0">P0</span><span class="t">IX-2 · 运行摘要条 + 任务甘特时间线</span></div>
+  <div class="gap-b">
+    <p>CrewAI AMP 的 Traces 页可以近乎原样移植：<strong>顶部固定一条摘要——total / prompt / completion tokens、请求数、总耗时、预估成本；下方是任务级执行时间线（甘特式），可按任务下钻看 Agent / LLM / 输入 / 输出 / 状态。</strong></p>
+    <p><strong>做法：</strong>群详情加第四个视图 "运行"，与 chat / dispatch / deliverables 并列。甘特图能一眼看出<strong>并行度是否真的用上了</strong>——如果三个 Worker 的条形是错开的而不是重叠的，说明扇出没生效，这个洞察用聊天流永远看不出来。</p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="t">IX-3 · Work Log 折叠手风琴（每步自评 + 耗时）</span></div>
+  <div class="gap-b">
+    <p>Devin 的 planner Work Log 是长任务信息密度最高的呈现：<strong>可折叠手风琴，每步带 🟢/🟠/🔴 自评等级 + 时间戳 + 耗时</strong>，人能直接跳到出问题的那一步，不用逐条读。</p>
+    <p><strong>做法：</strong>当前 <code>ProcessPanel.tsx</code> 是平铺的工具步骤列表 + shell 输出 <code>&lt;pre&gt;</code>。改为折叠手风琴，每步左侧一个状态点（成功 / 有警告 / 失败），右侧耗时。<strong>自评等级可由引擎按 <code>stop_reason</code> + 工具 <code>isError</code> 自动生成，不需要额外 LLM 调用。</strong>注意配色须用项目令牌 <code>--status-*-strong</code>，不用 emoji。</p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="t">IX-4 · 气泡来源标签 + 单 Worker 重跑</span></div>
+  <div class="gap-b">
+    <p>Coze 在预览区<strong>每条回复气泡上带彩色标签标明"由哪个 Agent 回答"</strong>，并可点单个 Agent 的运行图标只调它——这是群聊界面里成本最低的可解释性设计。</p>
+    <p><strong>做法：</strong>圆桌消息气泡加席位标签（用席位配色，对标 Claude Code 的 <code>color</code> frontmatter 字段）；气泡右上角 hover 出"重跑此 Worker"。扇出场景下这个按钮价值很大——某个 Worker 答得不好，不用重跑整轮。</p>
+  </div>
+</div>
+
+<h3>B · 让人能随时介入</h3>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p0">P0</span><span class="t">IX-5 · 审批卡片：四按钮 + 参数可编辑 + 超时倒计时</span></div>
+  <div class="gap-b">
+    <p>当前审批只有"批准 / 拒绝"。LangGraph Agent Inbox 的契约是四态——<strong><code>accept</code>（原样通过）/ <code>edit</code>（改参数后放行）/ <code>respond</code>（给自由文本反馈让它换个做法）/ <code>ignore</code>（跳过继续）</strong>，由 <code>config</code> 的四个布尔决定渲染哪几个按钮，描述支持 Markdown。n8n 的 Wait 节点补上了最后一块：<strong>Limit Wait Time 超时自动继续</strong>。</p>
+    <p><strong>做法：</strong>审批卡片展示工具名 + 参数（<strong>可内联编辑</strong>）+ 风险等级（由 MCP <code>destructiveHint</code> / <code>readOnlyHint</code> 推导）+ 倒计时进度条。<code>edit</code> 一态在 shell 命令场景价值极高——命令写错了一个路径，改一下就能放行，而不是拒绝后重新组织语言让 Agent 再试一遍。Claude Code 的 <code>PreToolUse</code> hook 用 <code>updatedInput</code> 改写参数后放行，是同一思路的程序化版本。</p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="t">IX-6 · 全局待办收件箱 + 跳回现场</span></div>
+  <div class="gap-b">
+    <p>多群 + 定时任务并行时，待审批事项会散落在各处。LangChain 的 <strong>Agent Inbox 是 Gmail 式独立收件箱</strong>，把所有中断收敛到一个列表，每条支持 "Open in Studio" 跳回执行现场。</p>
+    <p><strong>做法：</strong>侧边栏加"待办"入口带未读角标，聚合三类：待审批工具调用、失败需决策的任务、Worker 主动提问。点击跳转到对应群 + 定位到那条消息。<strong>桌面端还有云端做不到的一招：系统通知 + Dock 角标</strong>——Agent 后台跑长任务时这是关键体验差异。</p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="t">IX-7 · 从任意消息分叉重跑</span></div>
+  <div class="gap-b">
+    <p>LangGraph Studio 把重跑拆成两个语义明确的动作：<strong><code>Edit node state → Fork</code>（改状态后分叉重跑）与 <code>Re-run from here</code>（不改状态、换模型/配置重跑）</strong>。</p>
+    <p><strong>做法：</strong>圆桌消息 hover 出这两个动作。OneDesktop 的 <code>build_worker_seed</code> 已经按 <code>seq &lt; broadcast_seq</code> 截取历史，<strong>分叉的数据基础天然存在</strong>，主要是 UI 与会话 id 派生的工作量。</p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p2">P2</span><span class="t">IX-8 · 信息密度滑杆</span></div>
+  <div class="gap-b">
+    <p>LangGraph Studio 的线程面板有一根滑杆，<strong>拖动即可控制 trace 的展开层级（turn → node → state key）</strong>，比一堆折叠箭头高效得多。</p>
+    <p><strong>做法：</strong>群聊 / 运行视图顶部加三档切换：<em>只看结论</em>（每 Worker 一条最终回复）/ <em>看步骤</em>（含工具调用摘要）/ <em>看全部</em>（含参数与原始输出）。项目已有 <code>SegmentedControl</code> 通用组件可直接复用，符合"先复用再新增"的样式统筹规范。</p>
+  </div>
+</div>
+
+<h3>C · 让结果可比较、可沉淀</h3>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p0">P0</span><span class="chip chip-new">独有机会</span><span class="t">IX-9 · 竞速备选方案并排对比</span></div>
+  <div class="gap-b">
+    <p><strong>这是全篇性价比最高的一条。</strong><code>broadcast()</code> 竞速时落选方案已经存进了 <code>roundtable_alternatives</code> 表，但前端<strong>完全没有暴露</strong>——数据已经在库里躺着，只差一个 UI。</p>
+    <p>而横向看，"多方案并排择优"是竞品的空白区：Cursor 的 best-of-n 未经官方确认，其余产品基本没有。<strong>OneDesktop 的竞速语义是差异化资产，却是唯一一个"实现了但用户看不见"的能力。</strong></p>
+    <p><strong>做法：</strong>胜出气泡下方加"查看其他 N 个方案"，展开为并排卡片（各带 Worker 名 / 耗时 / token / 成本），支持"改选此方案"——改选后把该方案回填为后续任务的种子（架构方案 P0-5 层级 3 的"竞速胜者方案回填"正好对接）。</p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="t">IX-10 · 产出物 diff 与变更集审阅</span></div>
+  <div class="gap-b">
+    <p>Cursor 2.0 官方把<strong>"代码评审"列为 agent 时代的新瓶颈</strong>，其 diff 随 agent 工作实时渲染、方向错了随时 Stop 改道。Devin 的 <strong>Global Work Diff</strong>（任意时间点的全部改动汇总 + 单文件编辑历史 + 跨 shell 的 Command History）是更完整的版本。</p>
+    <p><strong>做法：</strong>当前 <code>GroupDeliverables</code> 只能看不能比。加两件事：① 文件类产出物显示 before/after diff；② 群任务结束时给一个"本次变更集"汇总——改了哪些文件、每个文件谁改的、可一键回滚。<strong>并行 Worker 场景下这是安全感的主要来源。</strong></p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="t">IX-11 · 派活前的事前成本预估</span></div>
+  <div class="gap-b">
+    <p>Claude Code 文档反复强调结构性成本："每个 teammate 独立上下文，<strong>token 随活跃成员数线性增长</strong>""<strong>broadcast 成本随团队规模成倍增长</strong>""调研 / 评审值得，常规任务用单会话更划算"。</p>
+    <p><strong>做法：</strong>成本提示要出现在<strong>派活时刻</strong>而不只是事后账单。@ 多个 Worker 或点广播时，按钮旁给出"预计 N 次调用 / 约 X tokens / 约 ¥Y"（用历史均值估算）；广播加二次确认。<strong>这是把 F3 的记账数据反哺到决策点。</strong></p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p2">P2</span><span class="t">IX-12 · DAG 只读拓扑视图</span></div>
+  <div class="gap-b">
+    <p>不建议做画布编辑器——OpenAI 弃用 Agent Builder 已经说明纯画布对复杂 Agent 表达力有限，且双向同步是工程地狱。<strong>LangGraph Studio 的折中更聪明：定义靠表单/代码，画布只做只读渲染 + 执行态高亮。</strong></p>
+    <p><strong>做法：</strong><code>GroupDispatch</code> 的 <code>depends_on</code> 复选框保留为录入方式，旁边加一个只读 DAG 图，<strong>运行时按状态着色</strong>（等待 / 进行中 / 完成 / 失败）。工作量小、信息增益大——依赖关系一旦超过 4 个任务，复选框就完全看不出拓扑了。</p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p2">P2</span><span class="t">IX-13 · 启动与长任务的阶段可见化</span></div>
+  <div class="gap-b">
+    <p>OpenHands 把会话启动做成显式状态机并对用户可见：<code>WAITING_FOR_SANDBOX → PREPARING_REPOSITORY → RUNNING_SETUP_SCRIPT → SETTING_UP_SKILLS → STARTING_CONVERSATION → READY</code>。桌面端冷启动、群初始化、Worker 首轮加载都适用这个模式。</p>
+    <p><strong>做法：</strong>把"正在加载"这种无信息量的 loading 替换成阶段化进度（正在装配席位 → 注入能力 → 建立会话 → 就绪）。<strong>感知性能的提升往往比真实性能优化更划算。</strong></p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p2">P2</span><span class="t">IX-14 · 运行回放与分享</span></div>
+  <div class="gap-b">
+    <p>Manus 的 replay、Lindy 的<strong>任意任务生成公开分享链接</strong>，都是把"过程"变成可传播资产。Devin 的 Playbook "Past runs" 标签页则让人能看同事怎么用。</p>
+    <p><strong>做法：</strong>基于 F3 的 <code>runs</code>/<code>run_steps</code> 表导出一次群协作的完整回放（自包含 HTML，与项目 <code>docs/</code> 下现有 mockup 同构）。桌面端不适合做公开链接，但<strong>导出文件分享</strong>同样成立，且更符合本地优先的定位。</p>
+  </div>
+</div>
+
+<h3>D · 补录：来自两个新对手的三项 <span class="chip chip-warn">2026-08-03</span></h3>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="t">IX-15 · 从单聊平滑升级为群 —— 本轮调研中价值最高的一条交互</span></div>
+  <div class="gap-b">
+    <p>阿里在 AgentTeams 的博客里非常清醒地写了一段反向论证：<em>"If it's just writing a piece of code, looking up a document, or generating an image, a single chat is a more direct and lower-cost option. <strong>The cost of introducing group chats is non-trivial.</strong>"</em> 只有三类场景值得付这个成本——<strong>跨域长时工作流、多 Agent 治理需求、组织级知识沉淀</strong>。</p>
+    <p><strong>OneDesktop 的问题在于：这个成本是在最错误的时刻收取的。</strong>当前流程是"先建群 → 想清楚要几个席位 → 各配什么能力 → 才能开始说第一句话"。用户在信息最少的时候被要求做最多的结构性决策，而真实情况几乎总是相反——<strong>人是在单聊里聊着聊着，才发现这事一个 Agent 干不完的。</strong></p>
+    <p><strong>做法：</strong>在普通会话的工具条上加一个"<strong>升级为协作群</strong>"入口。点击后：① 把当前会话的完整上下文作为群的初始共享状态（复用 <code>build_worker_seed</code>）；② 用一次 LLM 调用根据已有对话<strong>预填建议席位与任务拆解</strong>，用户只需增删改而不是从零填表；③ 原会话降级为群主视角，历史消息原样保留。反向也要能走通：群任务收尾后可"<strong>折叠回单聊</strong>"，只留结论与产出物。</p>
+    <p><strong>为什么这条价值最高：</strong>它不新增任何后端能力，却直接解决了群协作功能"建了但没人用"的根本原因。<strong>竞品做不了这一条——AgentTeams 的 Team 是 K8s CRD，AgentSpace 的工作区是多租户实体，都是重资源，不可能从一次对话里长出来。这恰好是单机形态的结构性优势。</strong></p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p1">P1</span><span class="t">IX-16 · 能力体检面板：把"为什么这个席位干不了活"变成可枚举清单</span></div>
+  <div class="gap-b">
+    <p>AgentSpace 在权限控制面里专门列了 <strong>Diagnostics</strong> 维度，枚举四类问题：<em>missing grants（缺授权）/ revoked credentials（凭证已吊销）/ orphaned grants（授权指向已不存在的对象）/ unavailable providers（运行时不可用）</em>。AgentRouter 层面每个 provider 还各有健康预检与错误分类。</p>
+    <p><strong>这是个被低估的产品设计。</strong>多 Agent 系统失败时最典型的用户体验是"它没反应 / 它说它做不了"，而真实原因藏在配置、凭证、网络、版本兼容里。把这些做成一张可枚举、可点击修复的清单，等于<strong>把最令人沮丧的黑盒时刻变成一次明确的操作</strong>。</p>
+    <p><strong>做法：</strong>扩展页新增"能力体检"，对每个席位输出一行结论：模型可达性（Provider Key 是否有效）· MCP Server 连通性与工具数（F1 落地后）· 外部 CLI 可执行性与版本（F11 的 <code>preflight()</code> 直接喂数据）· 引用的 Skill 是否存在 · workspace 路径是否可写。每条给出"去修复"跳转。<strong>建群时也跑一次，把"这个席位当前不可用"前置到配置期</strong>，而不是任务跑到一半才炸。</p>
+  </div>
+</div>
+
+<div class="gap">
+  <div class="gap-h"><span class="chip chip-p2">P2</span><span class="t">IX-17 · 审批快循环与预算触发的审批</span></div>
+  <div class="gap-b">
+    <p>AgentSpace 原文：<em>"High-impact actions route directly into human approvals, with a <strong>fast TabTabTab-style approval loop</strong>"</em>，且把触发审批的动作明确分为四类：tool use / document access / external sends / <strong>budget-sensitive actions</strong>。</p>
+    <p><strong>两个可直接落的点：</strong></p>
+    <ul style="margin-left:18px;font-size:13.5px;margin-top:6px">
+      <li><strong>键盘快循环。</strong>IX-5 的四态审批卡片如果只能用鼠标点，多 Worker 场景下会变成新的瓶颈——一轮扇出可能连续弹出 5～8 个审批。应支持 <kbd>Tab</kbd> 切换焦点 + <kbd>Enter</kbd> 批准 + <kbd>Esc</kbd> 拒绝的连续操作，以及"<strong>本轮全部批准</strong>"与"<strong>此工具本次会话内不再询问</strong>"两个批量出口（后者写入 F3 审计，并在运行摘要条上显示"已授予 N 项临时豁免"作为提醒）。</li>
+      <li><strong>预算成为审批触发条件。</strong>F3 的记账落地后，把"预估成本超过阈值"接进权限判定——单次工具调用预估超过 X、或本次群任务累计超过 Y 时强制转 Ask。<strong>这比按工具类型划分危险等级更贴近用户的真实焦虑</strong>：多 Agent 最容易失控的不是删文件，是无声地烧钱。</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ========== 7 ========== -->
+<section id="s7">
+<h2><span class="num">07</span>与现有架构方案的对齐</h2>
+<p class="lead">本报告与 <code>architecture-adjustment-plan.md</code>（2026-08-03）的关系速查。避免重复劳动，也避免遗漏。</p>
+
+<div class="tw">
+<table>
+<thead><tr><th style="width:26%">现有方案条目</th><th style="width:12%">状态</th><th>本报告的补充</th></tr></thead>
+<tbody>
+<tr><td>P0-1 结构化 <code>AgentRunOutcome</code></td><td><span class="chip chip-ok">已落地</span></td><td>正好是 F3 记账的数据源，<code>stop_reason</code> 直接落 <code>runs</code> 表，无需额外埋点。</td></tr>
+<tr><td>P0-2 会话/任务上下文分离 + 任务卡</td><td><span class="chip chip-ok">已落地</span></td><td>F7 建议在其上叠加<strong>结构化共享黑板</strong>（Flowise Flow State 式 schema 约束），把自由文本升级为受约束状态。</td></tr>
+<tr><td>P0-3 上下文压缩</td><td><span class="chip chip-warn">v1 落地</span></td><td>可参考 Manus 的 <strong>full / compact 双表示</strong>：full 存磁盘、compact 只留路径引用，对陈旧结果先 compaction 再 summarization。</td></tr>
+<tr><td>P0-4 工具异步化 + 可取消</td><td><span class="chip chip-ok">已落地</span></td><td>F1 的 MCP <code>tools/call</code> 超时与 <code>notifications/cancelled</code> 可直接复用这套机制。</td></tr>
+<tr><td>P0-5 思考逻辑复用层</td><td><span class="chip chip-warn">层级 1-2 落地</span></td><td>层级 3「竞速胜者回填」正好与 <strong>IX-9 备选方案并排对比</strong>配对：UI 让人改选，回填让结果沉淀。建议两者一起做。</td></tr>
+<tr><td>P1-6 workspace 强制隔离</td><td><span class="chip chip-warn">fs 已做</span></td><td>F10 补充<strong>并行 Worker 之间的隔离</strong>——现有隔离防越界，不防互相覆盖。</td></tr>
+<tr><td>P1-7 权限分级替代 auto_approve</td><td><span class="chip chip-warn">需扩展</span></td><td><strong>本报告最强调的一条。</strong>方案有策略层（三态），缺交互层：F2 的冒泡机制 + IX-5 的四态审批卡片。另建议接入 MCP <code>tool annotations</code> 作为默认策略的建议值（但 MUST 视为不可信，不得自动提权）。</td></tr>
+<tr><td>P1-8 资源治理</td><td><span class="chip chip-p1">计划中</span></td><td>补 F6 的任务心跳与依赖链防死锁——Claude Code 官方把"状态滞后导致依赖卡死"列为已知限制，是该模式的固有陷阱。</td></tr>
+<tr><td>P2-11 可观测性</td><td><span class="chip chip-p2">计划中</span></td><td><strong>建议从 P2 提到 P0。</strong>它不是叶子而是底座——审批审计、席位仪表、成本预估、运行回放全部依赖它。</td></tr>
+<tr><td>P2-12/13 执行器多态 + 外部 CLI</td><td><span class="chip chip-p2">计划中</span></td><td><strong>更正：不再是"市面无对标"</strong>——AgentSpace 的 <strong>AgentRouter</strong> 就是同一思路的成熟实现（8 种 harness，含 per-provider 诊断、健康预检、session fallback、tool approval bridge），AgentTeams 也靠 Matrix 协议做到三种运行时混编。<strong>这既说明方向被验证，也说明领先窗口不存在</strong>。落地时应对齐 F11 的三项能力。另保留原边界提醒：外部 CLI 在 UI 上必须<strong>显式标注"能力不可内省"</strong>，否则用户会困惑为什么这个席位看不到工具调用明细。</td></tr>
+<tr><td>（新增对照项）通信拓扑策略</td><td><span class="chip chip-new">方案未覆盖</span></td><td>AgentTeams 用 <code>peerMentions</code> / <code>channelPolicy</code> 把"谁能跟谁说话"策略化。<strong>建议在 F5（Worker 间通信）之前先落 F12</strong>，否则放开互 @ 会直接导致消息风暴与成本失控。</td></tr>
+<tr><td>（新增对照项）凭证边界</td><td><span class="chip chip-new">方案未覆盖</span></td><td>两家对手都做到"Agent 不持有真凭证"。单机版最低限度应做到 <strong>F13 ①：不向外部 CLI 子进程透传凭证环境变量</strong>——这是当前 P2-13 落地时最容易埋下的泄漏面。</td></tr>
+<tr><td>P2-14 A2A 原生</td><td><span class="chip chip-p2">计划中</span></td><td>两处规范更新：① v1.0 用 <code>supportedInterfaces</code>（有序列表）<strong>取代了 <code>url</code>/<code>preferredTransport</code></strong>，并新增 Signed Agent Card；② <code>Message</code> 用于交互、<strong><code>Artifact</code> 才是任务输出</strong>，deliverables 应映射 Artifact。</td></tr>
+<tr><td colspan="3" style="background:var(--new-soft)"><strong>方案完全未覆盖、本报告新增：</strong>F1 MCP tools/call · F4 Agent 定义可移植 · F5 Worker 间通信 · F9 Playbook/AGENTS.md · <strong>F12 通信拓扑策略 · F13 凭证边界 · F14 记忆分层与退役清理</strong> · <strong>以及第 06 章全部 17 项交互改进</strong></td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ========== 8 ========== -->
+<section id="s8">
+<h2><span class="num">08</span>建议路线图</h2>
+<p class="lead">按"解锁下游能力的数量"排序，而非按工作量排序。</p>
+
+<div class="grid">
+<div class="card" style="border-left:3px solid var(--p0)">
+  <h5>M2 · 打通与看见 <span class="chip chip-p0">先做这个</span></h5>
+  <p class="tag">目标：Agent 有工具可用，人能看见它在干什么</p>
+  <ul>
+    <li><strong>F1</strong> MCP tools/call 打通（生态入场券）</li>
+    <li><strong>F3</strong> runs / run_steps 记账落库（所有可视化的底座）</li>
+    <li><strong>F2 + IX-5</strong> Worker HITL 冒泡 + 四态审批卡片</li>
+    <li><strong>IX-1 / IX-2</strong> 席位仪表 + 运行摘要条与甘特时间线</li>
+    <li><strong>IX-9</strong> 竞速备选并排对比（数据已在库，只差 UI）</li>
+    <li><strong>IX-15</strong> 单聊一键升级为群 <span class="chip chip-warn">补录 · 提升采用率的关键</span></li>
+  </ul>
+  <p style="margin-top:10px;font-size:13px"><strong>验收：</strong>群里跑一轮三 Worker 扇出，能看到每人状态、耗时、token、成本；Worker 调 shell 会冒泡审批且可改参数放行；竞速能看到落选方案并改选；<strong>能在一次普通对话中途直接升级成群，且上下文不丢。</strong></p>
+</div>
+
+<div class="card" style="border-left:3px solid var(--p1)">
+  <h5>M3 · 协作深度</h5>
+  <p class="tag">目标：从"群主派活"走向"团队自组织"</p>
+  <ul>
+    <li><strong>F12</strong> 通信拓扑策略化 <span class="chip chip-warn">补录 · 必须先于 F5</span></li>
+    <li><strong>F5</strong> Worker 间 SendMessage 与转移</li>
+    <li><strong>F6</strong> 任务心跳 / 超时 / 强制推进</li>
+    <li><strong>F7</strong> 结构化共享黑板</li>
+    <li><strong>F4</strong> Agent Manifest + <code>.claude/agents</code> 双向导入 + <strong>群蓝图导出（脱敏）</strong></li>
+    <li><strong>F8</strong> Skill 三级预算加载（多 Worker 场景省 token 是乘法效应）</li>
+    <li><strong>F11</strong> CLI 执行器 preflight / 失败分类 / 会话回退 <span class="chip chip-warn">补录</span></li>
+    <li><strong>IX-3 / IX-6 / IX-7</strong> Work Log 手风琴 + 全局待办收件箱 + 分叉重跑</li>
+    <li><strong>IX-16</strong> 能力体检面板 <span class="chip chip-warn">补录 · 与 F11 共用数据</span></li>
+  </ul>
+</div>
+
+<div class="card" style="border-left:3px solid var(--p2)">
+  <h5>M4 · 沉淀与差异化</h5>
+  <p class="tag">目标：一次执行变成组织资产</p>
+  <ul>
+    <li><strong>F9</strong> Playbook + Knowledge 条件注入 + AGENTS.md 读取</li>
+    <li><strong>F10</strong> 并行隔离与变更集回滚</li>
+    <li><strong>F13 / F14</strong> 凭证不落 Worker + 记忆分层与退役清理 <span class="chip chip-warn">补录</span></li>
+    <li><strong>IX-10 / IX-14</strong> 产出物 diff + 运行回放导出</li>
+    <li><strong>IX-12 / IX-13 / IX-17</strong> DAG 只读拓扑 + 阶段化启动 + 审批快循环</li>
+    <li>P2-12/13/14 执行器多态 + 外部 CLI + A2A（现有方案）</li>
+  </ul>
+</div>
+</div>
+
+<div class="callout co-info">
+<strong>一句话优先级</strong>
+<p>如果只能做三件事：<strong>MCP 打通</strong>（否则能力受限）、<strong>运行记账 + 席位仪表</strong>（否则不可信）、<strong>Worker 审批冒泡</strong>（否则群协作的工具能力是残的）。这三件事互相之间没有依赖，可并行推进。</p>
+<p style="margin-top:8px"><strong>补录后如果要加第四件：IX-15（单聊升级为群）。</strong>前三件解决"能不能用、敢不敢用"，第四件解决"会不会用"——而且它是全表里唯一一条<strong>竞品结构上无法跟进</strong>的改动。</p>
+</div>
+
+<div class="callout co-warn">
+<strong>补录后的战略提醒：三条不要走的岔路</strong>
+<ol style="margin-top:8px;margin-left:18px;font-size:13.5px">
+  <li><strong>不要在治理深度上追赶。</strong>AgentTeams 有 L1/L2/L3 人类权限层级 + 零信任网关 + 三级凭证标签，AgentSpace 有多租户 + owner/admin/member + OAuth 委托。这些能力的价值前提是"存在一个需要互相防范的组织"。<strong>单人场景下它们是纯负担。</strong>OneDesktop 只需要做到"我知道 Agent 干了什么、能拦下它"，不需要做到"部门 A 不能看部门 B"。</li>
+  <li><strong>不要引入常驻服务依赖。</strong>Matrix homeserver、MinIO、PostgreSQL、AI 网关——每一个都会把"双击运行"变成"先读一遍部署文档"。<strong>现有的 SQLite + Tauri Event 已经足够支撑单机多 Agent，不要为了对齐对手的架构图而牺牲唯一的独占优势。</strong></li>
+  <li><strong>不要把"像个组织"当成目标本身。</strong>AgentTeams 把组织隐喻做到了 CRD 级别，但它服务的是真实的企业组织。OneDesktop 的席位是<strong>上下文隔离单元</strong>（这一点 Manus 的教训已经讲得很清楚），组织隐喻只是让用户容易理解的外壳。<strong>当"更像组织"和"更好用"冲突时，选后者</strong>——比如不要为了角色完整性去加一个用户根本不会配的"TeamAdmin"层。</li>
+</ol>
+</div>
+</section>
+
+<!-- ========== 9 ========== -->
+<section id="s9">
+<h2><span class="num">09</span>不要做什么</h2>
+<p class="lead">调研中收集到的失败案例与反面教训，比正面经验更值钱。</p>
+
+<div class="tw">
+<table>
+<thead><tr><th style="width:22%">别做</th><th style="width:30%">证据</th><th>启示</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>不要做可视化画布编辑器</strong></td>
+<td>OpenAI 已宣布 <strong>Agent Builder 于 2026-11-30 关停</strong>（ChatKit 保留）；AutoGen Studio 官方自标"原型工具、非生产就绪"。</td>
+<td>画布与代码/配置的双向同步是工程地狱，且对循环、递归、动态成员表达力有限。<strong>走 LangGraph 的折中：定义靠表单，画布只做只读渲染 + 执行态高亮</strong>（IX-12）。</td>
+</tr>
+<tr>
+<td><strong>不要让执行 Agent 自己维护 todo 文件</strong></td>
+<td>Manus 实测发现 <strong>约 1/3 的动作都花在更新 <code>todo.md</code> 上</strong>，纯属 token 浪费，后来改为 planner + executor + knowledge manager 分工。</td>
+<td>OneDesktop 的任务状态由 <code>TaskScheduler</code> 系统托管，<strong>这个设计是对的，不要退化成让 Worker 自己写计划文件</strong>。</td>
+</tr>
+<tr>
+<td><strong>不要把子 Agent 当"模仿人类分工"</strong></td>
+<td>Manus 明确定义子 agent 的目的是<strong>隔离上下文</strong>而非模仿分工——"LLM 没有人类的认知带宽限制"。</td>
+<td>席位设计的依据应是"上下文该不该隔离"，而不是"现实中这活儿归谁"。角色数量不是越多越好。</td>
+</tr>
+<tr>
+<td><strong>不要无限增加单 Agent 的可选动作</strong></td>
+<td>Copilot Studio 给出经验阈值：可选动作（工具 + topic + agent）<strong>超过 30–40 个时表现明显退化</strong>。</td>
+<td>MCP 打通后工具数会暴涨，<strong>必须按席位做工具白名单</strong>（对标 Claude Code 的 <code>tools</code> / <code>disallowedTools</code> frontmatter），不能全量注入。</td>
+</tr>
+<tr>
+<td><strong>不要让审批只活在会话里</strong></td>
+<td>Zapier Agents 被三方实测指出：审批历史<strong>只存在会话中、不持久化为审计轨迹</strong>。</td>
+<td>F2/F3 必须把每次审批决策（含超时自动拒绝）落库，这既是安全需求，也是"自动升级策略"的训练数据。</td>
+</tr>
+<tr>
+<td><strong>不要新建 MCP sampling / roots 实现</strong></td>
+<td>MCP <code>2026-07-28</code> 已将 <strong>sampling / roots / logging 标记 Deprecated（SEP-2577）</strong>，建议 sampling 改为直接对接 LLM Provider API。</td>
+<td>F1 只实现 tools（核心）+ elicitation（保留且有用），把会话抽象成可丢弃对象为无状态化预留即可。</td>
+</tr>
+<tr>
+<td><strong>不要信任 MCP tool annotations</strong></td>
+<td>规范原文：<em>"clients MUST consider tool annotations to be untrusted unless they come from trusted servers"</em>，且 <code>destructiveHint</code> <strong>默认为 true</strong>。</td>
+<td>annotations 只能用于<strong>降级</strong>默认策略（readOnlyHint=true → 默认 Allow），绝不能用于自动提权；未声明按危险处理。</td>
+</tr>
+<tr>
+<td><strong>不要照抄 LangGraph 的 interrupt 语义</strong></td>
+<td>LangGraph 恢复时<strong>整个节点从头重放</strong>，interrupt 之前的代码会再跑一遍，副作用必须幂等；官方也不推荐 <code>interrupt_before/after</code> 用于生产 HITL。</td>
+<td>OneDesktop 现有的"审批门 + <code>rx.await</code>"是挂起而非重放，<strong>本身优于 LangGraph</strong>。只抄它的 HumanInterrupt/HumanResponse <em>schema</em>，不抄执行模型。</td>
+</tr>
+<tr>
+<td><strong>不要把群协作当默认入口</strong> <span class="chip chip-warn">补录</span></td>
+<td>AgentTeams 官方明确：<em>"The cost of introducing group chats is non-trivial"</em>，只有跨域长时工作流 / 多 Agent 治理 / 组织级知识沉淀三类场景值得付这个成本；写段代码、查个文档、生成张图，<strong>单聊更直接也更便宜</strong>。</td>
+<td>群协作是重型工具。<strong>正确解法不是降低建群门槛，而是提供从单聊长出群的路径</strong>（IX-15）。让用户在信息充分之后再做结构性决策，而不是在第一秒。</td>
+</tr>
+<tr>
+<td><strong>不要用消息体在席位间传大内容</strong> <span class="chip chip-warn">补录</span></td>
+<td>AgentTeams 给 MinIO 共享文件系统标注的官方目的就是"<strong>降低多智能体 token 消耗</strong>"；Manus 的 full/compact 双表示、Lindy 的"可选择传递哪部分上下文"都指向同一件事。</td>
+<td>多 Agent 的成本大头是<strong>同一份内容被反复塞进 N 个上下文</strong>。OneDesktop 单机天然有本地文件系统这个共享底座——<strong>席位之间应传文件路径与摘要，让需要的一方自己去读</strong>，这比任何压缩策略都有效，且实现成本近乎为零。</td>
+</tr>
+<tr>
+<td><strong>不要向外部 CLI 子进程透传凭证环境变量</strong> <span class="chip chip-warn">补录</span></td>
+<td>AgentTeams 的零信任设计把这条讲得很直白：<em>"Agents never touch real credentials"</em>，Worker 只拿可吊销 Consumer Token；AgentSpace 的 runtime grants 与 daemon token 也都可单独吊销。</td>
+<td>P2-13 落地外部 CLI 执行器时，<strong>最容易顺手做、也最难事后补救的就是直接透传 env</strong>。子进程的环境变量会出现在进程列表、崩溃转储和它自己的日志里。<strong>凭证留主进程、按需代理请求</strong>，是单机版能以极低成本获得的等价安全性。</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ========== 10 ========== -->
+<section id="s10">
+<h2><span class="num">10</span>参考来源</h2>
+
+<div class="callout co-warn">
+<strong>信源质量提示</strong>
+<p>以下结论<strong>未经一手来源确认，本报告未作为事实引用</strong>：Cursor "8 个并行 agent""best-of-n 提升约 20%"（仅见三方博客，且相关文章含幻觉型号名）；Devin "MultiDevin / 最多 10 并行会话"（来自聚合评测站）；Relevance AI 的 eval 通过率与每任务成本数字（厂商自证）；MCP Registry 的条目规模（多个 AI 内容站数据互相矛盾）；Coze "多人 + 多 Agent 协作工作台"（营销页表述，无对应产品文档）。A2A v1.0 的具体发布日期在三个二手源中不一致，本报告只引用 Linux Foundation 官方"一周年 + 150+ 组织"的表述。</p>
+<p style="margin-top:8px"><strong>关于补录的两个开源项目：</strong>AgentSpace 的能力描述以其 GitHub README 的 Roadmap「Implemented / Planned」分区为准，已明确区分"已实现"与"规划中"；其 star 数在抓取的页面文本中未包含，活跃度依据为<strong>首提交 2026-06-22、约一个月内 142 commits</strong>。AgentTeams 的架构细节主要来自阿里云官方技术博客与开发者社区文章，其中 <strong>ReMe 三层记忆、Higress 凭证收敛、15 个 Agent / 4 个场景的内部实践属于厂商自述</strong>，未经第三方验证；博客中亦注明部分权限约束"在商业化版本中通过产品层面的房间拓扑和权限策略来保障，属于推荐实践，开源 CRD 层提供字段但并非全部强制执行"——引用时已保留该边界。<strong>两个项目均未实机部署验证，第 04 章矩阵中对应两列为文档评估结果。</strong></p>
+</div>
+
+<h4>编排与设计工具</h4>
+<ul class="refs">
+<li><a href="https://docs.langchain.com/langsmith/studio">LangSmith Studio</a></li>
+<li><a href="https://docs.langchain.com/langsmith/use-studio">How to use Studio（断点 / Fork / 密度滑杆）</a></li>
+<li><a href="https://deepwiki.com/langchain-ai/agent-inbox/5-human-in-the-loop-workflow">Agent Inbox · HITL Workflow</a></li>
+<li><a href="https://github.com/langchain-ai/agent-inbox">Agent Inbox · HumanInterrupt schema</a></li>
+<li><a href="https://blog.langchain.com/introducing-ambient-agents/">Introducing ambient agents</a></li>
+<li><a href="https://docs.langchain.com/oss/python/langgraph/interrupts">LangGraph Interrupts（重放陷阱）</a></li>
+<li><a href="https://microsoft.github.io/autogen/stable/user-guide/autogenstudio-user-guide/index.html">AutoGen Studio</a></li>
+<li><a href="https://docs.ag2.ai/0.9.7/docs/user-guide/advanced-concepts/orchestration/group-chat/patterns">AG2 Orchestration Patterns</a></li>
+<li><a href="https://docs.crewai.com/en/concepts/processes">CrewAI Processes</a></li>
+<li><a href="https://docs.crewai.com/en/concepts/agents">CrewAI Agents（配置维度）</a></li>
+<li><a href="https://docs-platform.crewai.com/platform/en/features/traces">CrewAI AMP Traces（成本呈现）</a></li>
+<li><a href="https://docs.dify.ai/en/guides/workflow/node/agent">Dify Agent Node</a></li>
+<li><a href="https://www.coze.cn/open/docs/guides/multiagent">Coze 多 Agent 模式</a></li>
+<li><a href="https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.wait/">n8n Wait Node（超时兜底）</a></li>
+<li><a href="https://docs.flowiseai.com/using-flowise/agentflowv2">Flowise AgentFlow V2（Flow State）</a></li>
+<li><a href="https://docs.langflow.org/agents">Langflow Agents（Tool Mode）</a></li>
+<li><a href="https://learn.microsoft.com/cs-cz/training/modules/design-multi-agent-solutions-copilot-studio/4-select-multi-agent-orchestration-pattern">Copilot Studio 多 Agent 编排模式</a></li>
+<li><a href="https://openai.github.io/openai-agents-python/handoffs/">OpenAI Agents SDK Handoffs</a></li>
+<li><a href="https://developers.openai.com/api/docs/guides/agent-builder">OpenAI Agent Builder（已宣布弃用）</a></li>
+</ul>
+
+<h4>协作型产品</h4>
+<ul class="refs">
+<li><a href="https://docs.claude.com/en/docs/claude-code/sub-agents">Claude Code Subagents（frontmatter 字段）</a></li>
+<li><a href="https://claudecode.ac.cn/docs/en/agent-teams">Claude Code Agent Teams</a></li>
+<li><a href="https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview">Agent Skills（三级预算）</a></li>
+<li><a href="https://docs.claude.com/en/docs/claude-code/hooks">Claude Code Hooks（权限决策）</a></li>
+<li><a href="https://cursor.com/blog/2-0">Introducing Cursor 2.0</a></li>
+<li><a href="https://cursor.com/docs/agent/review">Cursor · Reviewing and testing code</a></li>
+<li><a href="https://cognition.ai/blog/june-24-product-update">Devin 产品更新（Playbook / Work Log）</a></li>
+<li><a href="https://docs.devin.ai/pt-BR/use-cases/gallery">Devin Docs 用例库</a></li>
+<li><a href="http://rlancemartin.github.io/2025/10/15/manus">Context Engineering in Manus</a></li>
+<li><a href="https://lindy.ai/changelog">Lindy Changelog</a></li>
+<li><a href="https://relevanceai.com/agents">Relevance AI Agents（Workforce 看板）</a></li>
+<li><a href="https://deepwiki.com/All-Hands-AI/OpenHands/3.3-event-driven-architecture">OpenHands 架构与技能系统</a></li>
+<li><a href="https://help.zapier.com/hc/en-us/articles/41776074420493-Add-approval-steps-to-your-agent-s-instructions">Zapier Agents 审批步骤</a></li>
+</ul>
+
+<h4>开源同类（2026-08-03 补录）</h4>
+<ul class="refs">
+<li><a href="https://github.com/agentscope-ai/AgentTeams">阿里 AgentTeams 仓库（原 HiClaw，2026-07-17 完成更名，Apache-2.0）</a></li>
+<li><a href="https://www.alibabacloud.com/blog/603358">AgentTeams and Claude Tag Both Enter Group Chat Mode（CRD 身份模型 / L1-L3 权限 / ReMe 三层记忆 / 何时需要群聊）</a></li>
+<li><a href="https://developer.aliyun.com/article/1740830">云原生 - AI Native 多智能体数字人架构实践（四种 Kind 字段 / TeamAdmin→TeamLeader→Workers / peerMentions / 凭证收敛）</a></li>
+<li><a href="https://www.alibabacloud.com/blog/603177">What Does Alibaba Cloud's Agent Infra Look Like（AgentRun 与 AgentTeams 的分层关系 / AI Registry / OTel 成本拆账）</a></li>
+<li><a href="https://developer.aliyun.com/article/1747694">Agent 开源开发者沙龙（从 HiClaw 到 AgentTeams：多运行时 Worker 与生产级控制面）</a></li>
+<li><a href="https://github.com/HKUDS/AgentSpace">港大 HKUDS AgentSpace 仓库（Apache-2.0，AgentRouter / 数字员工 / 治理面）</a></li>
+<li><a href="https://testingcatalog.net/agentspace-hkus-open-source-platform-turns-ai-agents-into-digital-employees">AgentSpace: HKU's open-source platform turns AI agents into digital employees</a></li>
+<li><a href="https://www.sotasync.com/reader/2026-06-22-hkuds-agentspace-digital-employees">港大开源 AgentSpace：把 Claude 与 OpenClaw 路由为数字员工（四大核心能力拆解）</a></li>
+</ul>
+
+<h4>协议与标准</h4>
+<ul class="refs">
+<li><a href="https://modelcontextprotocol.io/docs/2026-07-28/learn/versioning">MCP Versioning</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/changelog">MCP 2026-07-28 Changelog（破坏性变更）</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2025-06-18/server/tools">MCP Tools 2025-06-18（建议落地版本）</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools">MCP Tools 2026-07-28</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation">MCP Elicitation</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization">MCP Authorization（OAuth 2.1）</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr">MCP MRTR 多轮请求模式</a></li>
+<li><a href="https://a2a-protocol.org/latest/specification/">A2A Specification v1.0</a></li>
+<li><a href="https://a2a-protocol.org/latest/topics/agent-discovery/">A2A Agent Discovery</a></li>
+<li><a href="https://agents.md/">AGENTS.md</a></li>
+<li><a href="https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation">Agentic AI Foundation 成立公告</a></li>
+</ul>
+</section>
+
+<footer>
+  OneDesktop 竞品调研 · 2026-08-03（含当日补录：阿里 AgentTeams / 港大 AgentSpace）· 对照基线 <code>docs/architecture-adjustment-plan.md</code>
+</footer>
+
+</div>
+</body>
+</html>

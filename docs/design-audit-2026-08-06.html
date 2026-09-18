@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OneDesktop · 界面设计审研与优化方案</title>
+<style>
+  :root {
+    --bg: #fafafc;
+    --surface: #ffffff;
+    --ink: #1d1d1f;
+    --ink-2: #6e6e73;
+    --ink-3: #8e8e93;
+    --accent: #006edb;
+    --line: rgba(0,0,0,0.08);
+    --line-2: rgba(0,0,0,0.12);
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 8px 30px rgba(0,0,0,0.08);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); line-height: 1.6; font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 56px 32px 96px; }
+  header.hero {
+    border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 40px;
+  }
+  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .04em; font-size: 12px; text-transform: uppercase; }
+  h1 { font-size: 32px; line-height: 1.2; margin: 8px 0 10px; font-weight: 600; letter-spacing: -0.02em; }
+  .lede { color: var(--ink-2); font-size: 16px; max-width: 640px; }
+  .meta { margin-top: 14px; color: var(--ink-3); font-size: 13px; }
+  h2 { font-size: 22px; font-weight: 600; margin: 52px 0 16px; letter-spacing: -0.01em; }
+  h3 { font-size: 16px; font-weight: 600; margin: 26px 0 10px; }
+  p { color: var(--ink); }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 24px; box-shadow: var(--shadow-sm); margin: 16px 0;
+  }
+  .verdict-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .verdict { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+  .verdict b { display: block; font-size: 28px; margin-bottom: 4px; letter-spacing: -0.02em; }
+  .verdict span { color: var(--ink-2); font-size: 13px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .chip.high { background: rgba(255,59,48,.12); color: #d70015; }
+  .chip.med  { background: rgba(255,149,0,.14); color: #b45309; }
+  .chip.low  { background: rgba(52,199,89,.14); color: #1a7f37; }
+  .chip.win  { background: rgba(0,110,219,.12); color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--ink-3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+  td code { background: rgba(0,0,0,.04); padding: 1px 6px; border-radius: 5px; font-size: 12px; }
+  .loc { color: var(--ink-2); font-size: 12px; font-family: ui-monospace, Menlo, monospace; }
+  .ia { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  .ia figure { margin: 0; }
+  .ia figcaption { font-size: 13px; color: var(--ink-2); margin: 10px 0 4px; font-weight: 600; }
+  .roadmap { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .road { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+  .road h4 { margin: 0 0 4px; font-size: 14px; }
+  .road .tag { font-size: 11px; color: var(--ink-3); }
+  ul.tight { margin: 8px 0; padding-left: 20px; }
+  ul.tight li { margin: 6px 0; }
+  .kbd { font-family: ui-monospace, Menlo, monospace; background: var(--bg); border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 6px; padding: 1px 7px; font-size: 12px; }
+  .accent { color: var(--accent); font-weight: 600; }
+  svg { display: block; width: 100%; height: auto; }
+  footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 13px; }
+  @media (max-width: 720px) { .verdict-grid, .roadmap, .ia { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">UI / UX 设计审研</div>
+    <h1>OneDesktop 界面设计方案与优化建议</h1>
+    <p class="lede">基于当前真实代码（Sidebar / TopBar / ChatArea / InputBar / MessageList 与 App.css 设计令牌）的逐项审查。结论：底层设计语言已相当成熟，问题集中在「信息架构的清晰度」「顶部栏的闲置」与「对话密度」三处，均为低成本高回报的改动。</p>
+    <div class="meta">审阅人：UI Designer · 日期：2026-08-06 · 范围：主框架与对话主屏</div>
+  </header>
+
+  <h2>一、总体评价</h2>
+  <div class="verdict-grid">
+    <div class="verdict"><b>👍 扎实</b><span>Apple HIG 令牌体系、统一图标、毛玻璃系统、暗色适配均到位，组件不写死。</span></div>
+    <div class="verdict"><b>⚠️ 3 处</b><span>高影响问题：导航模型重叠、顶部栏空置、对话留白偏松。</span></div>
+    <div class="verdict"><b>🎯 快赢</b><span>⌘K 命令面板 + 侧栏分组 + 气泡间距微调，半天即可上线。</span></div>
+  </div>
+
+  <div class="card">
+    <p><b>一句话结论：</b>不应该推倒重来，而是<strong>收敛导航心智模型</strong>、<strong>把顶部栏变成生产力入口</strong>、<strong>收紧对话节奏</strong>。这正是飞书 / Linear / Raycast / Arc 这类「用户习惯」标杆的共同做法。</p>
+  </div>
+
+  <h2>二、信息架构：现状 vs 建议</h2>
+  <div class="ia">
+    <figure>
+      <svg viewBox="0 0 360 300" role="img" aria-label="当前侧栏结构">
+        <rect x="8" y="8" width="344" height="284" rx="14" fill="#fff" stroke="rgba(0,0,0,.08)"/>
+        <rect x="24" y="22" width="120" height="14" rx="4" fill="#ececf1"/>
+        <text x="24" y="20" font-size="11" fill="#8e8e93" font-family="sans-serif">品牌 + v0.1.0</text>
+        <rect x="24" y="56" width="312" height="30" rx="8" fill="#006edb" opacity=".12"/>
+        <rect x="24" y="96" width="312" height="26" rx="8" fill="#f5f5f7"/>
+        <rect x="24" y="130" width="312" height="26" rx="8" fill="#f5f5f7"/>
+        <rect x="24" y="164" width="312" height="26" rx="8" fill="#f5f5f7"/>
+        <rect x="24" y="206" width="312" height="28" rx="8" fill="#ececf1"/>
+        <text x="34" y="225" font-size="11" fill="#1d1d1f" font-family="sans-serif">会话 | 圆桌（分段控件）</text>
+        <rect x="24" y="246" width="312" height="34" rx="8" fill="#fff" stroke="rgba(0,0,0,.1)"/>
+        <text x="34" y="268" font-size="11" fill="#6e6e73" font-family="sans-serif">会话列表 / 群列表 …</text>
+      </svg>
+      <figcaption>现状：全局导航 + 模式分段 + 会话列表 三层堆叠在侧栏内，且顶部栏仅显示与之一致的标题。</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 360 300" role="img" aria-label="建议侧栏结构">
+        <rect x="8" y="8" width="344" height="284" rx="14" fill="#fff" stroke="rgba(0,0,0,.08)"/>
+        <text x="24" y="28" font-size="11" fill="#8e8e93" font-family="sans-serif">导航（分组 + 左强调条）</text>
+        <rect x="24" y="36" width="312" height="28" rx="8" fill="#006edb" opacity=".12"/>
+        <rect x="24" y="70" width="312" height="24" rx="8" fill="#f5f5f7"/>
+        <rect x="24" y="100" width="312" height="24" rx="8" fill="#f5f5f7"/>
+        <line x1="24" y1="138" x2="336" y2="138" stroke="rgba(0,0,0,.08)"/>
+        <text x="24" y="158" font-size="11" fill="#8e8e93" font-family="sans-serif">对话工作区（模式=目的地）</text>
+        <rect x="24" y="166" width="312" height="26" rx="13" fill="#ececf1"/>
+        <rect x="28" y="170" width="152" height="18" rx="9" fill="#fff"/>
+        <text x="44" y="183" font-size="10" fill="#1d1d1f" font-family="sans-serif">会话</text>
+        <text x="196" y="183" font-size="10" fill="#6e6e73" font-family="sans-serif">圆桌</text>
+        <rect x="24" y="202" width="312" height="30" rx="8" fill="#fff" stroke="rgba(0,0,0,.1)"/>
+        <rect x="24" y="238" width="312" height="30" rx="8" fill="#fff" stroke="rgba(0,0,0,.1)"/>
+      </svg>
+      <figcaption>建议：导航分组并加「左强调条」区分激活态；模式分段（会话/圆桌）与顶部 ⌘K 命令栏协同，侧栏只负责「去哪 + 列什么」。</figcaption>
+    </figure>
+  </div>
+
+  <h2>三、问题清单（按严重度）</h2>
+  <div class="card" style="padding:6px 8px">
+    <table>
+      <thead><tr><th style="width:64px">严重度</th><th style="width:150px">位置</th><th>问题</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="chip high">高</span></td>
+          <td class="loc">Sidebar.tsx · TopBar.tsx</td>
+          <td>存在<strong>两套并行导航心智</strong>：顶部全局 NavKey（chat/tasks/kanban/calendar）+ 侧栏内「会话｜圆桌」分段控件，二者都改变主区却语义不同，用户易混淆。</td>
+          <td>把「会话 / 圆桌」明确为<strong>对话区两种目的地</strong>（而非全局模式），或合并进顶部导航；用 pill 分段控件 + 图标强化可发现性。</td>
+        </tr>
+        <tr>
+          <td><span class="chip high">高</span></td>
+          <td class="loc">TopBar.tsx</td>
+          <td>顶部栏仅放折叠按钮 + 与侧栏重复的标题，<strong>浪费黄金视区</strong>。专业桌面工具普遍在此放命令入口。</td>
+          <td>加入 <span class="kbd">⌘K</span> <strong>全局命令面板</strong> + 当前上下文面包屑（如「圆桌 / 市场调研群」）。低成本、极高「符合习惯」感。</td>
+        </tr>
+        <tr>
+          <td><span class="chip med">中</span></td>
+          <td class="loc">App.css · .message-row / .message-list</td>
+          <td>消息间距 <code>gap: var(--space-lg)</code>（24px）偏松，长对话滚动节奏拖沓；同发送者连续消息未分组。</td>
+          <td>将气泡间距收至 14–16px，连续同发送者消息合并间距 6px，建立清晰「轮次」节奏（对齐 iMessage / 飞书）。</td>
+        </tr>
+        <tr>
+          <td><span class="chip med">中</span></td>
+          <td class="loc">App.css · .message-bubble.user</td>
+          <td>用户气泡背景 <code>#ececf1</code> 为<strong>写死十六进制</strong>，且为平涂灰、无层次，与设计令牌规范冲突。</td>
+          <td>改用令牌（如 <code>--bubble-user</code> 派生自 <code>--bg-tertiary</code>），并加极轻 inner highlight，呼应毛玻璃语言。</td>
+        </tr>
+        <tr>
+          <td><span class="chip med">中</span></td>
+          <td class="loc">Sidebar.tsx · .sidebar-nav-item</td>
+          <td>导航项与下方会话列表的「激活态」视觉处理相同（填充背景），层级易混淆；品牌区版本号 <code>v0.1.0</code> 占用纵向空间。</td>
+          <td>导航激活用<strong>左侧强调条 + 浅色 pill</strong>；会话激活用浅色 pill，二者区分；版本号移入关于页或缩为角标。</td>
+        </tr>
+        <tr>
+          <td><span class="chip med">中</span></td>
+          <td class="loc">InputBar.tsx</td>
+          <td>工具栏同时塞入 附件 / 权限 / 升级 / 上下文环 / 模型 / 语音 / 发送，窄宽下拥挤；权限默认「Ask Approval」但入口较隐。</td>
+          <td>分<strong>左簇（附件·@·升级）</strong>与<strong>右簇（上下文·模型·语音·发送）</strong>，中间分隔；权限收为图标，展开才显文案；保证 44px 触控区。</td>
+        </tr>
+        <tr>
+          <td><span class="chip low">低</span></td>
+          <td class="loc">MessageList.tsx · chat-empty</td>
+          <td>首屏标题 <code>One Desktop, All Solutions</code> 中英混排，建议与中文界面统一；建议项写死 4 条。</td>
+          <td>中文主标题 + 动态建议（近期文件 / 常用任务），并给一个清晰主 CTA。</td>
+        </tr>
+        <tr>
+          <td><span class="chip low">低</span></td>
+          <td class="loc">全局</td>
+          <td>缺少可发现的键盘快捷键（⌘K / ⌘N 新会话 / ⌘B 折叠侧栏已存在），无障碍焦点管理在侧栏折叠时未显式处理。</td>
+          <td>快捷键在设置中集中展示；侧栏折叠后焦点移至主区；命令面板自带焦点陷阱。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>四、视觉方向（保持并强化）</h2>
+  <div class="card">
+    <h3>1 · 设计令牌已是资产，别动底层</h3>
+    <p>Apple HIG 色板（<code>--bg-canvas:#fafafc</code>、<code>--accent:#006edb</code>）、8pt 间距、统一 1.5px 单色图标、可调毛玻璃系统——这几项构成了一致的「高级感」基础，新页面务必复用，<span class="accent">禁止写死十六进制</span>。</p>
+    <h3>2 · 毛玻璃要「有信号」</h3>
+    <p>毛玻璃的识别信号不是 blur 本身，而是<strong>更亮的半透明白 + 1px 高光描边 + 柔影</strong>。新组件（抽屉、气泡、卡片）统一走 <code>var(--glass-surface)</code> 系列，并设置已能在「设置 → 个性化」调节，这条链路保持。</p>
+    <h3>3 · 层级靠「位置 + 亮度」而非颜色</h3>
+    <p>沿用现有原则：区分来自对齐方式与表面明度，主色占比 ≤5%。圆桌群内可保留微信化绿色气泡作为语义例外，但主对话区保持克制。</p>
+  </div>
+
+  <h2>五、落地优先级</h2>
+  <div class="roadmap">
+    <div class="road">
+      <h4>P0 · 快赢（半天）</h4>
+      <span class="tag">低成本 · 高回报</span>
+      <ul class="tight">
+        <li>顶部栏加 <span class="kbd">⌘K</span> 命令入口 + 面包屑</li>
+        <li>侧栏导航与对话列表分组 + 左强调条激活态</li>
+        <li>气泡间距收紧至 14–16px、连续同发送者合并</li>
+        <li>用户气泡改用令牌色（去 <code>#ececf1</code>）</li>
+      </ul>
+    </div>
+    <div class="road">
+      <h4>P1 · 收敛（1–2 天）</h4>
+      <span class="tag">中成本 · 强体验</span>
+      <ul class="tight">
+        <li>「会话 / 圆桌」改为对话区目的地心智，与顶部导航解耦清晰</li>
+        <li>InputBar 左右簇分组 + 权限图标化</li>
+        <li>首屏空状态本地化 + 动态建议</li>
+        <li>设置页新增「快捷键」展示</li>
+      </ul>
+    </div>
+    <div class="road">
+      <h4>P2 · 打磨（持续）</h4>
+      <span class="tag">细节 · 一致性</span>
+      <ul class="tight">
+        <li>侧栏折叠焦点管理 + 动效顺滑</li>
+        <li>暗色下玻璃对比复检（已含 axe 校验约定）</li>
+        <li>跨页面统一卡片/抽屉圆角与阴影层级</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>六、立即可做的 5 个微调</h2>
+  <div class="card">
+    <ul class="tight">
+      <li><b>⌘K 占位：</b>在 <code>TopBar</code> 居中放一个「搜索或执行命令… ⌘K」的胶囊按钮，先接占位逻辑，体验立刻专业。</li>
+      <li><b>侧栏分隔：</b>在导航区与会话区之间加 1px <code>--border-light</code> 分隔线，层级立刻清晰。</li>
+      <li><b>激活态：</b>导航激活项改为「左侧 3px accent 强调条 + 浅 pill」，与列表激活区分。</li>
+      <li><b>间距：</b><code>.message-list { gap: 14px }</code>、<code>.message-row.group-start { margin-top: 6px }</code>，阅读更紧凑。</li>
+      <li><b>气泡令牌：</b>新增 <code>--bubble-user: var(--bg-tertiary)</code>，替换写死的 <code>#ececf1</code>。</li>
+    </ul>
+  </div>
+
+  <footer>
+    本方案基于当前代码静态审查给出，未做可用性测试。落地时建议按 P0→P1 推进，每步保持 check:ts 与暗色/对比度校验。
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,240 @@
+/* ── AgentEditorModal 弹窗（Cherry Studio 风格，2026-09-02 重写）──
+   设计要点：
+   · 整页大卡片（白底 + radius + shadow）容纳所有字段
+   · 面包屑 + 帮助 + 关闭 一行
+   · 字段 label 在上、input 在下，水平 padding 一致
+   · 工具/skills 选择从 TagInput 改为 ChipMultiSelect（chip + 自定义输入）
+   · 高级折叠保留（disallowedTools/provider/permission/isolation/maxTurns）
+   · 唯一蓝做激活态、单色克制、Apple HIG 风 */
+
+.modal-agent-editor {
+  width: 780px;
+  max-width: 92vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xl) var(--space-xl) var(--space-lg);
+}
+
+/* ── 顶部：面包屑 + 操作 ── */
+.ae-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--space-md);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+.ae-breadcrumb-step {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.ae-breadcrumb-step.current {
+  color: var(--text-secondary);
+}
+.ae-breadcrumb-sep {
+  color: var(--text-tertiary);
+  opacity: 0.6;
+}
+.ae-breadcrumb-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ae-help-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.ae-help-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+.ae-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.ae-close-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* ── Header：标题 + 副标题 ── */
+.ae-header {
+  margin-bottom: var(--space-lg);
+}
+.ae-header h2 {
+  margin: 0 0 4px;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.ae-subtitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── 大白卡片：包主要内容 ── */
+.ae-card {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+}
+
+/* ── 字段：label 在上、input 在下 ── */
+.ae-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ae-field label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.ae-field input,
+.ae-field textarea,
+.ae-field select {
+  width: 100%;
+  padding: 9px var(--space-md);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+  box-sizing: border-box;
+}
+.ae-field input::placeholder,
+.ae-field textarea::placeholder { color: var(--text-tertiary); }
+.ae-field input:hover,
+.ae-field textarea:hover,
+.ae-field select:hover { border-color: var(--border-focus); }
+.ae-field input:focus,
+.ae-field textarea:focus,
+.ae-field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.ae-textarea-lg {
+  min-height: 96px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.ae-helper {
+  margin: 4px 0 0;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* ── 多列行：名称 + 模型 上下两列等宽 ── */
+.ae-row {
+  display: grid;
+  gap: var(--space-md);
+}
+.ae-row-2col {
+  grid-template-columns: 1fr 1fr;
+}
+.ae-row-advanced {
+  margin: 0;
+}
+
+/* ── 高级折叠按钮（参考图「▼ 高级」）── */
+.ae-advanced-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 6px 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  cursor: pointer;
+}
+.ae-advanced-toggle:hover { color: var(--text-primary); }
+.ae-advanced-toggle .rot { transform: rotate(90deg); transition: transform 150ms ease; }
+
+.ae-advanced-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md) 0 0;
+  border-top: 1px solid var(--border-light);
+  margin-top: var(--space-xs);
+}
+
+/* ── 错误态 ── */
+.ae-error {
+  margin: var(--space-md) 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(168, 92, 60, 0.08);
+  border: 1px solid rgba(168, 92, 60, 0.18);
+  color: #a85c3c;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+/* ── 底部 actions ── */
+.ae-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+}
+
+/* ── Dark 适配 ── */
+[data-theme="dark"] .ae-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .ae-field input,
+[data-theme="dark"] .ae-field textarea,
+[data-theme="dark"] .ae-field select {
+  background: rgba(255, 255, 255, 0.04);
+}
+[data-theme="dark"] .ae-error {
+  background: rgba(168, 92, 60, 0.15);
+  border-color: rgba(168, 92, 60, 0.3);
+  color: #d49180;
+}
+[data-theme="dark"] .ae-advanced-body {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}

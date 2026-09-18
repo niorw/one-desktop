@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Dashboard Hero 方案模拟器</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    background: #eef0f4;
+    color: #1d1d1f;
+    min-height: 100vh;
+  }
+
+  /* ── 顶部方案切换条 ── */
+  .picker {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e3e4e8;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+  }
+  .picker-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6e6e73;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .picker button {
+    padding: 7px 14px;
+    border: 1px solid #d9d9de;
+    border-radius: 999px;
+    background: #fff;
+    color: #44444a;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 140ms ease;
+  }
+  .picker button:hover { border-color: #a8a8b0; }
+  .picker button.active {
+    background: #006edb;
+    border-color: #006edb;
+    color: #fff;
+  }
+
+  /* ── 模拟 App 窗口 ── */
+  .stage {
+    max-width: 1080px;
+    margin: 32px auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(20,40,80,0.14), 0 2px 8px rgba(20,40,80,0.06);
+    overflow: hidden;
+    display: flex;
+    min-height: 640px;
+  }
+
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: #fafafc;
+    border-right: 1px solid #ececf0;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .side-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #44444a;
+  }
+  .side-item.on { background: #eef3fb; color: #006edb; font-weight: 600; }
+  .side-item .dot {
+    width: 15px; height: 15px; border-radius: 5px;
+    background: #d9d9de; flex-shrink: 0;
+  }
+  .side-item.on .dot { background: #006edb; }
+  .side-spacer { flex: 1; }
+  .side-foot {
+    padding: 9px 12px;
+    font-size: 11px;
+    color: #8a8f98;
+    border-top: 1px solid #ececf0;
+    margin-top: 8px;
+  }
+
+  /* ── 主区 ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .main-topbar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid #f0f0f2;
+  }
+  .main-topbar .left { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #6e6e73; }
+  .main-topbar .pill {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: #f2f2f5;
+    font-size: 12px;
+    color: #44444a;
+  }
+
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 48px;
+    overflow: hidden;
+  }
+
+  /* ── hero 容器（JS 切换）── */
+  #hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 320px;
+  }
+  #hero .hero-inner { width: 100%; }
+
+  .logo-img {
+    height: 34px;
+    width: auto;
+    display: block;
+  }
+
+  /* 方案 A：光晕托盘 + 居中 */
+  .va { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+  .va .mark {
+    position: relative;
+    width: 132px; height: 132px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+  }
+  .va .glow {
+    position: absolute; inset: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 45%, rgba(91,192,235,0.35), rgba(59,130,246,0.16) 40%, transparent 70%);
+    filter: blur(16px);
+  }
+  .va .mark .logo-img { position: relative; height: 64px; }
+  .va h1 { font-size: 25px; font-weight: 600; letter-spacing: -0.015em; }
+  .va p { font-size: 12px; color: #6e6e73; letter-spacing: 0.06em; }
+
+  /* 方案 B：左对齐工作台 */
+  .vb { display: flex; align-items: flex-end; gap: 20px; }
+  .vb .logo-wrap { display: flex; flex-direction: column; gap: 8px; padding-bottom: 4px; }
+  .vb .logo-wrap .logo-img { height: 30px; }
+  .vb h1 { font-size: 27px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 8px; }
+  .vb p { font-size: 13px; color: #6e6e73; }
+
+  /* 方案 C：分栏式（logo 左、标题右 + chips） */
+  .vc { display: flex; align-items: center; gap: 24px; }
+  .vc .logo-img { height: 54px; }
+  .vc .right { display: flex; flex-direction: column; gap: 6px; }
+  .vc h1 { font-size: 23px; font-weight: 600; letter-spacing: -0.015em; }
+  .vc p { font-size: 12px; color: #6e6e73; }
+  .vc .chips { display: flex; gap: 8px; margin-top: 10px; }
+  .vc .chip {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #f2f2f5;
+    font-size: 12px;
+    color: #44444a;
+  }
+
+  /* 方案 D：极简纯文字 */
+  .vd { display: flex; flex-direction: column; }
+  .vd h1 { font-size: 30px; font-weight: 600; letter-spacing: -0.025em; margin-bottom: 10px; }
+  .vd p { font-size: 13px; color: #6e6e73; letter-spacing: 0.05em; margin-bottom: 26px; }
+  .vd .rule { height: 1px; background: #e8e8ed; margin-bottom: 24px; }
+
+  /* 方案 E：问候卡片 */
+  .ve { display: flex; justify-content: center; }
+  .ve .card {
+    width: 420px;
+    background: linear-gradient(135deg, #eaf3fe, #f0f7ff);
+    border: 1px solid #d4e5f8;
+    border-radius: 16px;
+    padding: 26px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ve .card .logo-img { height: 26px; margin-bottom: 4px; }
+  .ve .card h1 { font-size: 19px; font-weight: 600; color: #0c447c; letter-spacing: -0.01em; }
+  .ve .card p { font-size: 12px; color: #185fa5; }
+
+  /* 方案 F：双行品牌锁 */
+  .vf { display: flex; align-items: center; gap: 18px; }
+  .vf .lock { display: flex; align-items: center; gap: 12px; }
+  .vf .lock .logo-img { height: 34px; }
+  .vf .lock .words { display: flex; flex-direction: column; line-height: 1.25; }
+  .vf .lock .words .w1 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+  .vf .lock .words .w2 { font-size: 11px; color: #6e6e73; letter-spacing: 0.08em; }
+  .vf .divider { width: 1px; height: 40px; background: #e3e4e8; }
+  .vf h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+
+  /* ── 输入框（模拟） ── */
+  .inputbar {
+    padding: 0 0 40px;
+  }
+  .inputbox {
+    max-width: 720px;
+    margin: 0 auto;
+    border: 1px solid #dcdce1;
+    border-radius: 14px;
+    background: #fff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .inputbox .ph { flex: 1; font-size: 14px; color: #a0a0a8; }
+  .inputbox .send {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #006edb;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .inputbox .send::after {
+    content: ""; width: 0; height: 0;
+    border-left: 7px solid #fff;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    margin-left: 2px;
+  }
+  .hint {
+    text-align: center;
+    padding: 0 0 36px;
+    font-size: 12px;
+    color: #8a8f98;
+  }
+</style>
+</head>
+<body>
+
+<div class="picker" id="picker">
+  <span class="picker-label">方案</span>
+  <button data-k="a" class="active">A 光晕托盘</button>
+  <button data-k="b">B 左对齐工作台</button>
+  <button data-k="c">C 分栏式</button>
+  <button data-k="d">D 极简纯文字</button>
+  <button data-k="e">E 问候卡片</button>
+  <button data-k="f">F 双行品牌锁</button>
+</div>
+
+<div class="stage">
+  <aside class="sidebar">
+    <div class="side-item on"><span class="dot"></span>新建任务</div>
+    <div class="side-item"><span class="dot"></span>自动化</div>
+    <div class="side-item"><span class="dot"></span>看板</div>
+    <div class="side-item"><span class="dot"></span>日历</div>
+    <div class="side-item"><span class="dot"></span>灵感</div>
+    <div class="side-spacer"></div>
+    <div class="side-foot">OneDesktop v0.1 · dev</div>
+  </aside>
+
+  <div class="main">
+    <div class="main-topbar">
+      <div class="left"><span class="pill">默认工作区</span></div>
+      <div class="left">⌘K</div>
+    </div>
+
+    <div class="content">
+      <div id="hero"></div>
+      <div class="inputbar">
+        <div class="inputbox">
+          <span class="ph">输入消息，开始与 Agent 协作…</span>
+          <span class="send"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hint">方案模拟器 · 点击顶部按钮切换 · 与 src/components/chat/Dashboard.tsx hero 区对应</div>
+
+<script>
+const LOGO = "../src/assets/one-desktop-logo.svg";
+const hero = document.getElementById("hero");
+
+const TPL = {
+  a: `
+    <div class="va">
+      <div class="mark">
+        <span class="glow"></span>
+        <img class="logo-img" src="${LOGO}" alt="">
+      </div>
+      <h1>今天想解决什么问题？</h1>
+      <p>ONE DESKTOP, ALL SOLUTIONS</p>
+    </div>`,
+  b: `
+    <div class="vb">
+      <div class="logo-wrap">
+        <img class="logo-img" src="${LOGO}" alt="">
+      </div>
+      <div>
+        <h1>今天想解决什么问题？</h1>
+        <p>One Desktop, All Solutions</p>
+      </div>
+    </div>`,
+  c: `
+    <div class="vc">
+      <img class="logo-img" src="${LOGO}" alt="">
+      <div class="right">
+        <h1>今天想解决什么问题？</h1>
+        <p>One Desktop, All Solutions</p>
+        <div class="chips">
+          <span class="chip">继续上次任务</span>
+          <span class="chip">查看今日安排</span>
+          <span class="chip">头脑风暴</span>
+        </div>
+      </div>
+    </div>`,
+  d: `
+    <div class="vd">
+      <h1>今天想解决什么问题？</h1>
+      <p>ONE DESKTOP, ALL SOLUTIONS</p>
+      <div class="rule"></div>
+    </div>`,
+  e: `
+    <div class="ve">
+      <div class="card">
+        <img class="logo-img" src="${LOGO}" alt="">
+        <h1>下午好，今天想解决什么？</h1>
+        <p>One Desktop · 随时待命</p>
+      </div>
+    </div>`,
+  f: `
+    <div class="vf">
+      <div class="lock">
+        <img class="logo-img" src="${LOGO}" alt="">
+        <div class="words">
+          <span class="w1">OneDesktop</span>
+          <span class="w2">ALL SOLUTIONS</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <h1>今天想解决什么问题？</h1>
+    </div>`,
+};
+
+function render(k) {
+  hero.innerHTML = `<div class="hero-inner">${TPL[k]}</div>`;
+  document.querySelectorAll("#picker button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.k === k);
+  });
+}
+
+document.getElementById("picker").addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (btn) render(btn.dataset.k);
+});
+
+render("a");
+</script>
+</body>
+</html>

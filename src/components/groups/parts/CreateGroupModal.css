@@ -1,0 +1,699 @@
+/* ── CreateGroupModal 弹窗专用样式（cg- 前缀） ──
+   设计要点：
+   · Apple HIG 极简基调，留白 + 字重 + 中性分隔线承重，非颜色镶边
+   · 单色 SVG 图标（stroke=currentColor）+ 唯一蓝（功能激活态）
+   · 横排 4 等宽模板卡 / chip-pill 选择 / segmented 单选卡
+   · sticky live preview 让用户在创建前看到将创建什么
+   · 配色仅用语义变量（--accent / --bg-* / --border-* / --text-*）
+   · 自适应 light + dark
+*/
+
+.cg-modal {
+  width: 720px;
+  max-width: 92vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header：标题 + 关闭 ── */
+.cg-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.cg-modal-head-text h2 {
+  margin: 0 0 4px 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.cg-modal-head-text p {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.cg-close-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px -4px 0 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.cg-close-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+
+/* ── 主滚动区 ── */
+.cg-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-lg) 0 var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* ── 分区标签：「┃ 标题」style ── */
+.cg-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.cg-section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.cg-section-label::before {
+  content: '';
+  width: 3px;
+  height: 11px;
+  border-radius: 1.5px;
+  background: var(--accent);
+  display: inline-block;
+}
+.cg-section-helper {
+  margin: -2px 0 0;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* ── Field：标准字段 ── */
+.cg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cg-field-label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.cg-field-helper {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin: 2px 0 0;
+}
+
+/* ── § 智能体 section 内 sub-section（2026-09-02 UX 收尾）──
+   把「群主 Agent」「静态 Worker」各自包成独立卡片，破除"4 个 label 平铺糊在一起"的观感：
+   · 群主用左侧 3px accent 边 +「群主」徽标 —— 视觉上「唯一最高权限」，与 Worker 区分
+   · Worker sub-card 平实，强调 "成员平等"
+   · 两 sub-card 之间 14px gap，分组呼吸
+   · Worker 内「职能角色 / 聊天人格」两个 worker-group 之间 dashed 分隔线，语义"同类不同子类"
+   —— 可与 .cg-field 叠加（sub-section 提供 box 视觉，field 提供 label-in-top 布局）*/
+.cg-subsection {
+  display: flex;
+  flex-direction: column;
+  /* 覆盖 .cg-field 的 gap:6px：sub-section 内更多内容（helper + 多个 worker-group），用 8px */
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated, var(--bg-primary));
+}
+.cg-subsection + .cg-subsection {
+  margin-top: 14px;
+}
+.cg-subsection--primary {
+  border-left: 3px solid var(--accent);
+}
+.cg-subsection-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.cg-subsection-title-row .cg-field-label { font-weight: 600; color: var(--text-primary); }
+.cg-subsection-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* worker-group 之间 dashed 分隔（不靠 margin-only，需要可见线条区分两个子类） */
+.cg-worker-group + .cg-worker-group {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-light);
+}
+
+.cg-input,
+.cg-textarea {
+  width: 100%;
+  padding: 10px var(--space-md);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: inherit;
+  line-height: 1.45;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+  box-sizing: border-box;
+}
+.cg-textarea {
+  min-height: 64px;
+  resize: vertical;
+  font-family: inherit;
+}
+.cg-input::placeholder,
+.cg-textarea::placeholder {
+  color: var(--text-tertiary);
+  opacity: 1;
+}
+.cg-input:hover,
+.cg-textarea:hover { border-color: var(--border-focus); }
+.cg-input:focus,
+.cg-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* ── 模板卡片：横排 4 等宽 grid ── */
+.cg-templates {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+}
+.cg-tpl {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 6px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  cursor: pointer;
+  font-family: inherit;
+  position: relative;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+}
+.cg-tpl:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-soft);
+}
+.cg-tpl:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+.cg-tpl.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.cg-tpl-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--bg-soft);
+  color: var(--text-secondary);
+  flex: 0 0 auto;
+}
+.cg-tpl.active .cg-tpl-icon {
+  background: rgba(0, 110, 219, 0.12);
+  color: var(--accent);
+}
+.cg-tpl-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.cg-tpl.active .cg-tpl-title { color: var(--accent); }
+.cg-tpl-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.cg-tpl.active .cg-tpl-desc { color: var(--accent); opacity: 0.85; }
+
+.cg-tpl-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 140ms ease, transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cg-tpl.active .cg-tpl-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Segmented 单选卡（群性质 / 协作拓扑都用）── */
+.cg-segment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+.cg-segment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  cursor: pointer;
+  font-family: inherit;
+  position: relative;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.cg-segment:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-soft);
+}
+.cg-segment:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+.cg-segment.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.cg-segment-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--bg-soft);
+  color: var(--text-secondary);
+}
+.cg-segment.active .cg-segment-icon {
+  background: rgba(0, 110, 219, 0.12);
+  color: var(--accent);
+}
+.cg-segment-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.cg-segment.active .cg-segment-title { color: var(--accent); }
+.cg-segment-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.cg-segment.active .cg-segment-desc { color: var(--accent); opacity: 0.85; }
+
+/* ── Chip pill 选择器（群主 / Worker） ── */
+.cg-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cg-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+.cg-pill:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-soft);
+}
+.cg-pill:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+.cg-pill.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.cg-pill-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  margin-left: 2px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 120ms ease, transform 120ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cg-pill.active .cg-pill-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Worker 分组 ── */
+.cg-worker-group-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.cg-worker-group-title .cg-count {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+/* ── 新建 Agent CTA ── */
+.cg-add-agent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  margin-top: 8px;
+  border-radius: 999px;
+  border: 1px dashed var(--border-medium);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+.cg-add-agent:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.cg-add-agent:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* ── Custom matrix（拓扑选了"自定义"后展开） ── */
+.cg-custom-matrix {
+  margin-top: var(--space-sm);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-soft);
+}
+.cg-custom-hint {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+.cg-custom-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: 6px 0;
+  border-top: 1px solid var(--border-light);
+}
+.cg-custom-row:first-of-type { border-top: none; }
+.cg-custom-from {
+  flex: 0 0 96px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.cg-custom-peers {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.cg-custom-from-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+.cg-custom-empty {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  padding: 8px 0;
+}
+
+/* ── Error ── */
+.cg-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(168, 92, 60, 0.08);
+  border: 1px solid rgba(168, 92, 60, 0.18);
+  color: #a85c3c;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+.cg-error-icon {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+/* ── Phases (阶段化进度) ── */
+.cg-phases {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0 var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+.cg-phase {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.cg-phase-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  flex: 0 0 auto;
+}
+.cg-phase-todo { color: var(--text-tertiary); }
+.cg-phase-todo .cg-phase-dot { background: var(--bg-tertiary); }
+.cg-phase-active { color: var(--text-primary); font-weight: 500; }
+.cg-phase-active .cg-phase-dot {
+  background: var(--accent-soft);
+  border: 2px solid var(--accent);
+}
+.cg-phase-done { color: var(--text-secondary); }
+.cg-phase-done .cg-phase-dot {
+  background: var(--accent);
+  color: #fff;
+}
+.cg-phase-spin {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: cg-pulse 1.1s ease-in-out infinite;
+}
+.cg-phase-idle {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+}
+.cg-phase-sep {
+  flex: 0 0 18px;
+  height: 1px;
+  background: var(--border-light);
+}
+@keyframes cg-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ── Footer：live preview + actions ── */
+.cg-modal-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0 0;
+  border-top: 1px solid var(--border-light);
+}
+.cg-preview {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 6px;
+  row-gap: 4px;
+  align-items: center;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  min-width: 0;
+}
+.cg-preview-label {
+  flex: 0 0 auto;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 2px;
+}
+.cg-preview-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* 关键：不被 preview 里其它 pill 挤压触发换行（220+220+220+gap > preview 宽）—— 邻居宁愿 wrap 也不压扁 */
+  flex-shrink: 0;
+}
+.cg-preview-pill.accent {
+  /* 「研发型群 · 星形拓扑」这组合文案最多，独占一行 */
+  max-width: 240px;
+}
+.cg-preview-pill strong { font-weight: 600; color: var(--text-primary); }
+.cg-preview-pill.accent {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cg-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex: 0 0 auto;
+}
+
+/* ── 暗色主题 ── */
+[data-theme="dark"] .cg-tpl,
+[data-theme="dark"] .cg-segment,
+[data-theme="dark"] .cg-pill {
+  background: rgba(255, 255, 255, 0.04);
+}
+[data-theme="dark"] .cg-tpl:hover,
+[data-theme="dark"] .cg-segment:hover,
+[data-theme="dark"] .cg-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-medium);
+}
+[data-theme="dark"] .cg-tpl.active,
+[data-theme="dark"] .cg-segment.active {
+  background: var(--accent-soft);
+}
+[data-theme="dark"] .cg-input,
+[data-theme="dark"] .cg-textarea {
+  background: rgba(255, 255, 255, 0.04);
+}
+[data-theme="dark"] .cg-modal-header,
+[data-theme="dark"] .cg-modal-footer {
+  border-color: var(--border-light);
+}
+[data-theme="dark"] .cg-add-agent:hover {
+  background: var(--accent-soft);
+}
+[data-theme="dark"] .cg-error {
+  background: rgba(168, 92, 60, 0.15);
+  border-color: rgba(168, 92, 60, 0.3);
+  color: #d49180;
+}
+[data-theme="dark"] .cg-preview-pill {
+  background: rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .cg-preview-pill.accent {
+  background: var(--accent-soft);
+}
+[data-theme="dark"] .cg-custom-matrix {
+  background: rgba(255, 255, 255, 0.03);
+}
+[data-theme="dark"] .cg-segment-icon,
+[data-theme="dark"] .cg-tpl-icon {
+  background: rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .cg-segment.active .cg-segment-icon,
+[data-theme="dark"] .cg-tpl.active .cg-tpl-icon {
+  background: rgba(10, 132, 255, 0.2);
+}
+
+/* 自定义拓扑的延迟提示（建群时 Worker 未生成，属"预设"而非最终授权） */
+.cg-custom-hint--warn {
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: rgba(168, 92, 60, 0.08);
+  border: 1px solid rgba(168, 92, 60, 0.18);
+  color: #a85c3c;
+  margin-bottom: var(--space-sm);
+}
+[data-theme="dark"] .cg-custom-hint--warn {
+  background: rgba(168, 92, 60, 0.15);
+  border-color: rgba(168, 92, 60, 0.3);
+  color: #d49180;
+}

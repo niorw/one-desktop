@@ -1,0 +1,1351 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>GroupInfoPanel V5 — 设计评审</title>
+<style>
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 0 rgba(0,0,0,.04);
+  --shadow-md: 0 4px 14px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --transition: 160ms cubic-bezier(.2,.8,.3,1);
+}
+body.theme-light {
+  --bg-page: #f5f5f7;
+  --bg-panel: #ffffff;
+  --bg-soft: #fafafc;
+  --bg-row: #ffffff;
+  --bg-row-hover: #f5f6f8;
+  --bg-tag: #ececf1;
+  --bg-tag-owner: rgba(0,110,219,.10);
+  --bg-tag-success: rgba(48,164,108,.12);
+  --bg-tag-warning: rgba(217,135,30,.12);
+  --bg-tag-muted: rgba(110,110,115,.10);
+  --bg-cta: #006edb;
+  --bg-cta-hover: #0058ad;
+  --bg-secondary-btn: #ffffff;
+  --text-primary: #14141a;
+  --text-secondary: #42424a;
+  --text-tertiary: #6e6e75;
+  --text-quaternary: #9a9aa0;
+  --text-on-cta: #ffffff;
+  --text-link: #006edb;
+  --border-light: rgba(0,0,0,.06);
+  --border-medium: rgba(0,0,0,.10);
+  --border-strong: rgba(0,0,0,.16);
+  --accent: #006edb;
+  --accent-strong: #0058ad;
+  --accent-soft: rgba(0,110,219,.10);
+  --status-success: #34c759;
+  --status-success-strong: #1f7a3d;
+  --status-warning: #ff9500;
+  --status-warning-strong: #b25e00;
+  --status-error: #ff3b30;
+  --status-error-strong: #b3261d;
+  --status-info: #5e9bff;
+  --status-idle: #b6b6bc;
+  --status-busy: #ff9500;
+}
+body.theme-dark {
+  --bg-page: #0e0e10;
+  --bg-panel: #16161a;
+  --bg-soft: #1c1c1f;
+  --bg-row: #1a1a1d;
+  --bg-row-hover: #22222a;
+  --bg-tag: rgba(255,255,255,.08);
+  --bg-tag-owner: rgba(0,138,255,.18);
+  --bg-tag-success: rgba(48,164,108,.18);
+  --bg-tag-warning: rgba(217,135,30,.18);
+  --bg-tag-muted: rgba(255,255,255,.06);
+  --bg-cta: #0a84ff;
+  --bg-cta-hover: #2e9bff;
+  --bg-secondary-btn: #2a2a30;
+  --text-primary: #f5f5f7;
+  --text-secondary: #c8c8cd;
+  --text-tertiary: #8e8e93;
+  --text-quaternary: #5b5b60;
+  --text-on-cta: #ffffff;
+  --text-link: #4ea8ff;
+  --border-light: rgba(255,255,255,.06);
+  --border-medium: rgba(255,255,255,.10);
+  --border-strong: rgba(255,255,255,.16);
+  --accent: #0a84ff;
+  --accent-strong: #4ea8ff;
+  --accent-soft: rgba(10,132,255,.18);
+  --status-success: #34d058;
+  --status-success-strong: #7bdf9a;
+  --status-warning: #ffae35;
+  --status-warning-strong: #ffc97a;
+  --status-error: #ff453a;
+  --status-error-strong: #ff8983;
+  --status-info: #7eb0ff;
+  --status-idle: #6b6b73;
+  --status-busy: #ffae35;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* ─── 顶部 header ─── */
+.shell {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 28px 32px 48px;
+}
+.top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.title h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+.title p {
+  margin: 4px 0 0;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tabs {
+  display: inline-flex;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  box-shadow: var(--shadow-sm);
+}
+.tabs button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+  transition: background var(--transition), color var(--transition);
+}
+.tabs button:hover { color: var(--text-primary); }
+.tabs button.on {
+  background: var(--accent);
+  color: var(--text-on-cta);
+}
+.theme-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  box-shadow: var(--shadow-sm);
+}
+.theme-toggle button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--text-tertiary);
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background var(--transition), color var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.theme-toggle button.on { background: var(--bg-tag); color: var(--text-primary); }
+.theme-toggle svg { width: 13px; height: 13px; }
+
+/* ─── view 切换 ─── */
+.view { display: none; }
+.view.on { display: grid; }
+
+/* 比较视图：两列 */
+.view.compare {
+  grid-template-columns: 320px 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.view.single {
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.frame-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.frame-label .ver {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--bg-tag);
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  margin-right: 6px;
+  color: var(--text-secondary);
+  letter-spacing: .06em;
+}
+.frame-label .ver.now { background: var(--bg-tag-muted); }
+.frame-label .ver.next { background: var(--bg-tag-owner); color: var(--accent-strong); }
+
+.canvas {
+  background: var(--bg-panel);
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  position: sticky;
+  top: 24px;
+}
+
+.canvas.light-bg { background: var(--bg-page); border: none; box-shadow: none; }
+
+/* ─── Panel canvas ─── */
+.panel-shell {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+.panel {
+  width: 260px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================
+   V4 — 当前版本（chrome）
+   ============================================ */
+.v4-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.v4-stat {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.v4-stat-value { font-size: 22px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+.v4-stat.accent .v4-stat-value { color: var(--accent); }
+.v4-stat.warning .v4-stat-value { color: var(--status-warning-strong); }
+.v4-stat.info .v4-stat-value { color: var(--status-info); }
+.v4-stat.muted .v4-stat-value { color: var(--text-quaternary); }
+.v4-stat-label { font-size: 11px; color: var(--text-tertiary); }
+
+.v4-section-head {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.v4-worker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--bg-row);
+  border: 1px solid var(--border-light);
+  text-align: left;
+  cursor: pointer;
+}
+.v4-worker-avatar {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: rgba(48,164,108,.18);
+  color: var(--status-success-strong);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  position: relative;
+}
+.v4-worker-avatar.av-busy { background: rgba(217,135,30,.18); color: var(--status-warning-strong); }
+.status-dot {
+  position: absolute; bottom: -2px; right: -2px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-panel);
+}
+.status-dot.status-idle { background: var(--status-idle); }
+.status-dot.status-busy { background: var(--status-busy); }
+.status-dot.status-error { background: var(--status-error); }
+
+.v4-worker-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.v4-worker-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.v4-worker-name { font-weight: 600; font-size: 12.5px; }
+.tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+.tag.owner { background: var(--bg-tag-owner); color: var(--accent-strong); }
+.tag.seat { background: var(--bg-tag); color: var(--text-secondary); }
+.v4-worker-role { font-size: 11px; color: var(--text-tertiary); display: flex; gap: 8px; }
+.seat-mini-metrics { margin-left: auto; display: inline-flex; gap: 4px; flex-shrink: 0; }
+.seat-mini-tok, .seat-mini-dur {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  background: var(--bg-tag);
+  border-radius: var(--radius-pill);
+  padding: 1px 6px;
+}
+
+.v4-workspace {
+  background: var(--bg-soft);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.v4-workspace-title { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+.v4-workspace-path { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); word-break: break-all; line-height: 1.4; }
+.v4-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin-top: auto;
+  border-top: 1px solid var(--border-light);
+  padding-top: 12px;
+}
+.v4-action { display: none; }
+.v4-action.circle {
+  display: inline-flex;
+  width: 100%;
+  height: 36px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 12px;
+  background: var(--bg-tag);
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  position: relative;
+}
+.v4-action.primary {
+  background: var(--bg-cta);
+  color: var(--text-on-cta);
+  height: 44px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.v4-action-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.v4-action-row .icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--bg-tag);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.v4-action-row .icon-btn:hover { background: var(--bg-tag-owner); color: var(--accent-strong); }
+
+/* ============================================
+   V5 — 设计稿
+   ============================================ */
+
+/* 概览条：4 个紧凑 metric + 时间戳 */
+.v5-overview {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 10px 4px;
+  gap: 4px;
+}
+.v5-overview-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  position: relative;
+}
+.v5-overview-cell + .v5-overview-cell::before {
+  content: ""; position: absolute; left: 0; top: 18%;
+  width: 1px; height: 64%;
+  background: var(--border-light);
+}
+.v5-overview-value {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.v5-overview-value .pulse {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--status-success);
+  box-shadow: 0 0 0 3px var(--bg-tag-success);
+}
+.v5-overview-value.warning { color: var(--status-warning-strong); }
+.v5-overview-value.accent { color: var(--accent); }
+.v5-overview-value.muted { color: var(--text-quaternary); }
+.v5-overview-label { font-size: 10px; color: var(--text-tertiary); }
+
+/* 折叠 section 通用 */
+.v5-section { display: flex; flex-direction: column; gap: 8px; }
+.v5-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+}
+.v5-section-head .twisty {
+  transition: transform var(--transition);
+  color: var(--text-quaternary);
+}
+.v5-section.collapsed .v5-section-head .twisty { transform: rotate(-90deg); }
+.v5-section.collapsed .v5-section-body { display: none; }
+.v5-section-head .meta {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  background: var(--bg-tag);
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+}
+.v5-section-head .head-action {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.v5-section-head .head-action:hover { color: var(--accent); background: var(--accent-soft); }
+
+/* 成员卡 */
+.v5-worker {
+  background: var(--bg-row);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+.v5-worker:hover { background: var(--bg-row-hover); border-color: var(--border-medium); }
+.v5-worker.is-owner { border-left: 2px solid var(--accent); padding-left: 10px; }
+
+.v5-worker-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.v5-worker-avatar {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  position: relative;
+  flex-shrink: 0;
+}
+.v5-avatar-pixel {
+  position: absolute; inset: 0;
+  background-size: 8px 8px;
+  background-image: var(--pixel);
+  border-radius: 6px;
+  image-rendering: pixelated;
+}
+.v5-avatar-label {
+  position: relative;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+.v5-worker-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.v5-worker-name {
+  font-weight: 600;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v5-worker-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.tag-mini {
+  font-size: 9.5px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.tag-mini.owner { background: var(--bg-tag-owner); color: var(--accent-strong); }
+.tag-mini.seat-static { background: var(--bg-tag-muted); color: var(--text-secondary); }
+.tag-mini.seat-dynamic { background: var(--bg-tag-success); color: var(--status-success-strong); }
+.tag-mini.seat-cap { background: var(--bg-tag-warning); color: var(--status-warning-strong); }
+
+/* 进度环 */
+.v5-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+.v5-progress-ring { position: relative; width: 28px; height: 28px; }
+.v5-progress-num { font-size: 9px; font-weight: 700; color: var(--text-secondary); }
+
+/* 状态行 */
+.v5-worker-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  min-width: 0;
+}
+.v5-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.v5-status-badge.idle { background: var(--bg-tag); color: var(--text-tertiary); }
+.v5-status-badge.busy {
+  background: var(--bg-tag-warning);
+  color: var(--status-warning-strong);
+}
+.v5-status-badge.idle .pulse { background: var(--text-quaternary); }
+.v5-status-badge .pulse {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--status-warning);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+.v5-status-msg {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+.v5-status-msg .mono { font-family: var(--font-mono); font-size: 10px; padding: 0 4px; background: var(--bg-tag); border-radius: 3px; }
+.v5-status-cost { color: var(--text-quaternary); font-size: 10.5px; flex-shrink: 0; }
+
+/* hover 操作（出现） */
+.v5-worker-actions {
+  position: absolute;
+  top: 6px; right: 6px;
+  display: flex;
+  gap: 2px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 2px;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity var(--transition), transform var(--transition);
+  pointer-events: none;
+  box-shadow: var(--shadow-md);
+}
+.v5-worker:hover .v5-worker-actions { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.v5-worker-actions button {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.v5-worker-actions button:hover { background: var(--bg-tag); color: var(--text-primary); }
+.v5-worker-actions button.danger:hover { background: var(--accent-soft); color: var(--status-error); }
+.v5-worker-actions svg { width: 12px; height: 12px; }
+
+/* 工作空间 - 可操作 */
+.v5-workspace {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.v5-workspace-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.v5-workspace-label svg { width: 11px; height: 11px; }
+.v5-workspace-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.v5-workspace-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v5-workspace-meta { font-size: 10px; color: var(--text-tertiary); }
+.v5-workspace-actions { display: flex; gap: 2px; }
+.v5-workspace-actions button {
+  width: 24px; height: 24px;
+  border: 0; background: transparent;
+  color: var(--text-tertiary);
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.v5-workspace-actions button:hover { background: var(--bg-tag); color: var(--accent); }
+.v5-workspace-actions svg { width: 13px; height: 13px; }
+
+/* 底部主行动 */
+.v5-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+.v5-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--bg-cta);
+  color: var(--text-on-cta);
+  height: 38px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 13px;
+  border: 0;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+.v5-primary:hover { background: var(--bg-cta-hover); transform: translateY(-1px); }
+.v5-primary svg { width: 14px; height: 14px; }
+.v5-secondary-row {
+  display: flex;
+  gap: 6px;
+}
+.v5-secondary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--bg-tag);
+  color: var(--text-secondary);
+  border: 0;
+  border-radius: var(--radius-md);
+  height: 32px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.v5-secondary:hover { background: var(--bg-tag-owner); color: var(--accent-strong); }
+.v5-secondary.ghost { background: transparent; color: var(--text-tertiary); }
+.v5-secondary.ghost:hover { background: var(--bg-tag); color: var(--text-primary); }
+.v5-secondary svg { width: 13px; height: 13px; }
+
+/* 加号 - 添加席位 */
+.v5-add-zone {
+  border: 1.5px dashed var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition), color var(--transition);
+}
+.v5-add-zone:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.v5-add-zone-plus {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  background: var(--bg-tag);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.v5-add-zone:hover .v5-add-zone-plus { background: var(--bg-cta); color: var(--text-on-cta); }
+.v5-add-zone-plus svg { width: 12px; height: 12px; }
+.v5-add-zone-text { font-size: 12px; font-weight: 500; }
+
+/* ============================================
+   说明栏（右侧或下方）
+   ============================================ */
+.spec {
+  background: var(--bg-panel);
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  padding: 22px 26px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.spec h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.spec h3 .num {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 11px;
+  font-weight: 700;
+}
+.spec .lede { color: var(--text-tertiary); font-size: 12.5px; line-height: 1.6; }
+.spec ul { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.spec li {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  padding-left: 14px;
+  position: relative;
+}
+.spec li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.spec li b { color: var(--text-primary); font-weight: 600; }
+.spec .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px; }
+.spec .cmp {
+  background: var(--bg-soft);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.spec .cmp-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.spec .cmp.bad b { color: var(--status-error-strong); }
+.spec .cmp.good b { color: var(--status-success-strong); }
+.spec kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  background: var(--bg-tag);
+  border: 1px solid var(--border-medium);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.annotation {
+  background: var(--bg-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+.annotation b { color: var(--text-primary); }
+.badge-strip { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge-strip .badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  background: var(--bg-tag-owner);
+  color: var(--accent-strong);
+  border-radius: var(--radius-pill);
+}
+.badge-strip .badge.muted { background: var(--bg-tag-muted); color: var(--text-secondary); }
+
+/* 视觉对比示意 */
+.aims { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.aim {
+  background: var(--bg-soft);
+  border-radius: 8px;
+  padding: 12px;
+}
+.aim h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  color: var(--accent-strong);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.aim h4 svg { width: 12px; height: 12px; }
+.aim p { margin: 0; font-size: 11.5px; color: var(--text-tertiary); line-height: 1.5; }
+</style>
+</head>
+<body class="theme-light">
+
+<div class="shell">
+
+  <div class="top">
+    <div class="title">
+      <h1>GroupInfoPanel · V5 设计评审</h1>
+      <p>从"信息板"重塑为"群管理控制台"——三层信息架构 + 行动驱动</p>
+    </div>
+    <div class="controls">
+      <div class="tabs">
+        <button data-tab="compare" class="on">Before / After</button>
+        <button data-tab="single">仅 V5</button>
+        <button data-tab="spec">设计说明</button>
+      </div>
+      <div class="theme-toggle">
+        <button data-theme="light" class="on">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.5 3.5l1.4 1.4M11.1 11.1l1.4 1.4M3.5 12.5l1.4-1.4M11.1 4.9l1.4-1.4M8 5a3 3 0 100 6 3 3 0 000-6z" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+          日
+        </button>
+        <button data-theme="dark">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M11 9.5A4.5 4.5 0 016.5 5a4.5 4.5 0 014.5-4.5.5.5 0 01.3.9 3.5 3.5 0 00-1.8 5 .5.5 0 01-.5.8 4.5 4.5 0 00-2 3.3z" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+          月
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 主视图 ============ -->
+  <div class="view compare on" data-view="compare">
+    <!-- 当前 V4 -->
+    <div>
+      <div class="frame-label"><span class="ver now">V4</span>当前版本</div>
+      <div class="canvas">
+        <div class="panel-shell">
+          <div class="panel">
+            <div class="v4-stats">
+              <div class="v4-stat accent"><span class="v4-stat-value">3</span><span class="v4-stat-label">席位</span></div>
+              <div class="v4-stat warning"><span class="v4-stat-value">0</span><span class="v4-stat-label">执行中</span></div>
+              <div class="v4-stat info"><span class="v4-stat-value">0</span><span class="v4-stat-label">进行中任务</span></div>
+              <div class="v4-stat muted"><span class="v4-stat-value">0</span><span class="v4-stat-label">待验收</span></div>
+            </div>
+            <div class="v4-section-head">成员</div>
+            <button class="v4-worker" type="button">
+              <span class="v4-worker-avatar"><span style="position:relative">研</span><span class="status-dot status-idle"></span></span>
+              <span class="v4-worker-body">
+                <span class="v4-worker-top">
+                  <span class="v4-worker-name">研究助手</span>
+                  <span class="tag owner">群主</span>
+                  <span class="tag seat">静态席位</span>
+                </span>
+                <span class="v4-worker-role"><span>空闲</span><span class="seat-mini-metrics"><span class="seat-mini-tok">331.0k</span><span class="seat-mini-dur">2m0s</span></span></span>
+              </span>
+            </button>
+            <button class="v4-worker" type="button">
+              <span class="v4-worker-avatar av-busy"><span style="position:relative">代</span><span class="status-dot status-busy"></span></span>
+              <span class="v4-worker-body">
+                <span class="v4-worker-top">
+                  <span class="v4-worker-name">代码工程师</span>
+                  <span class="tag seat">静态席位</span>
+                </span>
+                <span class="v4-worker-role"><span>空闲</span><span class="seat-mini-metrics"><span class="seat-mini-tok">218.8k</span><span class="seat-mini-dur">1m36s</span></span></span>
+              </span>
+            </button>
+            <button class="v4-worker" type="button">
+              <span class="v4-worker-avatar av-busy"><span style="position:relative">代</span><span class="status-dot status-busy"></span></span>
+              <span class="v4-worker-body">
+                <span class="v4-worker-top">
+                  <span class="v4-worker-name">代码工程师</span>
+                  <span class="tag seat">静态席位</span>
+                </span>
+                <span class="v4-worker-role"><span>空闲</span><span class="seat-mini-metrics"><span class="seat-mini-tok">274.6k</span><span class="seat-mini-dur">49s</span></span></span>
+              </span>
+            </button>
+            <div class="v4-workspace">
+              <span class="v4-workspace-title">工作空间</span>
+              <code class="v4-workspace-path">~/.one-desktop/workspaces/grp_332c8ad43c3d49ba81a5bb57ed2975ed</code>
+            </div>
+            <div class="v4-actions">
+              <div class="v4-action-row">
+                <div style="flex:1"></div>
+                <span class="v4-action circle"><span style="font-size:11px">+</span></span>
+              </div>
+              <div class="v4-action-row">
+                <div style="flex:1"></div>
+                <span class="v4-action circle"><span style="font-size:11px">→</span></span>
+              </div>
+              <div class="v4-action-row">
+                <div style="flex:1"></div>
+                <span class="v4-action circle"><span style="font-size:11px">←</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V5 设计稿 -->
+    <div>
+      <div class="frame-label"><span class="ver next">V5</span>设计稿 · 群管理控制台</div>
+      <div class="canvas">
+        <div class="panel-shell">
+          <div class="panel">
+
+            <!-- ① 概览条 -->
+            <div class="v5-overview">
+              <div class="v5-overview-cell">
+                <span class="v5-overview-value accent">3<span class="pulse" style="background:var(--accent)"></span></span>
+                <span class="v5-overview-label">席位</span>
+              </div>
+              <div class="v5-overview-cell">
+                <span class="v5-overview-value warning">0</span>
+                <span class="v5-overview-label">执行中</span>
+              </div>
+              <div class="v5-overview-cell">
+                <span class="v5-overview-value">0</span>
+                <span class="v5-overview-label">任务</span>
+              </div>
+              <div class="v5-overview-cell">
+                <span class="v5-overview-value muted">0</span>
+                <span class="v5-overview-label">待验收</span>
+              </div>
+            </div>
+
+            <!-- ② 成员 -->
+            <div class="v5-section">
+              <div class="v5-section-head">
+                <span>成员 · 3</span>
+                <span style="display:flex;gap:6px;align-items:center">
+                  <span class="meta">共 3</span>
+                  <button class="head-action" title="新增席位">
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2.5v9M2.5 7h9"/></svg>
+                  </button>
+                </span>
+              </div>
+              <div class="v5-section-body">
+                <!-- 群主 -->
+                <div class="v5-worker is-owner">
+                  <div class="v5-worker-top">
+                    <span class="v5-worker-avatar">
+                      <span class="v5-avatar-pixel" style="--pixel:radial-gradient(circle at 30% 30%, #34c759 2px, transparent 2px), radial-gradient(circle at 70% 30%, #34c759 2px, transparent 2px), linear-gradient(#5be08d,#34c759);"></span>
+                      <span class="v5-avatar-label">研</span>
+                    </span>
+                    <div class="v5-worker-info">
+                      <div class="v5-worker-name">研究助手</div>
+                      <div class="v5-worker-tags">
+                        <span class="tag-mini owner">群主</span>
+                        <span class="tag-mini seat-static">静态</span>
+                      </div>
+                    </div>
+                    <div class="v5-progress">
+                      <div class="v5-progress-ring">
+                        <svg width="28" height="28" viewBox="0 0 28 28">
+                          <circle cx="14" cy="14" r="11" fill="none" stroke="var(--border-light)" stroke-width="3"/>
+                          <circle cx="14" cy="14" r="11" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="69.1" stroke-dashoffset="20" transform="rotate(-90 14 14)"/>
+                        </svg>
+                        <div class="v5-progress-num" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">7</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="v5-worker-status">
+                    <span class="v5-status-badge idle"><span class="pulse"></span>空闲</span>
+                    <span class="v5-status-msg">最近任务<strong>竞品调研</strong></span>
+                    <span class="v5-status-cost">2m0s</span>
+                  </div>
+                  <div class="v5-worker-actions">
+                    <button title="重跑"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11.5 7a4.5 4.5 0 11-1.3-3.2M11.5 2.5v2.5h-2.5"/></svg></button>
+                    <button title="编辑"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3l2 2-7 7-3 1 1-3 7-7z"/></svg></button>
+                    <button title="移除" class="danger"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4h8M5 4V2.5h4V4M4.5 4l.5 8h4l.5-8"/></svg></button>
+                  </div>
+                </div>
+
+                <!-- 动态席位（示例运行中） -->
+                <div class="v5-worker">
+                  <div class="v5-worker-top">
+                    <span class="v5-worker-avatar">
+                      <span class="v5-avatar-pixel" style="--pixel:radial-gradient(circle at 25% 25%, #ff9500 2px, transparent 2px), radial-gradient(circle at 75% 25%, #ffae35 2px, transparent 2px), linear-gradient(#ffb84d,#ff9500);"></span>
+                      <span class="v5-avatar-label">代</span>
+                    </span>
+                    <div class="v5-worker-info">
+                      <div class="v5-worker-name">代码工程师</div>
+                      <div class="v5-worker-tags">
+                        <span class="tag-mini seat-dynamic">动态</span>
+                      </div>
+                    </div>
+                    <div class="v5-progress">
+                      <div class="v5-progress-ring">
+                        <svg width="28" height="28" viewBox="0 0 28 28">
+                          <circle cx="14" cy="14" r="11" fill="none" stroke="var(--border-light)" stroke-width="3"/>
+                          <circle cx="14" cy="14" r="11" fill="none" stroke="var(--status-warning)" stroke-width="3" stroke-linecap="round" stroke-dasharray="69.1" stroke-dashoffset="69.1" transform="rotate(-90 14 14)"/>
+                        </svg>
+                        <div class="v5-progress-num" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">0</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="v5-worker-status">
+                    <span class="v5-status-badge busy"><span class="pulse"></span>运行中</span>
+                    <span class="v5-status-msg"><span class="mono">curl</span> 抓取竞品 API</span>
+                    <span class="v5-status-cost">1m36s · 218.8k</span>
+                  </div>
+                  <div class="v5-worker-actions">
+                    <button title="暂停"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 3v8M10 3v8"/></svg></button>
+                    <button title="重跑"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11.5 7a4.5 4.5 0 11-1.3-3.2M11.5 2.5v2.5h-2.5"/></svg></button>
+                    <button title="移除" class="danger"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4h8M5 4V2.5h4V4M4.5 4l.5 8h4l.5-8"/></svg></button>
+                  </div>
+                </div>
+
+                <!-- 能力席位 -->
+                <div class="v5-worker" style="border-style:dashed">
+                  <div class="v5-worker-top">
+                    <span class="v5-worker-avatar">
+                      <span class="v5-avatar-pixel" style="--pixel:radial-gradient(circle at 30% 30%, #5e9bff 2px, transparent 2px), radial-gradient(circle at 70% 30%, #5e9bff 2px, transparent 2px), linear-gradient(#7eb0ff,#5e9bff);"></span>
+                      <span class="v5-avatar-label">代</span>
+                    </span>
+                    <div class="v5-worker-info">
+                      <div class="v5-worker-name">代码工程师</div>
+                      <div class="v5-worker-tags">
+                        <span class="tag-mini seat-cap">能力</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="v5-worker-status">
+                    <span class="v5-status-badge idle"><span class="pulse"></span>按需召唤</span>
+                    <span class="v5-status-msg" style="color:var(--text-tertiary)">代码 / 重构 · 自动匹配</span>
+                  </div>
+                </div>
+
+                <!-- 添加席位 -->
+                <div class="v5-add-zone" role="button" tabindex="0">
+                  <span class="v5-add-zone-plus">
+                    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 2.5v9M2.5 7h9"/></svg>
+                  </span>
+                  <span class="v5-add-zone-text">添加席位（从 Preset 选）</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ③ 工作空间 -->
+            <div class="v5-section">
+              <div class="v5-section-head">
+                <span><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:-1px;margin-right:3px"><path d="M2 4h10v8H2zM4 4V2.5h6V4"/></svg>工作空间</span>
+                <span class="meta">edit</span>
+              </div>
+              <div class="v5-section-body">
+                <div class="v5-workspace">
+                  <div class="v5-workspace-row">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--accent);flex-shrink:0"><path d="M2 4h5l1.5 1.5H14V13H2z"/></svg>
+                    <span class="v5-workspace-name">workspaces/grp_332c8…</span>
+                    <span class="v5-workspace-meta">48 KB</span>
+                    <div class="v5-workspace-actions">
+                      <button title="在 Finder 显示">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 9.5l3 3M11 6.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
+                      </button>
+                      <button title="复制路径">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5h5v9H8M5 11.5H2v-9h5"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ④ 群设置 (折叠) -->
+            <div class="v5-section collapsed">
+              <div class="v5-section-head">
+                <span>群设置</span>
+                <svg class="twisty" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 4l2.5 2.5L7.5 4"/></svg>
+              </div>
+              <div class="v5-section-body" style="font-size:11.5px;color:var(--text-tertiary);padding:4px 0">拓扑 / 黑板 / 记忆清理等</div>
+            </div>
+
+            <!-- ⑤ 主行动 -->
+            <div class="v5-actions">
+              <button class="v5-primary">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+                派发任务
+              </button>
+              <div class="v5-secondary-row">
+                <button class="v5-secondary">
+                  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 2.5v9M2.5 7h9"/></svg>
+                  添加席位
+                </button>
+                <button class="v5-secondary">
+                  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3H5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2V5a2 2 0 00-2-2zM7 6v4M5 8h4"/></svg>
+                  BlackBoard
+                </button>
+                <button class="v5-secondary ghost" title="折叠回单聊">
+                  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 7H3M7 3l-4 4 4 4"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 设计说明栏 -->
+    <div>
+      <div class="frame-label"><span class="ver">DOC</span>设计意图</div>
+      <div class="spec">
+        <h3><span class="num">1</span>核心设计目标</h3>
+        <ul>
+          <li>从<b>"群信息板"</b>变为<b>"群管理控制台"</b>——视觉重量从<b>展示</b>转向<b>行动</b></li>
+          <li>信息架构三层：<b>概览</b>（一眼看完）→ <b>成员</b>（核心运营对象）→ <b>设置 / 操作</b>（可折叠）</li>
+          <li>所有现有功能零损失：4 个统计、3 类席位、tag 体系、群主标记、进度环、状态点、tokens / 耗时、工作空间路径、主操作（添加 / 派发 / 回退）</li>
+        </ul>
+
+        <h3><span class="num">2</span>主要改动</h3>
+        <div class="compare">
+          <div class="cmp bad">
+            <div class="cmp-label">V4 当前痛点</div>
+            <div><b>头部 2×2 占 50% 高度</b>但不传递"该做什么"</div>
+            <div>每个成员都挂全套 tag + 度量，<b>扫读速度慢</b></div>
+            <div>工作空间长路径<b>破碎 + 无操作</b></div>
+            <div>底部 3 个圆按钮孤立，<b>主操作不突出</b></div>
+          </div>
+          <div class="cmp good">
+            <div class="cmp-label">V5 解法</div>
+            <div>4 卡压成<b>一行概览条</b>（省 60% 高度）</div>
+            <div>第二行<b>任务驱动</b>（当前工具 + 状态）— 扫读 1 秒</div>
+            <div>路径显示<b>目录名 + Finder/复制操作</b></div>
+            <div><b>主操作"派发任务"实色突出</b>，次操作并排</div>
+          </div>
+        </div>
+
+        <h3><span class="num">3</span>关键交互</h3>
+        <ul>
+          <li><b>成员行 hover</b>：右上角浮出"重跑 / 编辑 / 移除"操作（icon-only，默认隐藏，符合"工程师工具感"）</li>
+          <li><b>状态 badge</b>：icon + 颜色 + 文字三通道，对色盲友好；运行中带呼吸 pulse 动画</li>
+          <li><b>任务状态</b>从抽象的"空闲"改为具体的"运行中 + 当前工具"——一眼知道 worker 在做什么</li>
+          <li><b>添加席位 → 虚线占位区</b>（dashboard 卡片文化的常见做法），点击直接打开 preset 选择器</li>
+          <li><b>Section 可折叠</b>：群设置默认折叠（不常用），工作空间和成员默认展开</li>
+          <li><b>键盘</b>：<kbd>⌘</kbd>+<kbd>↵</kbd> 派发任务 / <kbd>⌘</kbd>+<kbd>+</kbd> 添加席位</li>
+        </ul>
+
+        <h3><span class="num">4</span>视觉决策</h3>
+        <div class="annotation">
+          <b>对比策略</b>：未引入新色——token 全部沿用现有 <code style="font-family:var(--font-mono);font-size:11px">--accent / --status-warning / --bg-soft</code>。
+          视觉变化来自<b>信息密度、留白节奏、卡片层级</b>。
+          群主识别从纯 tag 升级为<b>2px 左边框 + tag</b>——一眼能数出"群里谁是主"。
+        </div>
+
+        <h3><span class="num">5</span>落地清单</h3>
+        <ul>
+          <li>tsx：1 文件改写（保持 props 不变；新增 wsRow hover affordance + 概览条）</li>
+          <li>css：~80 行（新增 <code style="font-family:var(--font-mono);font-size:11px">.v5-*</code>，旧 <code style="font-family:var(--font-mono);font-size:11px">.v4-*</code> 待 v5 收敛后删除）</li>
+          <li>i18n：新增 <code style="font-family:var(--font-mono);font-size:11px">groups.action.dispatch</code> 等 3 key</li>
+          <li>dark theme：一次性同步（CSS 变量驱动，全白名单方案）</li>
+        </ul>
+
+        <div class="badge-strip" style="margin-top:8px">
+          <span class="badge">设计意图</span>
+          <span class="badge muted">可落地</span>
+          <span class="badge muted">WCAG AA</span>
+          <span class="badge muted">保留全部现有元素</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 单视图 -->
+  <div class="view single" data-view="single">
+    <div class="spec">
+      <h3><span class="num">A</span>建议方向</h3>
+      <div class="lede">本视图只保留 V5 设计稿（更大尺寸预览）。请切换到 "Before / After" tab 看对比。</div>
+      <h3><span class="num">B</span>可选增强（待你勾选）</h3>
+      <div class="aims">
+        <div class="aim">
+          <h4>成员批操作</h4>
+          <p>勾选多个成员 → 统一"暂停 / 删除 / 派发"——适合批量管理场景</p>
+        </div>
+        <div class="aim">
+          <h4>席位类型图例</h4>
+          <p>面板底部加一行图例：静态 / 动态 / 能力——新人无需查文档</p>
+        </div>
+        <div class="aim">
+          <h4>群活跃度时间线</h4>
+          <p>24h 群活跃度条状图——快速判断"群是睡着了还是活跃"</p>
+        </div>
+        <div class="aim">
+          <h4>一键导出报告</h4>
+          <p>右侧 secondary 增加"导出"——所有 token / 任务时间汇总成本地 Markdown</p>
+        </div>
+        <div class="aim">
+          <h4>@ Mention 入口</h4>
+          <p>群成员 hover 时显示"@ta"快捷按钮（v4 群聊已修复 @ 无响应）</p>
+        </div>
+        <div class="aim">
+          <h4>群头像 / 封面</h4>
+          <p>群顶部一行显示群封面图（像素图）——区别于侧栏 list</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="frame-label"><span class="ver next">V5</span>设计稿（放大）</div>
+      <div class="canvas">
+        <div class="panel-shell" style="padding:32px">
+          <div class="panel" style="width:300px;padding:18px;gap:18px">
+            <!-- 同上结构，省略但保留概览 -->
+            <div class="v5-overview">
+              <div class="v5-overview-cell"><span class="v5-overview-value accent">3<span class="pulse" style="background:var(--accent)"></span></span><span class="v5-overview-label">席位</span></div>
+              <div class="v5-overview-cell"><span class="v5-overview-value warning">0</span><span class="v5-overview-label">执行中</span></div>
+              <div class="v5-overview-cell"><span class="v5-overview-value">0</span><span class="v5-overview-label">任务</span></div>
+              <div class="v5-overview-cell"><span class="v5-overview-value muted">0</span><span class="v5-overview-label">待验收</span></div>
+            </div>
+            <div class="v5-section">
+              <div class="v5-section-head"><span>成员 · 3</span><button class="head-action"><svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2.5v9M2.5 7h9"/></svg></button></div>
+              <div class="v5-section-body">
+                <div class="v5-worker is-owner">
+                  <div class="v5-worker-top">
+                    <span class="v5-worker-avatar"><span class="v5-avatar-pixel" style="--pixel:radial-gradient(circle at 30% 30%, #34c759 2px, transparent 2px), radial-gradient(circle at 70% 30%, #34c759 2px, transparent 2px), linear-gradient(#5be08d,#34c759);"></span><span class="v5-avatar-label">研</span></span>
+                    <div class="v5-worker-info"><div class="v5-worker-name">研究助手</div><div class="v5-worker-tags"><span class="tag-mini owner">群主</span><span class="tag-mini seat-static">静态</span></div></div>
+                  </div>
+                  <div class="v5-worker-status">
+                    <span class="v5-status-badge idle"><span class="pulse"></span>空闲</span>
+                    <span class="v5-status-msg">最近任务<strong>竞品调研</strong></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="color:var(--text-tertiary);font-size:12px;line-height:1.55;text-align:center;padding:32px 0">
+              ↗ 主视图（Before/After）请切回上方 tab
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设计说明大图 -->
+  <div class="view" data-view="spec" style="display:none;grid-template-columns:1fr;gap:18px">
+    <div class="spec">
+      <h3><span class="num">i</span>设计哲学</h3>
+      <div class="lede">
+        当前面板体现了一个典型的"功能堆叠"问题：每个元素都有合理性，但组合起来<b>读不出意图</b>。
+        V5 重塑的底层命题——<b>设计师的工作不是堆功能，是排意图</b>。
+        "群主 panel" 的用户意图只有 4 件：<b>① 群健康吗 ② 谁在干嘛 ③ 工作空间在哪 ④ 下一步做什么</b>。
+        V5 把这 4 件事放在面板从顶到底的视觉层次里。
+      </div>
+      <h3><span class="num">ii</span>取舍明细</h3>
+      <ul>
+        <li><b>保留</b>：4 个统计指标的所有语义（席位/执行/任务/验收），只是视觉密度变了</li>
+        <li><b>保留</b>：群主 tag、席位类型 tag、状态点、tokens/耗时、进度环、工作空间显示</li>
+        <li><b>保留</b>：3 个底部操作（添加/派发/回退），但重新分层（主+次）</li>
+        <li><b>新增</b>：成员 hover 操作（重跑/编辑/移除）、工作空间操作（Finder/复制）、可折叠 section、添加席位虚线占位</li>
+        <li><b>删减</b>：无。所有 V4 元素都在 V5 找到位置</li>
+      </ul>
+      <h3><span class="num">iii</span>实现成本</h3>
+      <div class="lede">
+        ttsx 1 文件改写（props 不变），css +80 行（新增 <code>v5-*</code>，旧 <code>v4-*</code> 等 V5 收敛后再删），
+        i18n 3 个新 key，dark 主题自动同步（CSS 变量驱动）。
+        预计开工 + 评审 + E2E 基线更新 = <b>半天工作量</b>。
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 主题切换
+  const themeBtns = document.querySelectorAll('.theme-toggle button');
+  themeBtns.forEach(b => b.addEventListener('click', () => {
+    document.body.classList.remove('theme-light', 'theme-dark');
+    document.body.classList.add('theme-' + b.dataset.theme);
+    themeBtns.forEach(x => x.classList.toggle('on', x === b));
+  }));
+  // Tab 切换
+  const tabBtns = document.querySelectorAll('.tabs button');
+  tabBtns.forEach(b => b.addEventListener('click', () => {
+    tabBtns.forEach(x => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.dataset.view === b.dataset.tab));
+    document.querySelectorAll('.view').forEach(v => {
+      if (v.dataset.view === b.dataset.tab) v.style.display = '';
+      else v.style.display = 'none';
+    });
+  }));
+  // 折叠 section（V5 mock 内）
+  document.querySelectorAll('.v5-section-head').forEach(h => {
+    if (h.closest('.v5-section').classList.contains('collapsed')) return;
+    h.style.cursor = 'pointer';
+    h.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      h.closest('.v5-section').classList.toggle('collapsed');
+    });
+  });
+</script>
+</body>
+</html>

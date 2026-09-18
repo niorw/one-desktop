@@ -1,0 +1,59 @@
+[package]
+name = "OneDesktop"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "onedesktop_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["test"] }
+tauri-plugin-shell = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-dialog = "2"
+
+# macOS 交通灯（红黄绿）运行时重定位：tauri.conf.json 的 trafficLightPosition
+# 在 dev 下不生效，用此 crate 提供的 WindowExt trait（cocoa 实现）强制把圆点
+# 下移到与 logo 对齐。仅作为依赖引入，不需要 .plugin() 注册。
+tauri-plugin-trafficlights-positioner = { git = "https://github.com/gitbutlerapp/tauri-plugin-trafficlights-positioner", branch = "v2" }
+
+# HTTP client for LLM API calls
+# `system-proxy` feature: honor HTTPS_PROXY/https_proxy so the app (and
+# integration tests) can reach external LLM endpoints through the dev proxy in
+# restricted networks.
+reqwest = { version = "0.12", features = ["json", "stream", "system-proxy"] }
+
+# Database
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Cron schedule parsing (scheduled tasks)
+cron = "0.12"
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Utilities
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "6"
+
+# Logging & Observability
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-appender = "0.2"
+
+# Error handling
+thiserror = "2"
+
+# Async tools
+futures-util = "0.3"
+async-trait = "0.1"

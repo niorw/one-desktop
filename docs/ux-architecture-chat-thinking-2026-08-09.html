@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OneDesktop · Chat 思考交互架构重设计 (2026-08-09)</title>
+<style>
+  :root{
+    --bg:#0f1012; --surface:#16181c; --surface-2:#1c1f24; --border:#2a2e36;
+    --text:#e7e9ee; --text-2:#a7adb8; --text-3:#6f7682;
+    --accent:#0066cc; --accent-soft:rgba(0,102,204,.14);
+    --think:#8b5cf6; --think-soft:rgba(139,92,246,.14);
+    --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+    --radius:12px; --radius-sm:8px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 28px 96px;}
+  header.hero{border-bottom:1px solid var(--border);padding-bottom:28px;margin-bottom:36px;}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;}
+  h1{font-size:30px;line-height:1.25;margin:10px 0 8px;font-weight:700;}
+  .sub{color:var(--text-2);font-size:15px;max-width:760px;}
+  .meta{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;}
+  .tag{background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:12px;color:var(--text-2);}
+  h2{font-size:21px;margin:52px 0 16px;padding-top:18px;border-top:1px solid var(--border);font-weight:700;}
+  h2 .num{color:var(--accent);font-family:var(--mono);margin-right:10px;}
+  h3{font-size:16px;margin:26px 0 10px;color:var(--text);font-weight:650;}
+  p{margin:10px 0;color:var(--text);}
+  .muted{color:var(--text-2);}
+  .dim{color:var(--text-3);font-size:13px;}
+  code{font-family:var(--mono);background:var(--surface-2);padding:2px 6px;border-radius:5px;font-size:13px;color:#cdd3de;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin:16px 0;}
+  .card.think{border-left:3px solid var(--think);}
+  .card.accent{border-left:3px solid var(--accent);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+  ul.tight{margin:10px 0;padding-left:20px;}
+  ul.tight li{margin:7px 0;}
+  .lead{font-size:16px;color:var(--text);}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  th{color:var(--text-2);font-weight:600;font-size:13px;}
+  td code{font-size:12px;}
+  .pill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600;}
+  .pill.bad{background:rgba(239,68,68,.15);color:#fca5a5;}
+  .pill.good{background:rgba(34,197,94,.15);color:#86efac;}
+  .pill.warn{background:rgba(245,158,11,.15);color:#fcd34d;}
+  .pill.info{background:var(--accent-soft);color:#93c5fd;}
+  .bp{display:flex;gap:14px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);margin:10px 0;align-items:flex-start;}
+  .bp .id{flex:0 0 34px;height:34px;border-radius:8px;background:rgba(239,68,68,.14);color:#fca5a5;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--mono);}
+  .bp .body{flex:1;}
+  .bp .body b{color:#fca5a5;}
+  svg{display:block;width:100%;height:auto;}
+  .fig{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin:18px 0;}
+  .figcap{color:var(--text-3);font-size:12px;margin-top:10px;text-align:center;}
+  .flow-row{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin:8px 0;}
+  .node{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;white-space:nowrap;}
+  .node.think{background:var(--think-soft);border-color:var(--think);color:#c4b5fd;}
+  .node.act{background:rgba(0,102,204,.12);border-color:var(--accent);color:#93c5fd;}
+  .node.ans{background:rgba(34,197,94,.12);border-color:var(--ok);color:#86efac;}
+  .arrow{color:var(--text-3);padding:0 8px;font-family:var(--mono);}
+  .callout{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;background:var(--surface);margin:14px 0;}
+  .callout.q{border-left:3px solid var(--warn);}
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);color:var(--text-3);font-size:13px;}
+  .kbd{font-family:var(--mono);background:var(--surface-2);border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">UX Architecture · Chat Thinking Interaction</div>
+    <h1>Chat 模式「模型思考」交互架构重设计</h1>
+    <p class="sub">把当前散落在 3 处的「思考」实现统一为<strong>永远在场的 ThinkingLayer + 单一 Turn 状态机</strong>，让思考可见、可控、跨模式一致,消除长任务期间的"静默空白"断点。</p>
+    <div class="meta">
+      <span class="tag">文档日期 2026-08-09</span>
+      <span class="tag">状态:设计草案 v1</span>
+      <span class="tag">范围:chat(session) 优先,架构上统一 group</span>
+      <span class="tag">角色:用户体验架构师 / ArchitectUX</span>
+    </div>
+  </header>
+
+  <!-- ============ TL;DR ============ -->
+  <div class="card accent">
+    <h3 style="margin-top:0">结论先行</h3>
+    <p class="lead">当前 chat 的思考交互有 3 套互相独立的实现、且<strong>只在 reasoner 模型下才出现</strong>。默认模型 <code>deepseek-v4-flash</code> 不吐 reasoning,导致用户在长任务"思考中"阶段只看到三个点的 spinner,既不知道在想什么、也不知道还要等多久——这是产品体验最大的断点。</p>
+    <p class="muted" style="margin-bottom:0">重设计方向:① 用<strong>单一 Turn 状态机</strong>(THINKING→ACTING→WAITING→ANSWERING→DONE)作为唯一真相源,chat 与 group 共用同一套语言;② 把思考提升为<strong>永远在场的 ThinkingLayer</strong>,非 reasoner 模型用「预测步骤骨架 + 派生计划」优雅降级,不再静默;③ 思考密度改为<strong>用户偏好</strong>(隐藏/收起/预览/展开)而非写死;④ 思考与回复之间用明确的语义分隔,消除"答案凭空蹦出"的跳变。</p>
+  </div>
+
+  <!-- ============ 1. 现状诊断 ============ -->
+  <h2><span class="num">01</span>现状诊断:思考交互的真实实现</h2>
+  <p>以下均来自本仓库实际代码,非推测。思考/推理的渲染目前分散在 4 个入口,由 3 套各自为政的状态逻辑驱动:</p>
+
+  <table>
+    <thead><tr><th>入口</th><th>文件 / 位置</th><th>触发条件</th><th>收起/展开逻辑</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>① ProcessPanel 内 <code>ThinkingBlock</code></td>
+        <td><code>ProcessPanel.tsx:181-235</code></td>
+        <td>turn 含 tool,且模型吐 <code>reasoning_content</code></td>
+        <td>live 时强制展开;done 时默认收起(header 保留),点击 <code>tb-head</code> 展开</td>
+      </tr>
+      <tr>
+        <td>② MessageList 内联 <code>ThinkingBlock</code></td>
+        <td><code>MessageList.tsx:263-267</code></td>
+        <td>纯思考无 tool 的 turn,靠 <code>reasoningStream</code> prop</td>
+        <td>live 态展示,完成后交由 <code>buildTurns</code> 合并进 <code>answerItem.reasoning</code></td>
+      </tr>
+      <tr>
+        <td>③ AnswerBubble 内 <code>ThinkingBlock</code></td>
+        <td><code>MessageList.tsx:88</code> + <code>ThinkingBlock.tsx</code></td>
+        <td>完成后 <code>item.reasoning</code> 存在</td>
+        <td>默认收起(<code>useState(false)</code>),无任何 live 概念</td>
+      </tr>
+      <tr>
+        <td>④ StreamGate 模式判定</td>
+        <td><code>streamGate.ts:52-73</code></td>
+        <td>依据 <code>streamingText</code> 词数阈值(25)切 <code>hold/quiet/answer</code></td>
+        <td>hold = 纯 spinner;<code>quiet</code> = 仅状态行</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p style="margin:0"><strong>关键耦合:</strong>思考可见性被<strong>模型能力</strong>绑架。<code>ProcessPanel.tsx:191-195</code> 的注释明确写了"done-collapse 只是密度/UX 取舍,不是模型限制;Rust 端无条件解析 <code>reasoning_content</code>"。也就是说——只要模型吐推理,它就一定能到前端;但默认模型不吐,于是整条思考链路静默。切换模型时(<code>InputBar.tsx</code> 的模型选择器)没有任何提示"此模型不展示思考过程"。</p>
+  </div>
+
+  <!-- ============ 2. 断点清单 ============ -->
+  <h2><span class="num">02</span>体验断点清单(Breakpoints)</h2>
+  <p class="muted">按"用户感知到的不流畅"严重程度排序。</p>
+
+  <div class="bp"><div class="id">P0</div><div class="body">
+    <b>静默空白期(最大断点)。</b>默认模型下,用户发出复杂请求后,在 THINKING/hold 阶段只看到 <code>ThinkingDots</code>(三个点)。3–10 秒内完全不知道模型在规划、在调工具、还是卡死了。无预期、无进度、无取消反馈。
+  </div></div>
+
+  <div class="bp"><div class="id">P0</div><div class="body">
+    <b>思考的"薛定谔可见性"。</b>同一句请求,用 <code>deepseek-reasoner</code> 能看到思考块,用 <code>deepseek-v4-flash</code> 看不到。用户无法预期界面行为,且切换模型无提示。思考成了"模型特性"而非"产品能力"。
+  </div></div>
+
+  <div class="bp"><div class="id">P1</div><div class="body">
+    <b>3 套思考实现、3 套状态机。</b>①/②/③ 的收起/展开/脉冲逻辑各写各的,<code>live</code> 语义在 ProcessPanel 里是 <code>parentLive</code> 派生、在 MessageList 里是 <code>reasoningStream</code> 派生、在 AnswerBubble 里压根没有。后续维护改一处漏两处,已出现"完成后面泡消失"类 bug 的补丁(<code>MessageList.tsx:198-219</code>)。
+  </div></div>
+
+  <div class="bp"><div class="id">P1</div><div class="body">
+    <b>思考密度写死,用户无控制权。</b>live 必展开、done 必收起。想复盘推理链的用户每次都要手动点开;想清爽的用户在长推理时被迫看满屏。没有全局偏好。
+  </div></div>
+
+  <div class="bp"><div class="id">P2</div><div class="body">
+    <b>思考↔回复边界模糊。</b><code>reasoning</code> 与 <code>text</code> 是两条独立流,UI 在 hold→quiet→answer 间靠词数阈值跳变,中文下推理与正式回复风格接近,用户常感觉"答案凭空蹦出来",缺少明确的语义分隔。
+  </div></div>
+
+  <div class="bp"><div class="id">P2</div><div class="body">
+    <b>群/chat 两套进度语言。</b>chat 用 ProcessPanel + StreamGate;group 用 <code>RoundtableProgressStrip</code> / <code>GroupRoundtable</code> 另一套。用户跨模式时要在脑中"翻译"两套进度语义。用户说"产品架构需要重新梳理"正是此意。
+  </div></div>
+
+  <div class="bp"><div class="id">P2</div><div class="body">
+    <b>思考中可中断性弱。</b><code>InputBar</code> 的"停止"在 THINKING 阶段语义不清:是取消规划?还是中断生成?停止后无明确的"已停止规划"状态回执。
+  </div></div>
+
+  <!-- ============ 3. 目标架构 ============ -->
+  <h2><span class="num">03</span>目标架构:统一 Turn 状态机 + ThinkingLayer</h2>
+
+  <div class="fig">
+    <svg viewBox="0 0 720 250" role="img" aria-label="Turn 状态机">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#6f7682"/></marker>
+        <style>
+          .st{font-family:var(--mono);font-size:13px;fill:#e7e9ee;}
+          .lb{font-family:var(--sans);font-size:12px;fill:#a7adb8;}
+          .box{rx:9;ry:9;stroke-width:1.5;}
+        </style>
+      </defs>
+      <!-- nodes -->
+      <rect class="box" x="6" y="105" width="92" height="40" rx="9" fill="#1c1f24" stroke="#2a2e36"/><text class="st" x="52" y="130" text-anchor="middle">IDLE</text>
+      <rect class="box" x="125" y="105" width="118" height="40" rx="9" fill="#2a2150" stroke="#8b5cf6"/><text class="st" x="184" y="130" text-anchor="middle" fill="#c4b5fd">THINKING</text>
+      <rect class="box" x="290" y="105" width="110" height="40" rx="9" fill="#102a44" stroke="#0066cc"/><text class="st" x="345" y="130" text-anchor="middle" fill="#93c5fd">ACTING</text>
+      <rect class="box" x="445" y="105" width="120" height="40" rx="9" fill="#3a2e10" stroke="#f59e0b"/><text class="st" x="505" y="130" text-anchor="middle" fill="#fcd34d">WAITING</text>
+      <rect class="box" x="610" y="105" width="104" height="40" rx="9" fill="#0f3a22" stroke="#22c55e"/><text class="st" x="662" y="130" text-anchor="middle" fill="#86efac">ANSWERING</text>
+      <!-- arrows -->
+      <line x1="98" y1="125" x2="123" y2="125" stroke="#6f7682" marker-end="url(#ar)"/>
+      <line x1="243" y1="125" x2="288" y2="125" stroke="#6f7682" marker-end="url(#ar)"/>
+      <line x1="400" y1="125" x2="443" y2="125" stroke="#6f7682" marker-end="url(#ar)"/>
+      <line x1="565" y1="125" x2="608" y2="125" stroke="#6f7682" marker-end="url(#ar)"/>
+      <!-- self loops -->
+      <path d="M184,145 C160,180 220,180 184,146" fill="none" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#ar)"/>
+      <path d="M345,145 C320,180 380,180 345,146" fill="none" stroke="#0066cc" stroke-width="1.5" marker-end="url(#ar)"/>
+      <path d="M662,145 C640,185 700,185 662,146" fill="none" stroke="#22c55e" stroke-width="1.5" marker-end="url(#ar)"/>
+      <!-- labels -->
+      <text class="lb" x="184" y="200" text-anchor="middle">理解→规划→决策工具</text>
+      <text class="lb" x="345" y="200" text-anchor="middle">执行 tool / 循环</text>
+      <text class="lb" x="662" y="200" text-anchor="middle">流式生成回复</text>
+      <!-- rejection -->
+      <path d="M505,145 C505,210 184,210 184,148" fill="none" stroke="#ef4444" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+      <text class="lb" x="345" y="232" text-anchor="middle" fill="#fca5a5">审批驳回 → 回到 THINKING 重新规划</text>
+      <!-- done -->
+      <rect class="box" x="610" y="20" width="104" height="36" rx="9" fill="#16181c" stroke="#2a2e36"/><text class="st" x="662" y="43" text-anchor="middle" font-size="12">DONE</text>
+      <line x1="662" y1="105" x2="662" y2="58" stroke="#6f7682" marker-end="url(#ar)"/>
+    </svg>
+    <div class="figcap">图 1 · 单一 Turn 状态机(唯一真相源)。chat 与 group 共用同一组状态与标签。</div>
+  </div>
+
+  <h3>3.1 核心组件契约</h3>
+  <table>
+    <thead><tr><th>组件</th><th>职责</th><th>替代现状</th></tr></thead>
+    <tbody>
+      <tr><td><code>&lt;TurnProgress&gt;</code></td><td>唯一进度指示器。接收 <code>phase / state / elapsed</code>,渲染统一状态条。chat 与 group 共用。</td><td>替代 StreamGate 散落判定 + RoundtableProgressStrip 第二套语言</td></tr>
+      <tr><td><code>&lt;ThinkingLayer&gt;</code></td><td>永远在场的思考层。接收 <code>{state, content, source, density, onToggle}</code>。<code>source</code> ∈ <code>model-reasoning | derived-plan | predicted</code>。</td><td>合并 ① ② ③ 三套 ThinkingBlock 为单一实现</td></tr>
+      <tr><td><code>&lt;PlanStrip&gt;</code></td><td>把内核 <code>TodoUpdate</code> 全量快照渲染为"规划即思考"内容(派生 source)。</td><td>当前 <code>TodoListCard</code> 浮窗(仅 done 展示)</td></tr>
+      <tr><td><code>TurnState</code> (事件模型)</td><td>useAgent 产出的单一对象:<code>{phase, reasoning, plan, tools, waiting}</code>,替代散落的 <code>reasoningStream / streamingText / isStreaming / live</code> 多 prop。</td><td>消除 MessageList/ProcessPanel/ChatArea 间 5+ 个相关 prop 拼接</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 ThinkingLayer 优雅降级(关键)</h3>
+  <div class="card think">
+    <p style="margin-top:0"><strong>原则:思考是产品能力,不是模型特性。</strong>无论模型是否吐 <code>reasoning_content</code>,ThinkingLayer 都<strong>在场</strong>,只是内容来源不同:</p>
+    <ul class="tight">
+      <li><span class="pill good">reasoner 模型</span> <code>source=model-reasoning</code>:真实 CoT 流式进入(沿用 Rust 端已实现的 <code>reasoning_content</code> 解析)。</li>
+      <li><span class="pill info">非 reasoner</span> <code>source=derived-plan</code>:一旦内核下发 <code>TodoUpdate</code>/plan,把计划渲染为思考内容——用户看到"模型在规划"。</li>
+      <li><span class="pill warn">纯 hold 期</span> <code>source=predicted</code>:展示<strong>预测步骤骨架</strong>(理解需求 → 规划 → 调用工具 → 撰写回复),纯预期管理,不假装是模型原话。骨架在拿到真实内容(plan/推理)后自然替换为实质内容。</li>
+    </ul>
+    <p class="dim" style="margin-bottom:0">这样,默认模型下用户也永远有"可见的轨迹",静默空白期被消除。</p>
+  </div>
+
+  <!-- ============ 4. 思考密度偏好 ============ -->
+  <h2><span class="num">04</span>思考密度:改为用户偏好</h2>
+  <p>把当前<strong>写死</strong>的(live 展开 / done 收起)升级为设置项 <code>thinkingDensity</code>,存于设置页(与主题/语言并列,属"外观/常规"语义,不要塞回"个性化")。</p>
+  <table>
+    <thead><tr><th>档位</th><th>行为</th><th>适用</th></tr></thead>
+    <tbody>
+      <tr><td><code>hidden</code></td><td>完全不渲染思考 UI(连 predicted 骨架也省)</td><td>老手 / 带宽敏感</td></tr>
+      <tr><td><code>collapsed</code>(默认)</td><td>仅 header + 状态点;点击展开。对应现 done 默认行为</td><td>大多数用户</td></tr>
+      <tr><td><code>peek</code></td><td>内联显示前 2 行,展开看全部</td><td>想扫一眼推理的用户</td></tr>
+      <tr><td><code>expanded</code></td><td>始终展开完整内容(对应现 live 行为)</td><td>需要信任/复盘模型的用户</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">默认 <code>collapsed</code> 保持时间线可扫读;但<strong>预测骨架(predicted)</strong>在 hold 期不受密度折叠——它是预期管理,不是推理细节,即使 <code>collapsed</code> 也应短暂露头(可配)。</p>
+
+  <!-- ============ 5. 交互流 ============ -->
+  <h2><span class="num">05</span>重设计后的流畅交互流</h2>
+  <div class="fig">
+    <div class="flow-row">
+      <span class="node">用户发送</span><span class="arrow">→</span>
+      <span class="node">OneDesktop 身份头立刻出现</span><span class="arrow">→</span>
+      <span class="node think">THINKING · 预测骨架露头</span>
+    </div>
+    <div class="flow-row">
+      <span class="arrow" style="visibility:hidden">→</span>
+      <span class="node think">reasoner:真实推理流入 / 非reasoner:plan 派生为思考</span><span class="arrow">→</span>
+      <span class="node act">ACTING · 工具在 ProcessPanel 展开</span>
+    </div>
+    <div class="flow-row">
+      <span class="arrow" style="visibility:hidden">→</span>
+      <span class="node act">WAITING · 审批卡(若需)</span><span class="arrow">→</span>
+      <span class="node ans">ANSWERING · 回复在思考层下流式生成</span><span class="arrow">→</span>
+      <span class="node">DONE · 思考按密度档收起</span>
+    </div>
+    <div class="figcap">图 2 · 单一连贯流,无静默空白、无模式跳变。思考层贯穿始终,回复在其下方以明确分隔出现。</div>
+  </div>
+
+  <h3>5.1 思考 ↔ 回复的明确分隔</h3>
+  <p>在 ThinkingLayer 完成(live→done)与 AnswerBubble 出现之间,插入一条<strong>轻语义分隔</strong>:思考块收起为 muted 态 + 一行"回复"标签 + 细分隔线。让"答案"是"思考的产物"而非"凭空蹦出"。分隔样式随 <code>thinkingDensity</code> 调节(<code>hidden</code> 时直接不渲染分隔)。</p>
+
+  <h3>5.2 思考中的可中断性</h3>
+  <ul class="tight">
+    <li>THINKING / ACTING 阶段,InputBar 的"停止"常驻且语义明确:<b>停止 = 取消本次规划与生成</b>。</li>
+    <li>停止后由 <code>notice</code> 回执"已停止规划",不再是无声 spinner 消失。</li>
+    <li>可选:THINKING 阶段提供"重新规划"入口(若内核支持)。</li>
+  </ul>
+
+  <h3>5.3 模型选择器的思考可见性提示</h3>
+  <p><code>InputBar</code> 模型下拉中,reasoner 模型带 <span class="pill info">🧠 思考可见</span> 标记;非 reasoner 模型标注"<span class="muted">思考过程由计划/步骤替代</span>"。用户切换即知界面差异,<strong>不再静默消失</strong>。</p>
+
+  <!-- ============ 6. 开发者落地 ============ -->
+  <h2><span class="num">06</span>开发者落地指南(迁移路径)</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">不要动的地方</h3>
+      <ul class="tight muted">
+        <li>Rust 端 <code>reasoning_content</code> 解析(<code>deepseek.rs</code> / <code>llm/client.rs on_thinking</code>)——已无条件解析,保留。</li>
+        <li>工具执行可视化 ActionCard / TrivialGroup —— 已经做得好,保留。</li>
+        <li>审批四态、PlanStrip 数据(内核 TodoUpdate)—— 保留。</li>
+      </ul>
+    </div>
+    <div class="card accent">
+      <h3 style="margin-top:0">需要收敛/新增</h3>
+      <ul class="tight">
+        <li>新增 <code>&lt;ThinkingLayer&gt;</code> + <code>&lt;TurnProgress&gt;</code>,<strong>废弃</strong> ProcessPanel/MessageList/AnswerBubble 三处 ThinkingBlock。</li>
+        <li>useAgent 输出单一 <code>TurnState</code>,替换 <code>reasoningStream / streamingText / isStreaming / live</code> 拼接。</li>
+        <li>设置页加 <code>thinkingDensity</code> 偏好(与主题并列)。</li>
+        <li>InputBar 模型项加"思考可见"标记。</li>
+        <li>RoundtableProgressStrip 改为渲染同一 <code>TurnState</code> 的薄摘要。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>6.1 建议的最小可行切片(MVP 顺序)</h3>
+  <ol class="tight">
+    <li><b>预测骨架 + 密度档</b>:先解决 P0 静默空白。即使不做 reasoner 对接,非 reasoner 模型下用 predicted 骨架也立刻消除空白期。改动集中在新增 <code>ThinkingLayer</code> + 设置项。</li>
+    <li><b>三合一 ThinkingBlock</b>:把 ①②③ 收敛到 <code>ThinkingLayer</code>,消除状态机分叉。</li>
+    <li><b>TurnState 单一事件</b>:解耦 useAgent 与渲染层,为 group 统一铺路。</li>
+    <li><b>群/chat 统一</b>:RoundtableProgressStrip 接入同一状态。</li>
+    <li><b>模型可见性提示 + 中断回执</b>:收尾体验闭环。</li>
+  </ol>
+
+  <!-- ============ 7. 待决策 ============ -->
+  <h2><span class="num">07</span>需要你拍板的决策项</h2>
+  <div class="callout q">
+    <p style="margin:0 0 8px"><b>Q1 · 范围:</b>本次是先聚焦 chat(session) 落地,还是连 group 统一一起做?我建议 MVP 先 chat(切片 1–3),group 统一放切片 4。如你希望一步到位,我会把 RoundtableProgressStrip 的重构也并进同一 PR。</p>
+  </div>
+  <div class="callout q">
+    <p style="margin:0 0 8px"><b>Q2 · 默认模型与思考:</b>是否把默认模型切到 <code>deepseek-reasoner</code> 让真实 CoT 稳定出现?这涉及成本/延迟(交接文档已记此未决项)。或维持 flash + predicted 骨架降级路线?两条路我都能支持,需你定。</p>
+  </div>
+  <div class="callout q">
+    <p style="margin:0 0 8px"><b>Q3 · predicted 骨架文案:</b>非 reasoner 的"预测步骤"是否要向用户<em>声明这是 UI 预期而非模型原话</em>(如加极淡的"预计步骤"标注)?声明更诚实但略噪;不声明更顺但可能误导。倾向<strong>轻标注</strong>。</p>
+  </div>
+  <div class="callout q">
+    <p style="margin:0 0 8px"><b>Q4 · 密度默认档:</b>默认 <code>collapsed</code>(推荐,保时间线清爽)还是 <code>peek</code>(推荐给"想看推理"的增长期用户)?</p>
+  </div>
+
+  <footer>
+    <p>交付物:本设计文档(<code>docs/ux-architecture-chat-thinking-2026-08-09.html</code>)。配套可落地的组件契约见 §3.1、迁移路径见 §6。</p>
+    <p>下一步:你确认 §7 四个决策项后,我可产出 <code>&lt;ThinkingLayer&gt;</code> / <code>&lt;TurnProgress&gt;</code> 的具体 CSS + TSX 骨架(含 dark/light token、a11y role),直接交前端实现。如要,回我"出组件骨架"。</p>
+  </footer>
+
+</div>
+</body>
+</html>

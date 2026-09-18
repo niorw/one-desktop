@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OneDesktop 设计系统学习笔记 · Impeccable extract</title>
+<style>
+  :root{
+    --bg:#fafafc; --surface:#fff; --surface-2:#f5f5f7; --line:rgba(0,0,0,.08);
+    --text:#1d1d1f; --text-2:#6e6e73; --text-3:#a8a8ad; --accent:#006edb;
+    --ok:#1a7f37; --warn:#b45309; --err:#d70015;
+    --radius:12px; --shadow:0 2px 8px rgba(0,0,0,.06);
+    --mono:"SF Mono",Menlo,monospace; --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 28px 64px}
+  header{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:28px}
+  h1{font-size:25px;font-weight:700;letter-spacing:-.02em}
+  .sub{color:var(--text-2);font-size:14px;margin-top:6px}
+  .tag{display:inline-block;font-size:11px;font-weight:600;color:var(--accent);background:rgba(0,110,219,.08);padding:3px 10px;border-radius:999px;margin-right:6px}
+  h2{font-size:17px;font-weight:600;margin:34px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:14px;font-weight:600;color:var(--text-2);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.04em}
+  p{margin:8px 0;color:var(--text)}
+  .muted{color:var(--text-2)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--surface-2);font-weight:600;color:var(--text-2);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  tr:last-child td{border-bottom:none}
+  code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+  .card h4{font-size:13px;font-weight:600;margin-bottom:6px}
+  .card p{font-size:12px;color:var(--text-2);margin:0}
+  .swatch{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid var(--line)}
+  .score{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+  .pill{flex:1;min-width:150px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+  .pill .n{font-size:28px;font-weight:700;color:var(--accent)}
+  .pill .l{font-size:12px;color:var(--text-2);margin-top:2px}
+  .verdict{background:rgba(0,110,219,.06);border:1px solid rgba(0,110,219,.18);border-radius:var(--radius);padding:14px 16px;margin:14px 0}
+  .verdict b{color:var(--accent)}
+  ul{margin:8px 0 8px 20px}
+  li{margin:4px 0}
+  .find{border-left:3px solid var(--warn);background:#fff;padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0}
+  .find.crit{border-left-color:var(--err)}
+  .find b{color:var(--text)}
+  .ok{color:var(--ok)} .err{color:var(--err)} .warn{color:var(--warn)}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--text-3);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>OneDesktop 设计系统 · 学习笔记</h1>
+    <div class="sub">
+      <span class="tag">Impeccable · extract</span>
+      <span class="tag">Apple HIG</span>
+      <span class="tag">Tauri2 + React18 + TS</span>
+      通过抽取现有代码归纳的设计语言，附 Impeccable AI Slop Test 评分与可系统化薄弱点。
+    </div>
+  </header>
+
+  <h2>0 · 设计上下文（非从代码推断）</h2>
+  <div class="card">
+    <h4>谁用 / 在什么情境 / 该有什么感觉</h4>
+    <p><b>受众</b>：开发者，单机桌面 AI Agent（OneDesktop）做 Agent 协作 / 自动化。<br>
+    <b>调性</b>：Apple HIG 极简、克制、中性分隔线承重；唯一功能蓝 <code>#006edb</code>；至多一个去饱和信号色（错误暖陶土 <code>#a85c3c</code>）；禁用彩色 emoji、单色 SVG 图标。<br>
+    <b>约束</b>：纯本机 SQLite、无服务端/账号；亮/暗双主题同源切换；a11y 视为硬约束（WCAG AA 4.5:1 写进注释与 token 命名）。</p>
+  </div>
+
+  <h2>1 · Token 体系（单一来源 <code>src/App.css</code>）</h2>
+  <p class="muted">原生 Apple 系统色为 source of truth，v2 语义名（<code>--bg-base/--accent-primary/--status-*</code>）仅作别名，保证旧组件不动。这是教科书级的分层：primitive → semantic alias。</p>
+
+  <h3>颜色（节选）</h3>
+  <table>
+    <tr><th>Token</th><th>Light</th><th>Dark</th><th>语义 / 用途</th></tr>
+    <tr><td><code>--bg-primary</code></td><td><span class="swatch" style="background:#fff"></span>#ffffff</td><td><span class="swatch" style="background:#141416"></span>#141416</td><td>systemBackground</td></tr>
+    <tr><td><code>--bg-canvas</code></td><td><span class="swatch" style="background:#fafafc"></span>#fafafc</td><td><span class="swatch" style="background:#101012"></span>#101012</td><td>画布（比 surface 沉，让卡"浮"）</td></tr>
+    <tr><td><code>--accent</code> / <code>-strong</code></td><td><span class="swatch" style="background:#006edb"></span>#006edb</td><td><span class="swatch" style="background:#0a84ff"></span>#0a84ff</td><td>功能蓝（链接/状态/激活）；≤5% 屏占比</td></tr>
+    <tr><td><code>--signal</code></td><td><span class="swatch" style="background:#a85c3c"></span>#a85c3c</td><td><span class="swatch" style="background:#c87a52"></span>#c87a52</td><td>错误暖陶土（唯一去饱和信号色）</td></tr>
+    <tr><td><code>--status-error-strong</code></td><td><span class="swatch" style="background:#d70015"></span>#d70015</td><td><span class="swatch" style="background:#ff453a"></span>#ff453a</td><td>作文字用（系统红作底足够，作字不达标）</td></tr>
+    <tr><td><code>--text-on-soft</code></td><td>#515154</td><td>#c7c7cc</td><td>弱填充上的文字，专门保 AA</td></tr>
+  </table>
+
+  <h3>排版 / 间距 / 圆角 / 阴影 / 布局</h3>
+  <div class="grid">
+    <div class="card"><h4>Typography</h4><p>字体栈 SF Pro / PingFang SC。字号刻度 <code>--text-2xs</code>→<code>--text-3xl</code>（11→40px）。<b>禁止裸 font-size</b>。代码块语法高亮走语义 token（kw=蓝 / str=绿 / num=橙 / cmt=灰）。</p></div>
+    <div class="card"><h4>Spacing</h4><p><code>--space-xs</code>(4) → <code>--space-2xl</code>(32)。轮间 14px 收紧（对齐 iMessage/飞书节奏）。</p></div>
+    <div class="card"><h4>Radius</h4><p>sm6 / md10 / lg14 / xl20。气泡用 lg，右下角收 sm 制造"发出"感。</p></div>
+    <div class="card"><h4>Shadow</h4><p>sm/md/lg 近不可见（0.04–0.06 alpha）。卡靠 canvas-vs-surface 亮度差"浮起"，不靠阴影重量。</p></div>
+    <div class="card"><h4>Layout</h4><p>sidebar 260 / topbar 52 / 控制高 36 / 内容最大 1180 / 弹窗 420·600·900。macOS 红黄绿避让 68px。</p></div>
+    <div class="card"><h4>Glass</h4><p><code>--glass-surface</code> 半透白 + 1px 顶高光 + 柔抬影；@supports backdrop-filter 才启用，否则回退实色。暗主题独立套。</p></div>
+  </div>
+
+  <h2>2 · 图标系统（<code>Icons.tsx</code>）</h2>
+  <p>单色 SVG 组件库，<b>统一 1.5px 圆角描边 + <code>currentColor</code></b>，无填充、无彩色 emoji。按用途分组：</p>
+  <ul>
+    <li><b>通用/导航</b>：Copy / Refresh / Chevron / Settings(Sliders) / Globe / Palette / User / Bot / Plug / Wrench / Puzzle / Sun / Moon / Search …</li>
+    <li><b>Process 时间轴专用</b>（16px 画布）：ProcessReasoning / Observation / Command / Edit / Document / Search / Folder / Think / Grep / GenericTool —— "已执行工具"用语义图标而非 <code>+</code> 号。</li>
+    <li><b>状态/空态</b>：AlertTriangle / Inbox / Zap / Clock / Stethoscope(能力体检) / Coins(预算护栏) / Ban。</li>
+    <li><b>圆桌/作曲家</b>：Paperclip / AtSign / Summarize / Send / Kanban / Deliverables。</li>
+  </ul>
+  <p class="muted">设计纪律：图标是"系统表面"的一部分，不是装饰。深度思考图标从 v1"中心射线"（小尺寸酷似加号，被用户否决）迭代为"气泡+三点"。</p>
+
+  <h2>3 · 组件模式（可复用骨架）</h2>
+  <div class="grid">
+    <div class="card"><h4>玻璃浮层</h4><p>输入条 / 侧栏 / 顶栏用 <code>--glass-surface</code> 半透 + blur + 顶高光，在平灰画布上才"读得出"。</p></div>
+    <div class="card"><h4>气泡</h4><p>user = 静灰填充(右) / assistant = 白面 + 发丝边(左)。区分靠位置+亮度，不靠蓝。</p></div>
+    <div class="card"><h4>卡片</h4><p>1px 发丝边 + 同 surface 底，hover 仅变底；选中用灰底 + 600 黑字（accent 不上此面）。</p></div>
+    <div class="card"><h4>弹窗/抽屉</h4><p>role=dialog + useDialogA11y；遮罩 <code>--overlay</code> 禁止写死；宽度走 --modal-width-*。</p></div>
+    <div class="card"><h4>侧栏导航</h4><p>图标+文字；激活态浅蓝 pill + 左侧 3px accent 条，文字黑字 600（保 AA）。</p></div>
+    <div class="card"><h4>状态点</h4><p>6px 圆点传状态；仅 busy 显"工作中(n)"文字（计数有用）。中性、不喧哗。</p></div>
+  </div>
+
+  <h2>4 · 主题与切换</h2>
+  <p>亮/暗仅覆盖原生 token，语义别名自动解析（DRY）。<code>[data-theme-transition]</code> 只对颜色属性做 200ms 缓动，<b>刻意排除 transform/opacity</b> 防重绘闪烁。暗主题纯黑→冷深灰（带蓝相），canvas 比 primary 略深，与亮主题同构。</p>
+
+  <h2>5 · Impeccable AI Slop Test 评分</h2>
+  <div class="score">
+    <div class="pill"><div class="n">A</div><div class="l">反模板 / 有观点</div></div>
+    <div class="pill"><div class="n">✓</div><div class="l">字体非 Inter 默认</div></div>
+    <div class="pill"><div class="n">≤5%</div><div class="l">品牌色屏占比</div></div>
+    <div class="pill"><div class="n">AA</div><div class="l">WCAG 对比度</div></div>
+  </div>
+  <div class="verdict">
+    <b>结论：这项目本身就是"反 AI 味"的正面样本。</b> 它没有紫蓝渐变、三列等宽 Feature Card、玻璃滥用、圆角+发光。它的克制是<b>有意图的</b>（Apple HIG，非收敛默认）。把界面给人看并说"这是 AI 做的"，对方不会立刻信——因为它读起来像原生 macOS 应用。这正好通过 Impeccable 的核心测试："独特的界面应该让人问怎么做出来的，而非哪个 AI 做的。"
+  </div>
+
+  <h2>6 · Extract 机会（该系统化的薄弱点）</h2>
+  <div class="find crit">
+    <b>① calendar.css 整片硬编码红</b> —— <code>#e53935 / #c62828 / #fff !important</code> 出现 ~10 处（事件标记/今日高亮）。绕过 <code>--danger / --status-error / --text-inverse</code> token，暗主题下未重定义会翻车。建议：抽 <code>--cal-event / --cal-today</code> 语义 token，走现有状态色体系。
+  </div>
+  <div class="find">
+    <b>② 遗留 token 兜底引用</b> —— <code>var(--color-danger, #e53e3e)</code>(agentPlan.css)、<code>var(--border, #d0d0d5)</code>、<code>var(--accent, #2f6feb)</code>(groups.css)、<code>var(--status-error, #dc2626)</code>(artifacts.css) 引用了 <b>App.css 未定义的旧名</b>。要么补定义、要么改回现行 token。属"假 token"，是系统腐化苗头。
+  </div>
+  <div class="find">
+    <b>③ 暗主题 diff 行写死 rgba</b> —— run-changeset.css 暗态 <code>rgba(48,209,88,.16)/rgba(255,69,58,.16)</code> 应并入 <code>--cu-green/--cu-*</code> 或新增 <code>--diff-add/--diff-del</code> token。
+  </div>
+  <div class="find">
+    <b>④ DAG 关键节点写死 signal 值</b> —— groups.css <code>#a85c3c</code>（3256/3375/3380/3381 行）虽与 <code>--signal</code> 等值，但应直接 <code>var(--signal)</code>，避免日后改 token 不同步。
+  </div>
+
+  <h2>7 · 关键约定速记</h2>
+  <ul>
+    <li>颜色只走 <code>App.css</code> 语义变量；组件禁写死 hex（dark 仅 <code>[data-theme="dark"]</code> 重写）。</li>
+    <li>禁用彩色 emoji；图标走 <code>Icons.tsx</code>，stroke=currentColor 1.5px。</li>
+    <li>选中态用黑字 600 + 灰底，<b>禁用 accent 蓝字</b>（保 WCAG AA）。聚焦环用中性加深 <code>--border-focus</code>，不用蓝框。</li>
+    <li>弹窗 <code>.modal*</code> + role=dialog；两答案出口（AnswerBubble / ProcessPanel）共享 <code>MessageActions</code>。</li>
+    <li>单一 blue 作功能激活态，屏占比 ≤5%；至多一个去饱和信号色（暖陶土）。</li>
+  </ul>
+
+  <footer>
+    由 Impeccable「extract」流程生成 · 来源：<code>src/App.css</code> · <code>src/components/common/Icons.tsx</code> · 各组件 CSS（token 纪律扫描 2026-08-20）。
+    本节为学习/审计快照，非项目正式文档；所列薄弱点待后续系统化。
+  </footer>
+</div>
+</body>
+</html>

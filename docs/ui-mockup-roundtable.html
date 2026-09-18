@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OneDesktop · 圆桌（群协作）UI Mockup</title>
+<style>
+:root{
+  --bg-primary:#ffffff;--bg-secondary:#f5f5f7;--bg-tertiary:#e8e8ed;--bg-elevated:#ffffff;
+  --bg-hover:#e8e8ed;--bg-active:#d7d7dc;
+  --text-primary:#1d1d1f;--text-secondary:#6e6e73;--text-tertiary:#aeaeb2;--text-muted:#aeaeb2;--text-inverse:#ffffff;
+  --accent:#0071e3;--accent-hover:#0077ed;--accent-pressed:#006edb;--accent-soft:rgba(0,113,227,.08);
+  --danger:#ff3b30;--success:#34c759;--warning:#ff9500;
+  --border-light:rgba(0,0,0,.08);--border-medium:rgba(0,0,0,.12);--border-heavy:rgba(0,0,0,.18);--border-focus:var(--accent);
+  --overlay:rgba(0,0,0,.35);--thumb-bg:#fff;
+  --font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",sans-serif;
+  --font-mono:"SF Mono",Menlo,Monaco,monospace;
+  --text-2xs:10px;--text-xs:11px;--text-sm:12px;--text-base:13px;--text-md:14px;--text-lg:16px;--text-xl:20px;--text-2xl:24px;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;
+  --space-xs:4px;--space-sm:8px;--space-md:12px;--space-lg:16px;--space-xl:24px;--space-2xl:32px;
+  --topbar-height:52px;--traffic-lights-inset:76px;--control-height:36px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:14px;color:var(--text-primary);background:var(--bg-secondary);-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+.app{display:flex;height:100vh;width:100vw;overflow:hidden;background:var(--bg-primary)}
+
+/* ── Sidebar ── */
+.sidebar{width:260px;flex-shrink:0;background:var(--bg-secondary);border-right:.5px solid var(--border-light);display:flex;flex-direction:column}
+.brand{height:var(--topbar-height);display:flex;align-items:center;gap:8px;padding:0 var(--space-lg) 0 var(--traffic-lights-inset);border-bottom:.5px solid var(--border-light)}
+.logo{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#0071e3,#0a84ff);box-shadow:var(--shadow-sm)}
+.brand-name{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.nav{padding:var(--space-sm);display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border:none;border-radius:var(--radius-md);background:transparent;color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer;text-align:left}
+.nav-item:hover{background:var(--bg-hover);color:var(--text-primary)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent)}
+.nav-ico{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;color:currentColor}
+.sec-label{padding:var(--space-md) var(--space-lg) var(--space-xs);font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.04em}
+.sessions{flex:1;overflow-y:auto;padding:0 var(--space-sm);min-height:0}
+.sess{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:2px;border-radius:var(--radius-md);cursor:pointer;transition:background .15s}
+.sess:hover{background:var(--bg-hover)}
+.sess.active{background:var(--bg-elevated);box-shadow:var(--shadow-sm)}
+.sess-ico{width:18px;height:18px;color:var(--text-secondary);flex-shrink:0;display:inline-flex}
+.sess-title{font-size:13px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot.active{background:var(--accent)}.dot.paused{background:var(--warning)}.dot.archived{background:var(--text-tertiary)}
+.add-sess{color:var(--accent);font-weight:600}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:var(--topbar-height);display:flex;align-items:center;gap:var(--space-md);padding:0 var(--space-lg);border-bottom:.5px solid var(--border-light);background:var(--bg-primary)}
+.tb-title{font-size:14px;font-weight:600}
+.badge{font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px;background:var(--accent-soft);color:var(--accent)}
+.badge.warn{background:rgba(255,149,0,.1);color:var(--warning)}
+.tb-spacer{flex:1}
+.tb-btn{width:32px;height:32px;border:none;border-radius:var(--radius-md);background:transparent;color:var(--text-secondary);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.tb-btn:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+
+.body{flex:1;display:flex;min-height:0}
+/* members */
+.members{width:220px;flex-shrink:0;background:var(--bg-secondary);border-right:.5px solid var(--border-light);overflow-y:auto;padding:var(--space-md)}
+.mem-h{font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:var(--space-sm)}
+.mem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-md);margin-bottom:4px}
+.mem:hover{background:var(--bg-hover)}
+.mem-ico{width:26px;height:26px;border-radius:7px;background:var(--bg-elevated);border:.5px solid var(--border-light);display:inline-flex;align-items:center;justify-content:center;color:var(--text-secondary);flex-shrink:0}
+.mem-main{flex:1;min-width:0}
+.mem-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mem-sub{font-size:11px;color:var(--text-tertiary);display:flex;align-items:center;gap:4px}
+.mem-dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--border-medium);flex-shrink:0}
+.mem-dot.idle{border-color:var(--text-tertiary)}
+.mem-dot.busy{border-top-color:var(--accent);animation:spin .8s linear infinite}
+.mem-dot.off{background:var(--text-tertiary);border-color:var(--text-tertiary)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.seat{font-size:10px;color:var(--text-tertiary);border:.5px solid var(--border-light);border-radius:4px;padding:0 5px}
+.mem-add{display:flex;align-items:center;gap:8px;color:var(--accent);font-size:13px;font-weight:500;padding:8px 10px;cursor:pointer;border:none;background:transparent;width:100%}
+.mem-add:hover{background:var(--accent-soft);border-radius:var(--radius-md)}
+
+/* chat */
+.chat{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg-primary)}
+.msgs{flex:1;overflow-y:auto;padding:var(--space-xl);display:flex;flex-direction:column;gap:var(--space-lg)}
+.row{max-width:720px;margin:0 auto;width:100%;display:flex}
+.row.user{justify-content:flex-end}
+.row.assistant{justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:var(--space-sm)}
+.bubble{padding:var(--space-md) var(--space-lg);border-radius:var(--radius-lg);font-size:14px;line-height:1.65;max-width:85%;word-break:break-word}
+.bubble.user{background:var(--accent);color:var(--text-inverse);border-bottom-right-radius:var(--radius-sm)}
+.bubble.assistant{background:var(--bg-secondary);color:var(--text-primary);border-bottom-left-radius:var(--radius-sm)}
+.bubble.sys{background:var(--accent-soft);color:var(--accent);font-size:13px;align-self:center}
+.mention{color:var(--accent);font-weight:600}
+
+/* execution card = workflow-group reuse */
+.wf{margin:0 auto;max-width:720px;width:100%;border:1px solid var(--border-light);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-elevated);box-shadow:var(--shadow-sm)}
+.wf-head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-secondary);cursor:pointer;user-select:none}
+.wf-head:hover{background:var(--bg-tertiary)}
+.wf-ico{width:22px;height:22px;border-radius:6px;background:var(--accent-soft);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.wf-name{font-size:13px;font-weight:600}
+.wf-prog{font-size:11px;color:var(--text-tertiary);flex:1}
+.wf-status{font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px}
+.wf-status.exec{color:var(--accent);background:rgba(0,113,227,.08);animation:pulse 2s infinite}
+.wf-status.done{color:var(--success);background:rgba(52,199,89,.08)}
+.wf-status.err{color:var(--danger);background:rgba(255,59,48,.08)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.wf-body{padding:4px 0;max-height:340px;overflow-y:auto}
+.wf-body .step{border:none;box-shadow:none;background:transparent;margin:2px 10px}
+.step{border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;background:var(--bg-elevated)}
+.step-head{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.step-ico{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.step-ico.act{background:rgba(0,113,227,.08);color:var(--accent)}
+.step-ico.obs{background:rgba(52,199,89,.08);color:var(--success)}
+.step-label{font-size:12px;font-weight:600;flex:1}
+.step-state{font-size:11px;color:var(--accent)}
+.step-body{padding:10px 12px;font-size:12px;font-family:var(--font-mono);color:var(--text-secondary);white-space:pre-wrap;word-break:break-all}
+.hitl{display:flex;align-items:center;gap:10px;margin:8px 14px;padding:8px 12px;background:rgba(0,113,227,.05);border:1px solid rgba(0,113,227,.12);border-radius:10px}
+.hitl-label{font-size:12px;flex:1}
+.hitl-btn{padding:5px 12px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer}
+.hitl-btn.ok{background:var(--accent);color:#fff}
+.hitl-btn.no{background:transparent;color:var(--text-secondary);border:1px solid var(--border-light)}
+
+/* input */
+.input-wrap{padding:var(--space-lg) var(--space-xl) var(--space-xl)}
+.input{background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border-light);box-shadow:var(--shadow-sm);padding:4px;transition:border-color .2s}
+.input:focus-within{border-color:var(--accent);box-shadow:var(--shadow-sm),0 0 0 3px rgba(0,113,227,.25)}
+.area{padding:12px 16px 8px}
+.area textarea{width:100%;border:none;outline:none;resize:none;font-family:var(--font-sans);font-size:15px;line-height:1.5;color:var(--text-primary);min-height:24px;max-height:120px;background:transparent}
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:4px 12px 8px}
+.tbl{display:flex;gap:12px;align-items:center}
+.tbb{width:28px;height:28px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text-secondary);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.tbb:hover{color:var(--text-primary)}
+.send{width:34px;height:34px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.send:hover{background:var(--accent-hover)}
+
+/* right workspace */
+.ws{width:240px;flex-shrink:0;background:var(--bg-secondary);border-left:.5px solid var(--border-light);padding:var(--space-md);overflow-y:auto}
+.ws-h{font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:var(--space-sm);display:flex;align-items:center;justify-content:space-between}
+.ws-finder{font-size:11px;color:var(--accent);cursor:pointer}
+.ws-tree{font-size:12px;color:var(--text-secondary);font-family:var(--font-mono);line-height:1.9}
+.ws-dir{color:var(--text-primary);font-weight:500}
+.ws-file{color:var(--text-tertiary);padding-left:14px;display:block}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:var(--overlay);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+.modal{background:var(--bg-elevated);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:460px;max-height:80vh;overflow-y:auto;padding:var(--space-2xl);animation:min .2s ease}
+@keyframes min{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1)}}
+.modal h2{font-size:17px;font-weight:600;margin-bottom:var(--space-xl)}
+.fg{margin-bottom:var(--space-lg)}
+.fg label{display:block;font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:var(--space-xs);text-transform:uppercase;letter-spacing:.04em}
+.fg input,.fg textarea,.fg select{width:100%;padding:var(--space-sm) var(--space-md);border:.5px solid var(--border-medium);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:14px;color:var(--text-primary);outline:none}
+.fg input:focus,.fg textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,113,227,.15)}
+.radio{display:flex;flex-direction:column;gap:var(--space-xs)}
+.ri{display:flex;align-items:center;gap:var(--space-sm);padding:var(--space-md);border:1px solid var(--border-light);border-radius:var(--radius-md);cursor:pointer;background:var(--bg-elevated)}
+.ri.active{border-color:var(--accent);background:var(--accent-soft)}
+.rdot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-medium);position:relative;flex-shrink:0}
+.ri.active .rdot{border-color:var(--accent)}.ri.active .rdot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--accent)}
+.rlabel{font-size:14px}
+.actions{display:flex;justify-content:flex-end;gap:var(--space-sm);margin-top:var(--space-xl)}
+.btn{padding:var(--space-sm) var(--space-lg);border-radius:var(--radius-md);font-size:14px;font-weight:500;border:none;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--text-inverse)}
+.btn.primary:hover{background:var(--accent-hover)}
+.btn.ghost{background:transparent;color:var(--text-secondary)}
+.btn.ghost:hover{background:var(--bg-hover);color:var(--text-primary)}
+.hidden{display:none}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-tertiary);gap:var(--space-md);padding:var(--space-2xl)}
+.empty h2{font-size:20px;font-weight:500;color:var(--text-secondary)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand"><div class="logo"></div><div class="brand-name">OneDesktop</div></div>
+    <nav class="nav">
+      <button class="nav-item"><span class="nav-ico">💬</span>对话</button>
+      <button class="nav-item"><span class="nav-ico">📋</span>任务</button>
+      <button class="nav-item"><span class="nav-ico">🧩</span>扩展</button>
+    </nav>
+    <div class="sec-label">群</div>
+    <div class="sessions">
+      <div class="sess active"><span class="sess-ico">👥</span><span class="sess-title">市场调研群</span><span class="dot active"></span></div>
+      <div class="sess"><span class="sess-ico">👥</span><span class="sess-title">官网重构群</span><span class="dot paused"></span></div>
+      <div class="sess"><span class="sess-ico">👥</span><span class="sess-title">竞品分析（归档）</span><span class="dot archived"></span></div>
+      <div class="sess"><span class="sess-ico add-sess">＋</span><span class="sess-title add-sess">创建群</span></div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="tb-title">市场调研群</div>
+      <span class="badge">运行中</span>
+      <div class="tb-spacer"></div>
+      <button class="tb-btn" title="在 Finder 打开工作空间">📁</button>
+      <button class="tb-btn" title="生命周期菜单">⋯</button>
+    </div>
+    <div class="body">
+      <!-- members -->
+      <div class="members">
+        <div class="mem-h">成员</div>
+        <div class="mem"><div class="mem-ico">🧠</div><div class="mem-main"><div class="mem-name">群主 · Atlas</div><div class="mem-sub">规划 / 验收</div></div></div>
+        <div class="mem"><div class="mem-ico">💬</div><div class="mem-main"><div class="mem-name">Worker · 研究员</div><div class="mem-sub"><span class="seat">静态</span></div></div><span class="mem-dot busy"></span></div>
+        <div class="mem"><div class="mem-ico">💬</div><div class="mem-main"><div class="mem-name">Worker · 写手</div><div class="mem-sub"><span class="seat">静态</span></div></div><span class="mem-dot busy"></span></div>
+        <div class="mem"><div class="mem-ico">💬</div><div class="mem-main"><div class="mem-name">Worker · 设计</div><div class="mem-sub"><span class="seat">能力</span></div></div><span class="mem-dot idle"></span></div>
+        <div class="mem"><div class="mem-ico">💬</div><div class="mem-main"><div class="mem-name">Worker · 校对</div><div class="mem-sub"><span class="seat">动态</span></div></div><span class="mem-dot off"></span></div>
+        <button class="mem-add">＋ 加人（动态席位）</button>
+      </div>
+
+      <!-- chat -->
+      <section class="chat">
+        <div class="msgs">
+          <div class="row user"><div class="bubble user">帮我调研一下 2026 年 AI Agent 协作工具的竞争格局，输出一份带数据的研究报告。</div></div>
+          <div class="row assistant"><div class="bubble assistant">收到。我拆成 3 个子任务并行推进：<span class="mention">@研究员</span> 负责数据收集、<span class="mention">@写手</span> 负责报告撰写、<span class="mention">@设计</span> 负责图表。依赖关系：撰写需等数据完成。</div></div>
+
+          <!-- execution card: researcher -->
+          <div class="wf">
+            <div class="wf-head" onclick="this.parentElement.querySelector('.wf-body').classList.toggle('hidden')">
+              <div class="wf-ico">💬</div><div class="wf-name">研究员</div>
+              <div class="wf-prog">子任务 2/2 · 数据收集中</div>
+              <div class="wf-status exec">执行中</div>
+            </div>
+            <div class="wf-body">
+              <div class="step"><div class="step-head"><div class="step-ico act">⚡</div><div class="step-label">调用 web_search</div><div class="step-state">executing</div></div><div class="step-body">query="AI agent collaboration tools 2026 market share"</div></div>
+              <div class="step"><div class="step-head"><div class="step-ico obs">👁</div><div class="step-label">观察结果</div><div class="step-state">done</div></div><div class="step-body">返回 12 条来源，已写入 workers/researcher/data.json</div></div>
+              <div class="hitl"><span>🔐</span><div class="hitl-label">请求批准：run_shell — 下载数据集</div><button class="hitl-btn ok">批准</button><button class="hitl-btn no">拒绝</button></div>
+            </div>
+          </div>
+
+          <!-- execution card: writer (waiting on dependency) -->
+          <div class="wf">
+            <div class="wf-head">
+              <div class="wf-ico">💬</div><div class="wf-name">写手</div>
+              <div class="wf-prog">等待依赖：数据收集完成</div>
+              <div class="wf-status" style="color:var(--text-tertiary);background:var(--bg-tertiary)">排队中</div>
+            </div>
+          </div>
+
+          <div class="row assistant"><div class="bubble sys">3 个子任务全部完成，请群主验收。</div></div>
+        </div>
+
+        <div class="input-wrap">
+          <div class="input">
+            <div class="area"><textarea rows="1" placeholder="发需求给群主，或 @ 某位 Worker 直接派活…"></textarea></div>
+            <div class="toolbar">
+              <div class="tbl"><button class="tbb">📎</button><button class="tbb">🧩</button></div>
+              <button class="send">➤</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- right workspace -->
+      <aside class="ws">
+        <div class="ws-h"><span>工作空间</span><span class="ws-finder">在 Finder 打开</span></div>
+        <div class="ws-tree">
+          <div class="ws-dir">groups/market-research/</div>
+          <span class="ws-file">workers/researcher/</span>
+          <span class="ws-file">workers/writer/</span>
+          <span class="ws-file">workers/design/</span>
+          <div class="ws-dir">artifacts/</div>
+          <span class="ws-file">report.md</span>
+          <span class="ws-file">charts/</span>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<!-- Create group modal -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <h2>创建群</h2>
+    <div class="fg"><label>群名</label><input value="市场调研群" /></div>
+    <div class="fg"><label>目标 / 用途</label><textarea>调研 AI Agent 协作工具竞争格局并产出报告</textarea></div>
+    <div class="fg"><label>群主（规划型 Agent）</label><select><option>Atlas（规划/验收）</option><option>Orion</option></select></div>
+    <div class="fg"><label>席位配置</label>
+      <div class="radio">
+        <div class="ri active" onclick="sel(this)"><span class="rdot"></span><span class="rlabel">静态名单（建群定死）</span></div>
+        <div class="ri" onclick="sel(this)"><span class="rdot"></span><span class="rlabel">动态候选池（运行时加人）</span></div>
+        <div class="ri" onclick="sel(this)"><span class="rdot"></span><span class="rlabel">能力标签库（按能力匹配）</span></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" onclick="document.getElementById('modal').classList.add('hidden')">取消</button>
+      <button class="btn primary" onclick="document.getElementById('modal').classList.add('hidden')">创建</button>
+    </div>
+  </div>
+</div>
+<script>
+function sel(el){el.parentElement.querySelectorAll('.ri').forEach(r=>r.classList.remove('active'));el.classList.add('active');}
+</script>
+</body>
+</html>

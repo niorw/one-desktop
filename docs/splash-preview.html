@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>OneDesktop 启动页预览</title>
+<style>
+  /* 复刻 src/components/common/SplashScreen.css（token-only，独立预览） */
+  :root {
+    --accent: #006edb;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    background: #eef3fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 模拟窗口容器 */
+  .window {
+    width: 960px;
+    height: 600px;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(15, 40, 90, 0.25), 0 4px 16px rgba(15, 40, 90, 0.1);
+  }
+
+  .splash-screen {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #f6f9ff 0%, #e3eefb 100%);
+    overflow: hidden;
+  }
+
+  .splash-bg { position: absolute; inset: 0; pointer-events: none; }
+  .splash-glow {
+    position: absolute;
+    left: 50%;
+    width: 180%;
+    height: 100%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    filter: blur(40px);
+  }
+  .splash-glow--top {
+    top: -85%;
+    background: radial-gradient(ellipse at center,
+      rgba(20, 50, 160, 0.22) 0%,
+      rgba(37, 99, 235, 0.12) 35%,
+      transparent 65%);
+  }
+  .splash-glow--bottom {
+    bottom: -85%;
+    background: radial-gradient(ellipse at center,
+      rgba(91, 192, 235, 0.55) 0%,
+      rgba(125, 211, 252, 0.3) 35%,
+      transparent 65%);
+  }
+
+  .splash-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .splash-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    animation: splash-fade-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .splash-logo-svg { width: 150px; height: auto; display: block; }
+  .splash-wordmark {
+    margin: 6px 0 0;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+  .splash-slogan {
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .splash-loader {
+    position: absolute;
+    bottom: 14%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-primary);
+    font-size: 13px;
+    animation: splash-fade-in 700ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+  }
+  .splash-progress {
+    width: 260px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(29, 29, 31, 0.14);
+    overflow: hidden;
+  }
+  .splash-progress-bar {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent), #8ab8f8);
+    box-shadow: 0 1px 4px rgba(0, 110, 219, 0.45);
+    transition: width 0.25s ease;
+  }
+
+  @keyframes splash-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 控制条 */
+  .controls {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+  }
+  .controls button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(0, 110, 219, 0.12);
+    color: #006edb;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 150ms ease;
+  }
+  .controls button:hover { background: rgba(0, 110, 219, 0.2); }
+  .hint {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+    font-size: 12px;
+    color: #8a8f98;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <div class="splash-screen" id="splash">
+    <div class="splash-bg" aria-hidden="true">
+      <div class="splash-glow splash-glow--top"></div>
+      <div class="splash-glow splash-glow--bottom"></div>
+    </div>
+
+    <div class="splash-inner">
+      <div class="splash-brand">
+        <img class="splash-logo-svg" src="../src/assets/one-desktop-logo.svg" alt="OneDesktop logo">
+        <h1 class="splash-wordmark">OneDesktop</h1>
+        <p class="splash-slogan">One Desktop, All Solutions</p>
+      </div>
+
+      <div class="splash-loader">
+        <div class="splash-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="prog">
+          <div class="splash-progress-bar" id="bar" style="width:0%"></div>
+        </div>
+        <span id="label">正在启动… 0%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="replay()">▶ 重播启动</button>
+  <button onclick="togglePause()">⏸ 暂停进度</button>
+</div>
+<div class="hint">启动页视觉预览（矢量 ∞ logo + CSS 光晕背景）<br>与 src/components/common/SplashScreen 一致</div>
+
+<script>
+  let p = 0, paused = false, timer = null;
+  const bar = document.getElementById('bar');
+  const label = document.getElementById('label');
+  const prog = document.getElementById('prog');
+
+  function tick() {
+    if (paused) return;
+    if (p < 100) {
+      p = Math.min(100, p + 2 + Math.random() * 3);
+      bar.style.width = p + '%';
+      label.textContent = '正在启动… ' + Math.floor(p) + '%';
+    } else {
+      clearInterval(timer);
+      label.textContent = '已就绪 — 即将进入应用';
+    }
+  }
+
+  function replay() {
+    clearInterval(timer);
+    p = 0; paused = false;
+    bar.style.width = '0%';
+    label.textContent = '正在启动… 0%';
+    timer = setInterval(tick, 90);
+  }
+
+  function togglePause() {
+    paused = !paused;
+    if (paused) clearInterval(timer);
+    else if (p < 100) timer = setInterval(tick, 90);
+  }
+
+  replay();
+</script>
+</body>
+</html>

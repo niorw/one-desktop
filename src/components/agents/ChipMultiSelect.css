@@ -1,0 +1,100 @@
+/* ChipMultiSelect —— 可视化多选 chip 选器（单色克制 + 唯一蓝） */
+
+.cms-root {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cms-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  min-height: 44px;
+  align-content: flex-start;
+  transition: border-color 140ms ease;
+}
+.cms-root:focus-within .cms-chips {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.cms-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+.cms-chip:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-soft);
+}
+.cms-chip.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.cms-chip-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+}
+
+.cms-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  background: var(--bg-soft);
+  color: var(--text-tertiary);
+  transition: border-color 120ms ease;
+}
+.cms-input-row:focus-within {
+  border-color: var(--accent);
+}
+.cms-input-row > svg { flex: 0 0 auto; }
+.cms-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+}
+.cms-input::placeholder { color: var(--text-tertiary); }
+
+/* dark 适配 */
+[data-theme="dark"] .cms-chips {
+  background: rgba(255, 255, 255, 0.03);
+}
+[data-theme="dark"] .cms-chip {
+  background: rgba(255, 255, 255, 0.04);
+}
+[data-theme="dark"] .cms-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .cms-input-row {
+  background: rgba(255, 255, 255, 0.04);
+}

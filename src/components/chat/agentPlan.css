@@ -1,0 +1,617 @@
+/* ────────────────────────────────────────────────────────────────
+ * 能力①待办清单卡（TodoListCard） + 能力②方案确认弹窗（ProposalModal）
+ *
+ * 约束（项目硬规矩）：
+ * - 只引用 App.css `:root` 语义令牌，禁写死 hex（品牌标除外）；
+ * - 每条 light 样式必须有对应 `[data-theme="dark"]` 覆盖，禁遗漏；
+ * - focus 指示一律中性加深 `--border-focus`，禁 accent 蓝框。
+ * ──────────────────────────────────────────────────────────────── */
+
+/* ── 待办清单卡 ── */
+
+/* 与 .message-list 同一左右内边距（--space-xl），保证卡片与消息气泡竖向对齐 */
+.chat-todo-slot {
+  flex: 0 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+.todo-card {
+  margin: 8px 0 0;
+  padding: 10px 12px 4px;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.todo-card.is-complete {
+  border-color: var(--border-light);
+  background: var(--bg-primary);
+}
+
+.todo-card.has-failed {
+  border-color: var(--border-medium);
+}
+
+.todo-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.todo-card-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.todo-card-toggle:hover {
+  background: var(--bg-hover);
+}
+
+.todo-card-toggle:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.todo-chevron {
+  display: flex;
+  transition: transform 0.18s ease;
+}
+
+.todo-chevron.open {
+  transform: rotate(90deg);
+}
+
+.todo-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* 折叠态的「当前正在做」，长文本省略而不撑破卡片 */
+.todo-card-now {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-card-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.todo-progress {
+  position: relative;
+  height: 2px;
+  margin: 8px 0 4px;
+  border-radius: 2px;
+  background: var(--bg-tertiary);
+  overflow: hidden;
+}
+
+.todo-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--text-secondary);
+  transition: width 0.3s ease;
+}
+
+.todo-card.is-complete .todo-progress-fill {
+  background: var(--status-success-strong);
+}
+
+.todo-card.has-failed .todo-progress-fill {
+  background: var(--status-error-strong);
+}
+
+.todo-list {
+  margin: 6px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* 进行中：黑字 + 600 承担语义（不靠蓝色），与侧栏 selected 态口径一致 */
+.todo-item.status-active .todo-item-text {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.todo-item.status-done .todo-item-text {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-primary);
+}
+
+.todo-item.status-failed .todo-item-text {
+  color: var(--status-error-strong);
+}
+
+.todo-item-text {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.todo-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  border-radius: 50%;
+  color: var(--text-inverse);
+}
+
+.todo-dot.dot-pending {
+  border: 1.5px solid var(--border-heavy);
+  background: transparent;
+}
+
+.todo-dot.dot-active {
+  border: 1.5px solid var(--text-primary);
+  background: transparent;
+  animation: todo-pulse 1.4s ease-in-out infinite;
+}
+
+.todo-dot.dot-done {
+  background: var(--status-success-strong);
+}
+
+.todo-dot.dot-failed {
+  background: var(--status-error-strong);
+}
+
+@keyframes todo-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.86); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .todo-dot.dot-active { animation: none; }
+  .todo-progress-fill { transition: none; }
+}
+
+/* ── 待办计划：右侧浮窗（合一展开 / 合并）──
+ * 展开态：浮窗条（标题+计数+收起） + TodoListCard(headerless) 作为卡片内容。
+ * 合并态：右上角小浮标（状态点 + n/total + 展开箭头），点击展开。
+ * 浮窗 absolute 定位相对 .chat-area（已在 App.css 置 position:relative）。 */
+.todo-fab {
+  position: absolute;
+  top: 56px;
+  right: 16px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - 80px);
+}
+
+.todo-fab.is-expanded {
+  width: 300px;
+  overflow-y: auto;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.16));
+}
+
+.todo-fab.is-collapsed {
+  width: auto;
+}
+
+/* 展开态浮窗条 */
+.todo-fab-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+}
+
+.todo-fab-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.todo-fab-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.todo-fab-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.todo-fab-toggle:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.todo-fab-toggle:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* 展开态里 TodoListCard 去掉自带外框，与浮窗条拼成一个完整卡片 */
+.todo-fab.is-expanded .todo-card {
+  margin: 0;
+  border-radius: 0 0 10px 10px;
+  border-top: none;
+}
+
+/* 合并态胶囊 */
+.todo-fab-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 10px;
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.todo-fab-pill:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-tertiary);
+}
+
+.todo-fab-pill:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.todo-fab-pill-count {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.todo-fab-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.todo-fab-pill-dot.dot-pending {
+  background: var(--border-heavy);
+}
+
+.todo-fab-pill-dot.dot-active {
+  background: var(--text-primary);
+  animation: todo-pulse 1.4s ease-in-out infinite;
+}
+
+.todo-fab-pill-dot.dot-done {
+  background: var(--status-success-strong);
+}
+
+.todo-fab-pill-dot.dot-failed {
+  background: var(--status-error-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .todo-fab-pill-dot.dot-active { animation: none; }
+}
+
+/* 复用 ChevronRight，靠旋转表达「收起(朝下)/展开(朝上)」方向 */
+.todo-fab-toggle svg { transform: rotate(90deg); }
+.todo-fab-pill svg { transform: rotate(-90deg); }
+
+/* ── 方案确认弹窗 ── */
+
+.proposal-modal {
+  width: min(520px, calc(100vw - 48px));
+  max-height: min(78vh, 720px);
+  overflow-y: auto;
+}
+
+.proposal-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.proposal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.proposal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.proposal-summary {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.proposal-seat {
+  align-self: flex-start;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.proposal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.proposal-option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 9px;
+  background: var(--bg-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.proposal-option:hover {
+  background: var(--bg-hover);
+}
+
+.proposal-option:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* 选中态：加粗边框 + 微填充，不用蓝底（a11y 对比度已踩过坑） */
+.proposal-option.selected {
+  border-color: var(--text-primary);
+  border-width: 1.5px;
+  padding: 9.5px 11.5px;
+  background: var(--bg-secondary);
+}
+
+.proposal-option-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.proposal-option-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.proposal-option-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.proposal-rec {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.proposal-risk {
+  width: 7px;
+  height: 7px;
+  margin-left: auto;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.proposal-risk.risk-low { background: var(--status-success-strong); }
+.proposal-risk.risk-medium { background: var(--status-warning-strong); }
+.proposal-risk.risk-high { background: var(--status-error-strong); }
+
+.proposal-option-custom {
+  border-style: dashed;
+}
+
+.proposal-custom-input {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.proposal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.proposal-actions .hitl-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Dark ── */
+
+[data-theme="dark"] .todo-card {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .todo-card.is-complete {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .todo-progress {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .todo-card-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .todo-item.status-done .todo-item-text {
+  text-decoration-color: var(--text-primary);
+}
+
+[data-theme="dark"] .todo-dot.dot-pending {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+[data-theme="dark"] .todo-dot.dot-active {
+  border-color: var(--text-primary);
+}
+
+[data-theme="dark"] .proposal-badge,
+[data-theme="dark"] .proposal-rec {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .proposal-option {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .proposal-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .proposal-option.selected {
+  border-color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── TrivialGroup：折叠的次要命令组 ── */
+
+.trivial-group {
+  margin: 3px 0;
+}
+
+.tg-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: 13.5px;
+  line-height: 1.4;
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+}
+
+.tg-summary:hover {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.tg-summary:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.tg-label {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tg-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.65;
+  font-size: 12.5px;
+  margin-right: auto;
+  max-width: 280px;
+}
+
+.tg-error-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--status-error-strong);
+  flex-shrink: 0;
+}
+
+.tg-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: var(--text-quaternary);
+}
+
+.tg-summary[aria-expanded="true"] .tg-chevron {
+  transform: rotate(90deg);
+}
+
+.tg-details {
+  margin-top: 3px;
+  margin-left: 8px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border-light);
+}
+
+[data-theme="dark"] .tg-summary:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .tg-details {
+  border-left-color: rgba(255, 255, 255, 0.08);
+}

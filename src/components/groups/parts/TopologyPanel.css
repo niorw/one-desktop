@@ -1,0 +1,277 @@
+/* TopologyPanel — 建群后协作拓扑热更面板（复用 cg- 前缀的设计语言） */
+
+.topo-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* ── 头部：标题 + 重载 ── */
+.topo-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.topo-panel-head h2 {
+  margin: 0 0 4px;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.topo-panel-sub {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.topo-reload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: background 120ms ease, color 120ms ease;
+}
+.topo-reload-btn:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  color: var(--accent);
+}
+.topo-reload-btn:disabled { opacity: 0.5; cursor: default; }
+
+.topo-loading {
+  padding: var(--space-xl);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+/* ── 三模式 segmented cards ── */
+.topo-modes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+.topo-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 8px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.topo-mode:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-soft);
+}
+.topo-mode:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+.topo-mode.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.topo-mode-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--bg-soft);
+  color: var(--text-secondary);
+}
+.topo-mode.active .topo-mode-icon {
+  background: rgba(0, 110, 219, 0.12);
+  color: var(--accent);
+}
+.topo-mode-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.topo-mode.active .topo-mode-title { color: var(--accent); }
+.topo-mode-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.topo-mode.active .topo-mode-desc { color: var(--accent); opacity: 0.85; }
+
+/* ── 自定义可见性矩阵 ── */
+.topo-custom {
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.topo-custom-hint {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+.topo-custom-empty {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  padding: 6px 0;
+}
+.topo-matrix-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: 8px 0;
+  border-top: 1px solid var(--border-light);
+}
+.topo-matrix-row:first-of-type { border-top: none; }
+.topo-matrix-from {
+  flex: 0 0 108px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  padding-top: 4px;
+}
+.topo-matrix-peers {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.topo-peer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+.topo-peer-chip:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-tertiary);
+}
+.topo-peer-chip.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.topo-peer-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 120ms ease, transform 120ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.topo-peer-chip.active .topo-peer-check {
+  opacity: 1;
+  transform: scale(1);
+}
+.topo-denied-hint {
+  margin: var(--space-xs) 0 0;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* ── 状态：错误 / 已保存 ── */
+.topo-error {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(168, 92, 60, 0.08);
+  border: 1px solid rgba(168, 92, 60, 0.18);
+  color: #a85c3c;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+.topo-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--status-success) 10%, transparent);
+  color: var(--status-success);
+  font-size: var(--text-sm);
+}
+
+/* ── 底部：版本 + 保存 ── */
+.topo-panel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: auto;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-light);
+}
+.topo-version {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+/* ── Dark 适配 ── */
+[data-theme="dark"] .topo-mode {
+  background: rgba(255, 255, 255, 0.03);
+}
+[data-theme="dark"] .topo-mode:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+[data-theme="dark"] .topo-mode.active {
+  background: var(--accent-soft);
+}
+[data-theme="dark"] .topo-mode-icon {
+  background: rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .topo-mode.active .topo-mode-icon {
+  background: rgba(10, 132, 255, 0.2);
+}
+[data-theme="dark"] .topo-peer-chip {
+  background: rgba(255, 255, 255, 0.04);
+}
+[data-theme="dark"] .topo-peer-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .topo-custom {
+  background: rgba(255, 255, 255, 0.03);
+}
+[data-theme="dark"] .topo-error {
+  background: rgba(168, 92, 60, 0.15);
+  border-color: rgba(168, 92, 60, 0.3);
+  color: #d49180;
+}
+[data-theme="dark"] .topo-panel-foot {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}

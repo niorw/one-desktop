@@ -1,0 +1,239 @@
+/* TaskDrawer —— 后台任务抽屉（Apple 中性，复用语义变量，零硬编码色） */
+
+.task-drawer {
+  position: fixed;
+  top: var(--topbar-height);
+  right: 0;
+  bottom: 0;
+  width: 0;
+  background: var(--bg-tertiary);
+  border-left: 0.5px solid var(--border-light);
+  z-index: 40;
+  transition: width 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: -8px 0 28px rgba(0, 0, 0, 0.18);
+}
+
+.task-drawer.open {
+  width: 400px;
+}
+
+.task-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 0.5px solid var(--border-light);
+  background: var(--bg-secondary, var(--bg-tertiary));
+  flex-shrink: 0;
+}
+
+.task-drawer-header .title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.task-drawer-header .title svg {
+  color: var(--text-secondary);
+}
+
+.task-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 0.5px solid var(--border-light);
+  border-radius: 8px;
+  padding: 1px 7px;
+  font-variant-numeric: tabular-nums;
+}
+
+.task-drawer-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.task-btn {
+  height: 26px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 0.5px solid var(--border-light);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.task-btn:hover:not(:disabled) {
+  background: var(--bg-soft, var(--bg-tertiary));
+  color: var(--text-primary);
+}
+
+.task-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.task-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 14px 12px;
+}
+
+.task-list::-webkit-scrollbar {
+  width: 6px;
+}
+.task-list::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 3px;
+}
+
+.task-empty {
+  color: var(--text-secondary);
+  padding: 16px 2px;
+  font-style: italic;
+  font-size: 13px;
+}
+
+.task-item {
+  padding: 9px 11px;
+  border-radius: 9px;
+  margin-bottom: 6px;
+  background: var(--bg-secondary, var(--bg-tertiary));
+  border: 0.5px solid var(--border-light);
+}
+
+.task-item.status-done {
+  opacity: 0.62;
+}
+
+.task-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+/* 运行态：旋转 spinner（中性，functional accent 仅描边） */
+.task-spinner {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border: 2px solid var(--border-light);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: task-spin 0.8s linear infinite;
+}
+
+@keyframes task-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 完成：中性对勾 */
+.task-icon-done {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+/* 失败：系统红 */
+.task-icon-failed {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--danger);
+}
+
+.task-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-time {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.task-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 5px 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-progress {
+  height: 3px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-left: 20px;
+}
+
+.task-progress-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+
+/* 运行中：indeterminate 流光（accent 功能色） */
+.task-progress-bar.indeterminate {
+  width: 40%;
+  background: var(--accent);
+  animation: task-indeterminate 1.2s ease-in-out infinite;
+}
+
+@keyframes task-indeterminate {
+  0% {
+    margin-left: 0;
+    width: 30%;
+  }
+  50% {
+    margin-left: 35%;
+    width: 45%;
+  }
+  100% {
+    margin-left: 70%;
+    width: 30%;
+  }
+}
+
+.task-progress-bar.done {
+  width: 100%;
+  background: var(--text-secondary);
+}
+
+.task-progress-bar.failed {
+  width: 100%;
+  background: var(--danger);
+}

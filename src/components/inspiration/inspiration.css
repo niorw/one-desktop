@@ -1,0 +1,378 @@
+/* ── 灵感（flomo 式）── 设计对齐 App.css token 系统，暗色与微交互一致 */
+
+.insp-page {
+  height: 100%;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-xl) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.insp-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.insp-head h1 {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.insp-total {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* ── 快速记录（玻璃卡）── */
+.insp-composer {
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.insp-composer:focus-within {
+  border-color: var(--border-focus);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .insp-composer {
+    background: var(--bg-elevated);
+  }
+}
+[data-theme="dark"] .insp-composer {
+  background: var(--glass-surface-dark);
+  border-color: var(--glass-border-dark);
+  box-shadow: var(--glass-shadow-dark);
+}
+
+.insp-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: 1.6;
+  padding: 0;
+}
+.insp-input::placeholder {
+  color: var(--text-muted);
+}
+.insp-composer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+.insp-hint {
+  font-size: var(--text-2xs);
+  color: var(--text-muted);
+}
+
+/* ── 工具栏：标签栏 + 搜索 ── */
+.insp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.insp-tags {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  flex: 1 1 auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+.insp-tag-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.insp-tag-chip:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.insp-tag-chip:active {
+  transform: scale(0.96);
+}
+.insp-tag-chip.active {
+  background: var(--bg-tertiary);
+  color: var(--accent);
+  border-color: transparent;
+}
+.insp-tag-count {
+  font-size: var(--text-2xs);
+  opacity: 0.7;
+}
+.insp-search {
+  flex: 0 0 200px;
+  max-width: 100%;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+.insp-search::placeholder {
+  color: var(--text-muted);
+}
+.insp-search:focus {
+  border-color: var(--border-focus);
+}
+
+/* ── 时间范围检索 ── */
+.insp-rangebar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.insp-range-label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+.insp-range-seg {
+  flex: 0 0 auto;
+}
+.insp-range-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.insp-date {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  outline: none;
+  color-scheme: light;
+  transition: border-color 0.18s ease;
+}
+[data-theme="dark"] .insp-date {
+  color-scheme: dark;
+}
+.insp-date:focus {
+  border-color: var(--border-focus);
+}
+.insp-range-sep {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+.insp-range-err {
+  margin: calc(-1 * var(--space-xs)) 0 0;
+  font-size: var(--text-sm);
+  color: var(--danger);
+}
+
+/* ── 时间线（独立滚动）── */
+.insp-timeline {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding-bottom: var(--space-2xl);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) transparent;
+}
+.insp-timeline::-webkit-scrollbar {
+  width: 8px;
+}
+.insp-timeline::-webkit-scrollbar-track {
+  background: transparent;
+}
+.insp-timeline::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 4px;
+}
+.insp-timeline::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+.insp-day-head {
+  margin: 0 0 var(--space-sm);
+  padding-left: 10px;
+  border-left: 3px solid var(--border-medium);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+.insp-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.insp-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.insp-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-medium);
+}
+.insp-card-body {
+  font-size: var(--text-md);
+  line-height: 1.65;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.insp-tag-inline {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+.insp-tag-inline:hover {
+  background: var(--bg-tertiary);
+}
+.insp-tag-inline.active {
+  text-decoration: underline;
+}
+.insp-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-sm);
+}
+
+/* 自动打标（无 #标签时 LLM 建议）展示在卡片上的标签 */
+.insp-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.insp-card-tag {
+  font-size: 13px;
+  line-height: 1;
+  padding: 4px 9px;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border-light);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.insp-card-tag:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.insp-card-tag.active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.insp-time {
+  font-size: var(--text-2xs);
+  color: var(--text-muted);
+}
+.insp-del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+.insp-card:hover .insp-del,
+.insp-del:focus-visible {
+  opacity: 1;
+}
+.insp-del:hover {
+  background: var(--bg-hover);
+  color: var(--danger);
+}
+
+/* ── 空状态 ── */
+.insp-empty {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) var(--space-lg);
+  text-align: center;
+  color: var(--text-muted);
+}
+.insp-empty-icon {
+  color: var(--text-tertiary);
+}
+.insp-empty-title {
+  margin: 0;
+  font-size: var(--text-md);
+  color: var(--text-secondary);
+}
+.insp-empty-desc {
+  margin: 0;
+  max-width: 320px;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+/* 窄屏：搜索框占满一行 */
+@media (max-width: 560px) {
+  .insp-page {
+    padding: var(--space-xl) var(--space-md);
+  }
+  .insp-search {
+    flex: 1 1 100%;
+  }
+}

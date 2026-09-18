@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OneDesktop UI 设计审视 v3 · 向 Craft Docs 学「安静美学」</title>
+<style>
+  /* ── 设计语言自示范：报告自身就是 "Craft 风格" 的活样本 ──
+     浅暖灰 canvas / 纯白卡片 / 14-18px 圆角 / 极轻投影 /
+     中性灰文字层级 / 极少彩色点缀 / 8px 间距网格 */
+  :root {
+    --bg-canvas: #FAFAFC;          /* 内容区浅暖灰底 */
+    --bg-surface: #FFFFFF;
+    --bg-subtle: #F5F5F7;
+    --line: rgba(0, 0, 0, 0.07);
+    --line-strong: rgba(0, 0, 0, 0.12);
+    --ink-1: #1D1D1F;
+    --ink-2: #6E6E73;
+    --ink-3: #AEAEB2;
+    --accent: #0066CC;             /* 主色只用 1 处 */
+    --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px;
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-elev: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg-canvas); color: var(--ink-1); }
+  body {
+    font: 14px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: var(--ink-1);
+    padding: 56px 24px 80px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  /* ── Hero ── */
+  .hero {
+    background: var(--bg-surface);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-card);
+    padding: 56px 48px 48px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--ink-1);
+  }
+  .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-3);
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: 40px; font-weight: 700; letter-spacing: -0.03em;
+    line-height: 1.1; margin-bottom: 12px;
+  }
+  .hero .sub { font-size: 18px; color: var(--ink-2); line-height: 1.5; max-width: 640px; }
+  .meta {
+    margin-top: 32px; display: flex; gap: 24px; font-size: 12px; color: var(--ink-3);
+    padding-top: 24px; border-top: 1px solid var(--line);
+  }
+  .meta strong { color: var(--ink-2); font-weight: 600; }
+
+  /* ── Section ── */
+  section { margin-bottom: 32px; }
+  h2 {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .h2-sub {
+    font-size: 13px; color: var(--ink-2); margin-bottom: 20px;
+ |
+
+}
+  h3 {
+    font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+    margin: 24px 0 12px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--bg-surface);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-card);
+    padding: 24px;
+  }
+  .card + .card { margin-top: 16px; }
+
+  /* ── §1 Craft 二联对照 ── */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 720px) { .duo { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--bg-surface);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+  .panel-img {
+    aspect-ratio: 16/9;
+    background: var(--bg-subtle);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--ink-3);
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .panel-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .panel-img .mockup { width: 100%; height: 100%; display: block; }
+  .panel-body { padding: 20px; }
+  .panel-title {
+    font-size: 13px; font-weight: 600; color: var(--ink-1);
+    margin-bottom: 8px;
+  }
+  .panel-list { list-style: none; }
+  .panel-list li {
+    font-size: 12.5px; color: var(--ink-2);
+    padding: 4px 0 4px 18px; position: relative;
+  }
+  .panel-list li::before {
+    content: ''; position: absolute; left: 4px; top: 13px;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--ink-3);
+  }
+  .panel-list li b { color: var(--ink-1); font-weight: 600; }
+
+  /* ── SVG inline mockup: 用 SVG 画一份"理想卡片"做愿景图 ── */
+  .mockup { background: #FFFFFF; }
+
+  /* ── §3 7 个差距 ── */
+  .gap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  @media (max-width: 720px) { .gap-grid { grid-template-columns: 1fr; } }
+  .gap {
+    background: var(--bg-surface);
+    border-radius: var(--r-md);
+    padding: 16px 18px;
+    box-shadow: var(--shadow-card);
+    border-left: 3px solid var(--ink-1);
+  }
+  .gap-num {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--ink-3); text-transform: uppercase;
+  }
+  .gap-title { font-size: 14px; font-weight: 600; margin: 4px 0 6px; }
+  .gap-now {
+    font-size: 12px; color: var(--ink-2); line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .gap-fix {
+    background: var(--bg-subtle);
+    border-radius: var(--r-sm);
+    padding: 8px 12px;
+    font-size: 12px; color: var(--ink-1); line-height: 1.5;
+  }
+  .gap-fix code {
+    font-family: "SF Mono", Menlo, monospace;
+    background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 3px;
+    font-size: 11px;
+  }
+
+  /* ── §5 V1~V4 方案卡 ── */
+  .plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 720px) { .plan-grid { grid-template-columns: 1fr; } }
+  .plan {
+    background: var(--bg-surface);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-card);
+    position: relative;
+  }
+  .plan.recommended {
+    box-shadow: var(--shadow-card), 0 0 0 1.5px var(--accent);
+  }
+  .plan-tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px;
+    background: var(--ink-1); color: #fff;
+    margin-bottom: 12px;
+  }
+  .plan.recommended .plan-tag { background: var(--accent); }
+  .plan-name { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .plan-sub { font-size: 12.5px; color: var(--ink-2); margin-bottom: 16px; }
+  .plan-list { list-style: none; font-size: 13px; color: var(--ink-1); }
+  .plan-list li { padding: 5px 0 5px 22px; position: relative; }
+  .plan-list li::before {
+    content: '✓'; position: absolute; left: 0; top: 5px;
+    color: var(--ink-3); font-weight: 700;
+  }
+  .plan-meta {
+    margin-top: 16px; padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 11px; color: var(--ink-3);
+    display: flex; justify-content: space-between;
+  }
+
+  /* ── §6 推荐路径 时间线 ── */
+  .timeline { padding-left: 8px; }
+  .step {
+    position: relative;
+    padding: 12px 0 12px 28px;
+    border-left: 2px solid var(--line);
+    margin-left: 8px;
+  }
+  .step::before {
+    content: attr(data-step);
+    position: absolute; left: -12px; top: 14px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--ink-1); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+
+  /* ── Token 对比表 ── */
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px; margin-top: 8px;
+  }
+  thead tr { border-bottom: 1px solid var(--line-strong); }
+  th {
+    text-align: left; font-size: 11px; font-weight: 600;
+    color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 10px 12px;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-1); vertical-align: top;
+  }
+  td code {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    background: var(--bg-subtle);
+    padding: 2px 6px; border-radius: 3px;
+  }
+  .diff-arrow { color: var(--ink-3); margin: 0 4px; }
+
+  /* ── Bottom CTA ── */
+  .cta {
+    background: var(--ink-1); color: #fff;
+    border-radius: var(--r-lg);
+    padding: 32px;
+    text-align: center;
+  }
+  .cta h2 { color: #fff; }
+  .cta .h2-sub { color: rgba(255,255,255,0.6); margin-bottom: 0; }
+  .cta-list {
+    list-style: none; margin-top: 20px; display: flex;
+    justify-content: center; gap: 24px; flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .cta-list li { padding: 8px 16px; background: rgba(255,255,255,0.08); border-radius: 99px; }
+
+  footer {
+    text-align: center; margin-top: 48px;
+    font-size: 11px; color: var(--ink-3);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ─────────────── Hero ─────────────── -->
+<div class="hero">
+  <div class="eyebrow">UI 设计审视 · 2026-08-05</div>
+  <h1>OneDesktop，向 Craft Docs 学「安静美学」</h1>
+  <p class="sub">
+    现状三个字：<b>low、土、配色老派</b>。Craft 给你看了什么叫"克制的留白"。
+    这份报告只做审视、不动代码——挑一个 V 方案，我再下手。
+  </p>
+  <div class="meta">
+    <span><strong>审视人</strong> UI Designer</span>
+    <span><strong>基线</strong> HEAD 3a7033c · 8/4 代码</span>
+    <span><strong>范围</strong> Sidebar / TopBar / Logo / Card / 配色 / 圆角 / 阴影 / 字号</span>
+    <span><strong>状态</strong> 审视报告 · 待拍板</span>
+  </div>
+</div>
+
+<!-- ─────────────── §1 Craft ─────────────── -->
+<section>
+  <h2>1. Craft 的「安静美学」到底美在哪</h2>
+  <p class="h2-sub">看图 30 秒，抓 5 条就够了——接下来每一条都对应 onedesktop 的一处病。</p>
+
+  <div class="duo">
+    <!-- 左：Craft 截图 -->
+    <div class="panel">
+      <div class="panel-img">
+        <img src="craft-reference.png" alt="Craft Docs 截图" />
+      </div>
+      <div class="panel-body">
+        <div class="panel-title">Craft 的画面</div>
+        <p style="font-size:12px; color:var(--ink-2); line-height:1.6;">
+          浅暖灰 canvas、纯白卡片、几乎无阴影、单色线性图标。
+          整屏就一个彩色点（右下角 Assistant）。
+        </p>
+      </div>
+    </div>
+
+    <!-- 右：5 大要点 -->
+    <div class="panel">
+      <div class="panel-body">
+        <div class="panel-title">5 大设计要点</div>
+        <ul class="panel-list">
+          <li><b>中性灰主调，</b>全屏只用 1 处彩色（右下角 Assistant）；其他都是 #1D1D1F / 灰阶</li>
+          <li><b>圆角 14-18px，</b>卡片软得像 Mac 原生</li>
+          <li><b>阴影极轻，</b>纯靠层级和留白"浮"出来</li>
+          <li><b>11-13-15-17 字号，</b>层级克制，不靠"花"字号撑场面</li>
+          <li><b>线性单色图标 1.5px stroke</b>，全图统一</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── §2 现状 ─────────────── -->
+<section>
+  <h2>2. OneDesktop 现状摸底</h2>
+  <p class="h2-sub">基于 8/4 HEAD 代码（`App.css` + `Sidebar.tsx` + `TopBar.tsx`），客观复刻现状。</p>
+
+  <div class="card">
+    <h3>当前 Token（写死的事实）</h3>
+    <table>
+      <thead>
+        <tr><th>维度</th><th>当前值（App.css）</th><th>看图感觉</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>背景</td>
+          <td><code>--bg-primary: #ffffff</code> 全屏大块纯白</td>
+          <td>像没装桌面壁纸</td>
+        </tr>
+        <tr>
+          <td>侧栏底</td>
+          <td><code>--bg-secondary: #f5f5f7</code></td>
+          <td>其实够灰了，能用</td>
+        </tr>
+        <tr>
+          <td>主色</td>
+          <td><code>--accent: #006edb</code></td>
+          <td>饱和度偏高、面积用得太猛</td>
+        </tr>
+        <tr>
+          <td>Logo</td>
+          <td>linear gradient + box-shadow + 6px 圆角</td>
+          <td>看着像 2018 年的 SaaS logo</td>
+        </tr>
+        <tr>
+          <td>卡片圆角</td>
+          <td><code>--radius-md: 10</code> / <code>--radius-lg: 14</code></td>
+          <td>偏硬，缺"软"</td>
+        </tr>
+        <tr>
+          <td>卡片阴影</td>
+          <td><code>--shadow-md: 0 4px 12px rgba(0,0,0,.08)</code></td>
+          <td>偏重，"低"就是阴影重出来的</td>
+        </tr>
+        <tr>
+          <td>消息气泡 user</td>
+          <td><code>background: var(--accent)</code> 全蓝填充</td>
+          <td>整屏蓝气泡跳，太花哨</td>
+        </tr>
+        <tr>
+          <td>选中态 sidebar</td>
+          <td><code>--accent-soft</code> 蓝色 8% 软底</td>
+          <td>能用，但比纯灰底差口气</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ─────────────── §3 7 个差距 ─────────────── -->
+<section>
+  <h2>3. 7 个具体差距（按"最显眼"排序）</h2>
+  <p class="h2-sub">改了第 1、2 项，立刻能让整屏看起来"贵"一倍。后面的排第 3、4…… 都是必要不紧急。</p>
+
+  <div class="gap-grid">
+
+    <div class="gap">
+      <div class="gap-num">差距 01 · 最显眼</div>
+      <div class="gap-title">Logo：渐变填充 + 阴影</div>
+      <div class="gap-now">
+        现在是 <code>linear-gradient(--accent → --accent-pressed)</code> + <code>box-shadow: var(--shadow-sm)</code>。
+        像 SaaS 营销页 logo，不像 macOS 原生应用。
+      </div>
+      <div class="gap-fix">
+        改：<code>fill: #0066CC</code> 单色 + 移除 box-shadow + 圆角 6→4 让它"靠色块自描述"。
+      </div>
+    </div>
+
+    <div class="gap">
+      <div class="gap-num">差距 02 · 最显眼</div>
+      <div class="gap-title">卡片阴影偏重</div>
+      <div class="gap-now">
+        <code>--shadow-md: 0 4px 12px rgba(0,0,0,0.08)</code>，所有"浮起来"的地方都很重。
+        这就是"low"的体感来源之一。
+      </div>
+      <div class="gap-fix">
+        改：只保留 <code>0 1px 2px rgba(0,0,0,0.04)</code> 的极轻投影；
+        浮起来靠"浅暖灰 canvas + 纯白卡片"的对比，不再靠阴影。
+      </div>
+    </div>
+
+    <div class="gap">
+      <div class="gap-num">差距 03 · 显眼</div>
+      <div class="gap-title">卡片圆角偏小</div>
+      <div class="gap-now">
+        <code>--radius-md: 10px</code> 给聊天消息、按钮，<code>--radius-lg: 14px</code> 给大卡片。
+        10 在 2026 年看着像"工具软件"，14-16 才像"内容产品"。
+      </div>
+      <div class="gap-fix">
+        改：消息 / 按钮 → <code>--radius-md: 10</code>（保留，给按钮），
+        大卡片新增 <code>--radius-card: 16px</code>（替代 14）。
+      </div>
+    </div>
+
+    <div class="gap">
+      <div class="gap-num">差距 04 · 显眼</div>
+      <div class="gap-title">背景几乎纯白</div>
+      <div class="gap-now">
+        内容区是 <code>#ffffff</code>，卡片也是 <code>#ffffff</code>。
+        没有"底"和"片"之分，所以卡片"飘不起来"。
+      </div>
+      <div class="gap-fix">
+        改：新增 <code>--bg-canvas: #FAFAFC</code> 给内容区；
+        卡片仍是 <code>--bg-surface: #FFFFFF</code>。靠 1.5% 灰度差把卡片"浮"出来。
+      </div>
+    </div>
+
+    <div class="gap">
+      <div class="gap-num">差距 05</div>
+      <div class="gap-title">User 气泡全蓝饱和</div>
+      <div class="gap-now">
+        <code>.message-bubble.user { background: var(--accent); }</code>
+        整个屏幕全是高饱和小蓝块，远看像一堆 emoji。
+      </div>
+      <div class="gap-fix">
+        改：保留蓝色 user 气泡做角色区隔，但缩小尺寸（<code>max-width: 70%</code>）+ 收紧内边距 +
+        让 user 气泡也用 <code>--bg-elevated</code> + 蓝边描线（hybrid）。
+      </div>
+    </div>
+
+    <div class="gap">
+      <div class="gap-num">差距 06</div>
+      <div class="gap-title">选中态偏蓝</div>
+      <div class="gap-now">
+        侧边栏选中 nav / 会话 / 群都用 <code>--accent-soft</code> 蓝色软底。
+        整屏"哪儿都点过"，过于花哨。
+      </div>
+      <div class="gap-fix">
+        改：选中态改用纯灰底 <code>--bg-hover</code> 或更深一档（如 <code>#EBEBF0</code>），
+        让图标和文字"主动变深"承担"选中"语义，不靠蓝色。
+      </div>
+    </div>
+
+    <div class="gap">
+      <div class="gap-num">差距 07</div>
+      <div class="gap-title">顶栏左侧偏空 + 不够紧凑</div>
+      <div class="gap-now">
+        TopBar 现在只有「侧栏开关 + 返回 + 标题」三个元素，左边 1/3 是空的。
+        顶上看着"没装满"。Craft 这种页是「标题在左 + 右上一排图标」紧凑。
+      </div>
+      <div class="gap-fix">
+        改：顶栏改为「左：drag region；中左：标题；右上：视图切换 / 排序 / 搜索 / 设置」4 个图标，
+        与 Apple macOS 原生应用风格对齐（更像 Finder / Notes）。
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─────────────── §4 原则 ─────────────── -->
+<section>
+  <h2>4. 升级原则（守住这 8 条底线）</h2>
+  <p class="h2-sub">不论选哪个方案，下面的红线不能跨。</p>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th>维度</th><th>原则</th><th>数值参考</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>色彩</b></td>
+          <td>中性灰主调，主色 ≤5% 面积</td>
+          <td><code>#1D1D1F / #6E6E73 / #AEAEB2</code></td>
+        </tr>
+        <tr>
+          <td><b>背景层</b></td>
+          <td>canvas 和 surface 必须有灰度差（卡片才"浮"）</td>
+          <td>canvas <code>#FAFAFC</code> / surface <code>#FFFFFF</code></td>
+        </tr>
+        <tr>
+          <td><b>字号</b></td>
+          <td>10/11/12/13/15/17/20/24px type scale</td>
+          <td>标题 600 / 正文 400 / 强调 500</td>
+        </tr>
+        <tr>
+          <td><b>圆角</b></td>
+          <td>按钮 8-10 / 小卡 10 / 中卡 14 / 大卡 16-18</td>
+          <td><code>--radius-{sm/md/lg/xl}</code></td>
+        </tr>
+        <tr>
+          <td><b>阴影</b></td>
+          <td>极轻，浮起来靠 canvas 灰度差而非投影</td>
+          <td><code>0 1px 2px rgba(0,0,0,.04)</code> 唯一一档</td>
+        </tr>
+        <tr>
+          <td><b>图标</b></td>
+          <td>单色 SVG，统一 1.5-2px stroke，禁用 emoji</td>
+          <td><code>stroke="currentColor"</code></td>
+        </tr>
+        <tr>
+          <td><b>间距</b></td>
+          <td>8px 网格，gap ≥ 16px</td>
+          <td><code>--space-{xs/sm/md/lg/xl}</code></td>
+        </tr>
+        <tr>
+          <td><b>动效</b></td>
+          <td>200ms cubic-bezier，仅颜色过渡</td>
+          <td>不引导 transform / opacity 全局动画</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ─────────────── §5 V1~V4 ─────────────── -->
+<section>
+  <h2>5. V1 ~ V4 升级方案</h2>
+  <p class="h2-sub">从"零风险"到"全换装"，四档可选。</p>
+
+  <div class="plan-grid">
+
+    <!-- V1 -->
+    <div class="plan">
+      <div class="plan-tag">V1 · 小修</div>
+      <div class="plan-name">3 处小动</div>
+      <div class="plan-sub">零风险、立竿见影、1~2 小时。</div>
+      <ul class="plan-list">
+        <li>Logo 去渐变去阴影，改为纯色块</li>
+        <li><code>--shadow-md</code> 改成 <code>0 1px 2px .04</code></li>
+        <li>侧栏选中态去掉蓝色软底改纯灰</li>
+      </ul>
+      <div class="plan-meta">
+        <span>风险：极低</span><span>预计：1 PR</span>
+      </div>
+    </div>
+
+    <!-- V2 -->
+    <div class="plan recommended">
+      <div class="plan-tag">V2 · 中修 · 推荐起点</div>
+      <div class="plan-name">V1 + 关键组件升级</div>
+      <div class="plan-sub">一天能做完，整屏"换光"，是性价比最高的一档。</div>
+      <ul class="plan-list">
+        <li>V1 全部 3 条</li>
+        <li>新增 <code>--bg-canvas #FAFAFC</code>，主区背景用 canvas</li>
+        <li>侧栏背景保留 <code>--bg-secondary</code>，与 canvas 错层</li>
+        <li>卡片圆角 14 → 16；新增 <code>--radius-card: 16</code></li>
+        <li>User 气泡 max-width 70% + 缩内边距</li>
+        <li>TopBar 重排：drag region / 标题居中 / 右上 4 图标</li>
+        <li>主标题字重 700 → 600，更克制</li>
+      </ul>
+      <div class="plan-meta">
+        <span>风险：中</span><span>预计：1 PR + 1 个 handoff</span>
+      </div>
+    </div>
+
+    <!-- V3 -->
+    <div class="plan">
+      <div class="plan-tag">V3 · 大改</div>
+      <div class="plan-name">设计系统重设</div>
+      <div class="plan-sub"><code>App.css</code> 全量改写、token 全调、所有组件过一遍。</div>
+      <ul class="plan-list">
+        <li>V2 全部</li>
+        <li>所有间距、圆角、字号集中对齐到 8px / 4px 倍数</li>
+        <li>所有面板 / 抽屉 / 弹窗统一阴影为极轻一档</li>
+        <li>图标库收敛到统一 1.5px stroke 集</li>
+        <li>logo / favicon / 启动屏一并换肤</li>
+        <li>设计 token 输出 CSS 变量 + 设计稿</li>
+      </ul>
+      <div class="plan-meta">
+        <span>风险：整窗一次变</span><span>预计：2-3 PR</span>
+      </div>
+    </div>
+
+    <!-- V4 -->
+    <div class="plan recommended">
+      <div class="plan-tag">V4 · 渐进 · 推荐路径</div>
+      <div class="plan-name">先 V1 → 再 V2 → 按需 V3</div>
+      <div class="plan-sub">分三次走，每一步都可回滚、可对比、可让团队对齐审美。</div>
+      <ul class="plan-list">
+        <li>第 1 步：V1（1 天）—— 立竿见影跑通</li>
+        <li>第 2 步：V2（2 天）—— 整屏换光</li>
+        <li>第 3 步：按需 V3（按组件升级）—— 不一次大改</li>
+      </ul>
+      <div class="plan-meta">
+        <span>风险：低</span><span>预计：3 次小迭代</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─────────────── §6 推荐路径 ─────────────── -->
+<section>
+  <h2>6. 推荐路径：V4 渐进</h2>
+  <p class="h2-sub">节奏就是 ≤ 1 天一档，每档可回退、可对照设计风格清单验证。</p>
+
+  <div class="card">
+    <div class="timeline">
+      <div class="step" data-step="1">
+        <div class="step-title">Day 0 — V1 小修</div>
+        <div class="step-desc">
+          Logo / 阴影 / 选中态 三处。1 个 PR，commit message：「chore(ui): apply craft-style bare minimum」。
+          跑完看一眼，整屏会马上"贵"起来。
+        </div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="step-title">Day 1 — V2 中修</div>
+        <div class="step-desc">
+          引入 <code>--bg-canvas</code> / 大卡片圆角 16 / TopBar 重排 / 主标题字重 600。
+          这一天不要碰业务逻辑，只动 token + 视觉骨架。
+        </div>
+      </div>
+      <div class="step" data-step="3">
+        <div class="step-title">Day 2+ — 按需 V3</div>
+        <div class="step-desc">
+          看团队反馈决定下一步。如果 ok，到此为止；如果你想要"全方位 Craft 化"，再分组件迭代到 V3 状态。
+          不会一次性大改、不会翻车。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── §6.5 Token 对比 ─────────────── -->
+<section>
+  <h2>7. Token 对比一览（V1+V2 完整改动）</h2>
+  <p class="h2-sub">如果你点头 V2，下面这 11 条 token 改动就是落地点——可以一晚上做完。</p>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th>Token</th><th>现在</th><th>改成</th><th>用途</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>--bg-canvas</code></td>
+          <td>无</td><td><code>#FAFAFC</code> 新增</td>
+          <td>内容区背景</td>
+        </tr>
+        <tr>
+          <td><code>--shadow-card</code></td>
+          <td>复用 <code>--shadow-md</code></td><td><code>0 1px 2px rgba(0,0,0,.04)</code> 新增</td>
+          <td>统一大卡片投影</td>
+        </tr>
+        <tr>
+          <td><code>--radius-card</code></td>
+          <td>无</td><td><code>16px</code> 新增</td>
+          <td>群/任务/详情卡片</td>
+        </tr>
+        <tr>
+          <td><code>--radius-md</code></td>
+          <td><code>10px</code></td><td>保留</td>
+          <td>按钮 / 输入框</td>
+        </tr>
+        <tr>
+          <td><code>--shadow-md</code></td>
+          <td><code>0 4px 12px rgba(0,0,0,.08)</code></td><td><code>0 2px 6px rgba(0,0,0,.04)</code></td>
+          <td>中卡片 / 抽屉</td>
+        </tr>
+        <tr>
+          <td><code>.sidebar-nav-item.active</code></td>
+          <td><code>background: --accent-soft</code></td><td><code>background: #EBEBF0</code></td>
+          <td>侧栏选中态</td>
+        </tr>
+        <tr>
+          <td><code>.sidebar-group-item.active</code></td>
+          <td>同</td><td>同</td><td>群项选中态</td>
+        </tr>
+        <tr>
+          <td><code>.message-bubble.user</code></td>
+          <td><code>background: --accent</code></td><td><code>background: --bg-elevated</code> + 蓝边</td>
+          <td>User 气泡</td>
+        </tr>
+        <tr>
+          <td><code>.topbar-title</code></td>
+          <td>font-weight: 600</td><td>保持 600 / letter-spacing -0.02em</td>
+          <td>标题对齐</td>
+        </tr>
+        <tr>
+          <td><code>Sidebar.tsx LogoMark</code></td>
+          <td>gradient + box-shadow</td><td><code>fill: #0066CC</code> + 移除 box-shadow</td>
+          <td>logo 去装饰</td>
+        </tr>
+        <tr>
+          <td><code>TopBar.tsx</code> 右侧</td>
+          <td>留白</td><td>4 个图标按钮（视图 / 排序 / 搜索 / 设置）</td>
+          <td>顶栏紧凑</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ─────────────── §8 拍板 ─────────────── -->
+<section>
+  <h2>8. 需要你拍板的两件事</h2>
+  <p class="h2-sub">我准备开第一个 PR——你在下面两问选一下方向。</p>
+
+  <div class="cta">
+    <h2>就等你一句话</h2>
+    <p class="h2-sub">决定后我开干，按 V1 → V2 节奏每天一档。</p>
+    <ul class="cta-list">
+      <li>① 升级路径：V1 / V2 / V3 / V4 哪个？</li>
+      <li>② 配色策略：保留主蓝做"极少强调" / 全砍掉纯中性？</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  OneDesktop · UI Designer · 2026-08-05 · 报告本身即"建议风格"样本
+</footer>
+
+</div>
+</body>
+</html>

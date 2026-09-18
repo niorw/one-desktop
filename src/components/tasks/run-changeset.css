@@ -1,0 +1,430 @@
+/* ============================================================================
+ * Run Changeset Review Panel — styles (ADR-021 / UX-021)
+ * ----------------------------------------------------------------------------
+ * 前缀 .run-cs-* 与 .job-recover-* 隔离，避免串扰。
+ * 全部使用 App.css 的语义令牌；dark 用主题 rgba 透明白，禁写死浅色。
+ * 动效尊重 prefers-reduced-motion。
+ * ========================================================================== */
+
+/* ── Panel container ── */
+.run-cs-panel {
+  margin-top: var(--space-sm);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  animation: run-cs-expand 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes run-cs-expand {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.run-cs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border-default);
+}
+.run-cs-head-titles { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.run-cs-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.run-cs-sub {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.run-cs-collapse-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+.run-cs-collapse-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* ── Segmented tab (reuses project segmented pattern) ── */
+.run-cs-tabs {
+  display: flex;
+  gap: 4px;
+  margin: var(--space-md) var(--space-lg) 0;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+.run-cs-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+/* selected: 黑字 + 600（禁 accent 蓝底，a11y） */
+.run-cs-tab[aria-selected="true"] {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+.run-cs-tab:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+.run-cs-tab-count {
+  font-size: var(--text-2xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.run-cs-tab[aria-selected="true"] .run-cs-tab-count { color: var(--text-secondary); }
+
+/* ── File list (shared by products & changes) ── */
+.run-cs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+}
+.run-cs-row {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-canvas);
+  overflow: hidden;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.run-cs-row:hover { background: var(--bg-hover); }
+.run-cs-row.is-open { border-color: var(--border-medium); }
+
+.run-cs-row-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+}
+.run-cs-file-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+.run-cs-file-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.run-cs-file-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.run-cs-file-sub {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* change summary chip group */
+.run-cs-summary { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.run-cs-sum {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.run-cs-sum.add { color: var(--status-success-strong); }
+.run-cs-sum.mod { color: var(--status-warning-strong); }
+.run-cs-sum.del { color: var(--status-error-strong); }
+
+/* hover-reveal actions (products) */
+.run-cs-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.run-cs-row:hover .run-cs-actions,
+.run-cs-row:focus-within .run-cs-actions { opacity: 1; }
+.run-cs-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.run-cs-act:hover { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-medium); }
+.run-cs-act.danger { color: var(--status-error-strong); }
+.run-cs-act.danger:hover { background: var(--border-light); border-color: var(--border-light); }
+
+/* change row expand trigger (▸) */
+.run-cs-expand {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  margin-left: auto;
+}
+.run-cs-expand-chevron { transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
+.run-cs-row.is-open .run-cs-expand-chevron { transform: rotate(90deg); }
+
+/* ── Diff container ── */
+.run-cs-diff {
+  border-top: 1px solid var(--border-default);
+  background: var(--bg-canvas);
+  padding: var(--space-md);
+  animation: run-cs-diff-in 150ms ease;
+}
+@keyframes run-cs-diff-in { from { opacity: 0; } to { opacity: 1; } }
+
+.run-cs-diff-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+/* version pills */
+.run-cs-versions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--space-sm);
+  flex-wrap: wrap;
+}
+.run-cs-ver {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.run-cs-ver:hover { color: var(--text-primary); border-color: var(--border-medium); }
+.run-cs-ver[aria-pressed="true"] {
+  color: var(--text-primary);
+  font-weight: 600;
+  border-color: var(--border-heavy);
+  background: var(--bg-secondary);
+}
+.run-cs-ver-snapshot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--status-warning);
+}
+
+/* code lines — Codex-style diff with side-by-side line numbers and folded context */
+.run-cs-code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: auto;
+  background: var(--bg-primary);
+}
+.run-cs-code-head {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.run-cs-line {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 var(--space-md);
+  white-space: pre;
+}
+.run-cs-line-content {
+  flex: 1;
+  min-width: 0;
+  padding-left: var(--space-sm);
+}
+.run-cs-gutter {
+  flex-shrink: 0;
+  text-align: center;
+  color: var(--text-tertiary);
+  user-select: none;
+}
+.run-cs-gutter-sign {
+  width: 24px;
+  text-align: center;
+}
+.run-cs-gutter-old,
+.run-cs-gutter-new {
+  width: 46px;
+  text-align: right;
+  padding: 0 8px;
+  border-right: 1px solid var(--border-default);
+}
+.run-cs-gutter-new { border-right: none; }
+.run-cs-line.add {
+  background: rgba(27, 161, 104, 0.10);
+  color: var(--status-success-strong);
+}
+.run-cs-line.del {
+  background: rgba(220, 76, 72, 0.09);
+  color: var(--status-error-strong);
+}
+.run-cs-line.ctx { color: var(--text-secondary); }
+.run-cs-line.fold {
+  justify-content: center;
+  color: var(--text-muted);
+  background: var(--bg-canvas);
+}
+.run-cs-fold-text {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.run-cs-binary-note {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  padding: var(--space-md);
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-md);
+  background: var(--bg-canvas);
+}
+.run-cs-binary-note.run-cs-err { color: var(--status-error-strong); border-color: var(--border-light); }
+
+/* ── Rollback inline confirm bar ── */
+.run-cs-confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  margin: var(--space-sm) var(--space-md) var(--space-md);
+  border: 1px solid var(--border-light);
+  background: var(--border-light);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  animation: run-cs-diff-in 150ms ease;
+}
+.run-cs-confirm-text { flex: 1; min-width: 0; }
+.run-cs-confirm-actions { display: flex; gap: var(--space-xs); flex-shrink: 0; }
+/* 确认条内按钮就近收口尺寸（全局 .btn / .btn-danger / .btn-ghost 已存在） */
+.run-cs-confirm .btn { padding: 5px 12px; font-size: var(--text-xs); }
+
+.run-cs-feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-sm) var(--space-md);
+  margin: var(--space-sm) var(--space-md) var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.run-cs-feedback.ok {
+  background: var(--border-light);
+  color: var(--status-success-strong);
+}
+.run-cs-feedback.err {
+  background: var(--border-light);
+  color: var(--status-error-strong);
+}
+.run-cs-feedback small {
+  display: block;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* spinner for rollback-in-progress */
+.run-cs-spin {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border-medium);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* ── Dark theme overrides (rgba translucent, never hard-coded light) ── */
+[data-theme="dark"] .run-cs-line.add { background: rgba(48, 209, 88, 0.16); color: #4ade80; }
+[data-theme="dark"] .run-cs-line.del { background: rgba(255, 69, 58, 0.16); color: #ff6961; }
+[data-theme="dark"] .run-cs-line.ctx { color: var(--text-secondary); }
+[data-theme="dark"] .run-cs-confirm {
+  background: var(--border-light);
+  border-color: var(--border-light);
+}
+[data-theme="dark"] .run-cs-panel,
+[data-theme="dark"] .run-cs-row,
+[data-theme="dark"] .run-cs-code,
+[data-theme="dark"] .run-cs-act,
+[data-theme="dark"] .run-cs-ver { background: rgba(255, 255, 255, 0.06); }
+[data-theme="dark"] .run-cs-tab[aria-selected="true"],
+[data-theme="dark"] .run-cs-row { background: rgba(255, 255, 255, 0.06); }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .run-cs-panel, .run-cs-diff, .run-cs-confirm, .run-cs-expand-chevron {
+    animation: none !important;
+    transition: none !important;
+  }
+}

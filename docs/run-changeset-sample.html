@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RunChangesetPanel 样例预览 · OneDesktop</title>
+<style>
+  /* ── Tokens (from App.css) ── */
+  :root {
+    --bg-primary:#ffffff; --bg-secondary:#f5f5f7; --bg-tertiary:#e8e8ed;
+    --bg-elevated:#ffffff; --bg-canvas:#fafafc; --bg-hover:#e8e8ed;
+    --text-primary:#1d1d1f; --text-secondary:#6e6e73; --text-muted:#6e6e73; --text-inverse:#fff;
+    --accent:#006edb; --danger:#ff3b30; --success:#34c759; --warning:#ff9500;
+    --border-light:rgba(0,0,0,.08); --border-medium:rgba(0,0,0,.12); --border-heavy:rgba(0,0,0,.18);
+    --border-default:var(--border-light); --border-focus:rgba(0,0,0,.28);
+    --status-success-strong:#1a7f37; --status-warning-strong:#b45309; --status-error-strong:#d70015;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.04);
+    --radius-sm:6px; --radius-md:10px; --radius-lg:14px;
+    --space-xs:4px; --space-sm:8px; --space-md:12px; --space-lg:16px;
+    --text-2xs:10px; --text-xs:11px; --text-sm:12px; --text-md:14px;
+    --font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",sans-serif;
+    --font-mono:"SF Mono","Menlo","Monaco",monospace;
+  }
+  [data-theme="dark"] {
+    --bg-primary:#141416; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e;
+    --bg-elevated:#1c1c1e; --bg-canvas:#101012; --bg-hover:#2c2c2e;
+    --text-primary:#f5f5f7; --text-secondary:#aeaeb2; --text-muted:#8e8e93; --text-inverse:#000;
+    --accent:#0a84ff; --danger:#ff453a; --success:#30d158; --warning:#ff9f0a;
+    --border-light:rgba(84,84,88,.6); --border-medium:rgba(84,84,88,.8); --border-heavy:rgba(120,120,128,.8);
+    --border-default:var(--border-light); --border-focus:rgba(255,255,255,.45);
+    --status-success-strong:#30d158; --status-warning-strong:#ff9f0a; --status-error-strong:#ff453a;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:var(--font-sans); color:var(--text-primary); background:var(--bg-canvas); padding:28px; line-height:1.5; }
+
+  .preview-stage { max-width:760px; margin:0 auto; }
+  .topbar-review { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .topbar-review h1 { font-size:16px; font-weight:700; letter-spacing:-.01em; }
+  .theme-toggle { border:1px solid var(--border-default); background:var(--bg-primary); color:var(--text-secondary);
+    font-family:var(--font-sans); font-size:12px; padding:6px 12px; border-radius:var(--radius-md); cursor:pointer; }
+  .theme-toggle:hover { color:var(--text-primary); background:var(--bg-hover); }
+
+  /* run card (mimic .job-recover-row) */
+  .run-card { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 16px;
+    background:var(--bg-elevated); border:1px solid var(--border-default); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); }
+  .run-card-info { display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .run-card-title { font-size:14px; font-weight:600; color:var(--text-primary); }
+  .run-card-meta { font-size:11px; color:var(--text-muted); }
+  .run-card-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+
+  .btn { font-family:var(--font-sans); font-size:13px; font-weight:500; border:none; border-radius:var(--radius-md);
+    padding:7px 16px; cursor:pointer; transition:background .15s; }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { filter:brightness(.94); }
+  .btn-ghost { background:transparent; color:var(--text-secondary); }
+  .btn-ghost:hover { background:var(--bg-hover); color:var(--text-primary); }
+  .btn-danger { background:var(--danger); color:#fff; }
+  .btn-danger:hover { filter:brightness(.92); }
+  .btn-sm { padding:5px 10px; font-size:11px; }
+
+  /* entry */
+  .run-cs-entry { display:inline-flex; align-items:center; gap:6px; padding:5px 10px 5px 12px; cursor:pointer;
+    border:1px solid var(--border-default); border-radius:var(--radius-md); background:var(--bg-primary);
+    color:var(--text-secondary); font-family:var(--font-sans); font-size:12px; font-weight:500; transition:background .15s,color .15s,border-color .15s; }
+  .run-cs-entry:hover { background:var(--bg-hover); color:var(--text-primary); border-color:var(--border-medium); }
+  .run-cs-entry .chev { transition:transform .18s cubic-bezier(.16,1,.3,1); }
+  .run-cs-entry[aria-expanded="true"] .chev { transform:rotate(90deg); }
+  .run-cs-entry-count { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px;
+    padding:0 5px; border-radius:9px; background:var(--bg-tertiary); color:var(--text-primary); font-size:10px; font-weight:600; }
+  .run-cs-entry[aria-expanded="true"] .run-cs-entry-count { background:var(--accent); color:var(--text-inverse); }
+
+  /* panel */
+  .run-cs-panel { margin-top:8px; border:1px solid var(--border-default); border-radius:var(--radius-lg);
+    background:var(--bg-elevated); overflow:hidden; box-shadow:var(--shadow-sm); animation:expand 180ms cubic-bezier(.16,1,.3,1); }
+  @keyframes expand { from{opacity:0;transform:translateY(-4px);} to{opacity:1;transform:translateY(0);} }
+  .run-cs-head { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 16px; border-bottom:1px solid var(--border-default); }
+  .run-cs-title { font-size:14px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:6px; }
+  .run-cs-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .run-cs-collapse { border:none; background:transparent; color:var(--text-muted); font-family:var(--font-sans); font-size:12px; cursor:pointer; padding:6px 8px; border-radius:6px; }
+  .run-cs-collapse:hover { background:var(--bg-hover); color:var(--text-primary); }
+
+  .run-cs-tabs { display:flex; gap:4px; margin:16px 16px 0; padding:4px; background:var(--bg-secondary); border-radius:var(--radius-md); }
+  .run-cs-tab { flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; border:none; background:transparent;
+    padding:6px 14px; border-radius:6px; font-family:var(--font-sans); font-size:12px; font-weight:500; color:var(--text-secondary); cursor:pointer; transition:background .15s,color .15s,box-shadow .15s; }
+  .run-cs-tab[aria-selected="true"] { background:var(--bg-elevated); color:var(--text-primary); font-weight:600; box-shadow:var(--shadow-sm); }
+  .run-cs-tab-count { font-size:10px; color:var(--text-muted); }
+  .run-cs-tab[aria-selected="true"] .run-cs-tab-count { color:var(--text-secondary); }
+
+  .run-cs-list { display:flex; flex-direction:column; gap:8px; padding:16px; }
+  .run-cs-row { border:1px solid var(--border-default); border-radius:var(--radius-md); background:var(--bg-canvas); overflow:hidden; transition:border-color .15s,background .15s; }
+  .run-cs-row:hover { background:var(--bg-hover); }
+  .run-cs-row.is-open { border-color:var(--border-medium); }
+  .run-cs-row-main { display:flex; align-items:center; gap:8px; padding:8px 16px; }
+
+  .run-cs-file-icon { flex-shrink:0; width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; color:var(--text-secondary); }
+  .run-cs-file-meta { display:flex; flex-direction:column; gap:1px; min-width:0; flex:1; }
+  .run-cs-file-name { font-family:var(--font-mono); font-size:12px; color:var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .run-cs-file-sub { font-size:11px; color:var(--text-muted); }
+  .run-cs-summary { display:inline-flex; align-items:center; gap:6px; flex-shrink:0; }
+  .run-cs-sum { font-family:var(--font-mono); font-size:11px; font-weight:600; }
+  .run-cs-sum.add { color:var(--status-success-strong); }
+  .run-cs-sum.mod { color:var(--status-warning-strong); }
+  .run-cs-sum.del { color:var(--status-error-strong); }
+
+  .run-cs-actions { display:flex; align-items:center; gap:4px; margin-left:auto; opacity:0; transition:opacity .12s; }
+  .run-cs-row:hover .run-cs-actions, .run-cs-row:focus-within .run-cs-actions { opacity:1; }
+  .run-cs-act { display:inline-flex; align-items:center; gap:4px; border:1px solid var(--border-default); background:var(--bg-primary);
+    color:var(--text-secondary); font-family:var(--font-sans); font-size:11px; padding:4px 8px; border-radius:6px; cursor:pointer; transition:background .15s,color .15s,border-color .15s; }
+  .run-cs-act:hover { background:var(--bg-secondary); color:var(--text-primary); border-color:var(--border-medium); }
+  .run-cs-act.danger { color:var(--status-error-strong); }
+  .run-cs-act.danger:hover { background:rgba(255,59,48,.1); border-color:rgba(255,59,48,.3); }
+
+  .run-cs-expand { flex-shrink:0; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; color:var(--text-tertiary); cursor:pointer; margin-left:auto; }
+  .run-cs-expand .chev { transition:transform .15s cubic-bezier(.16,1,.3,1); }
+  .run-cs-row.is-open .run-cs-expand .chev { transform:rotate(90deg); }
+
+  .run-cs-diff { border-top:1px solid var(--border-default); background:var(--bg-canvas); padding:16px; animation:fade 150ms ease; }
+  @keyframes fade { from{opacity:0;} to{opacity:1;} }
+  .run-cs-diff-summary { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-muted); margin-bottom:8px; }
+  .run-cs-versions { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+  .run-cs-ver { display:inline-flex; align-items:center; gap:5px; border:1px solid var(--border-default); background:var(--bg-primary);
+    color:var(--text-muted); font-family:var(--font-mono); font-size:10px; font-weight:500; padding:3px 9px; border-radius:999px; cursor:pointer; transition:background .15s,color .15s,border-color .15s; }
+  .run-cs-ver:hover { color:var(--text-primary); border-color:var(--border-medium); }
+  .run-cs-ver[aria-pressed="true"] { color:var(--text-primary); font-weight:600; border-color:var(--border-heavy); background:var(--bg-secondary); }
+  .run-cs-ver-dot { width:5px; height:5px; border-radius:50%; background:var(--warning); }
+
+  .run-cs-code { font-family:var(--font-mono); font-size:12px; line-height:1.6; border:1px solid var(--border-default); border-radius:var(--radius-md); overflow:hidden; background:var(--bg-primary); }
+  .run-cs-line { display:flex; gap:8px; padding:0 16px; white-space:pre; }
+  .run-cs-line .g { flex-shrink:0; width:16px; text-align:center; color:var(--text-tertiary); user-select:none; border-right:1px solid var(--border-default); margin-right:8px; padding-right:8px; }
+  .run-cs-line.add { background:rgba(27,161,104,.12); color:var(--status-success-strong); }
+  .run-cs-line.del { background:rgba(220,76,72,.10); color:var(--status-error-strong); }
+  .run-cs-line.ctx { color:var(--text-secondary); }
+  .run-cs-line.add .g, .run-cs-line.del .g { border-right-color:transparent; }
+
+  .run-cs-confirm { display:flex; align-items:center; gap:16px; padding:8px 16px; margin:8px 16px 16px;
+    border:1px solid rgba(255,159,0,.35); background:rgba(255,149,0,.1); border-radius:var(--radius-md); font-size:12px; color:var(--text-primary); animation:fade 150ms ease; }
+  .run-cs-confirm-text { flex:1; min-width:0; }
+  .run-cs-confirm-actions { display:flex; gap:8px; flex-shrink:0; }
+  .run-cs-feedback { display:flex; align-items:center; gap:8px; padding:8px 16px; margin:8px 16px 16px; border-radius:var(--radius-md); font-size:12px; font-weight:500; }
+  .run-cs-feedback.ok { background:rgba(52,199,89,.12); color:var(--status-success-strong); }
+  .run-cs-feedback small { display:block; font-weight:400; color:var(--text-muted); margin-top:2px; }
+
+  [data-theme="dark"] .run-cs-line.add { background:rgba(48,209,88,.16); color:#4ade80; }
+  [data-theme="dark"] .run-cs-line.del { background:rgba(255,69,58,.16); color:#ff6961; }
+  [data-theme="dark"] .run-cs-panel, [data-theme="dark"] .run-cs-entry, [data-theme="dark"] .run-cs-row,
+  [data-theme="dark"] .run-cs-code, [data-theme="dark"] .run-cs-act, [data-theme="dark"] .run-cs-ver { background:rgba(255,255,255,.06); }
+  [data-theme="dark"] .run-cs-confirm { background:rgba(255,159,0,.18); border-color:rgba(255,159,0,.45); }
+
+  .note { margin-top:24px; font-size:11px; color:var(--text-muted); line-height:1.6; border-top:1px solid var(--border-default); padding-top:16px; }
+</style>
+</head>
+<body>
+<div class="preview-stage">
+  <div class="topbar-review">
+    <h1>RunChangesetPanel · 静态样例（ADR-021 / UX-021）</h1>
+    <button class="theme-toggle" id="themeToggle">🌓 切换暗色</button>
+  </div>
+
+  <!-- run card -->
+  <div class="run-card">
+    <div class="run-card-info">
+      <span class="run-card-title">季度报告生成 · run-7</span>
+      <span class="run-card-meta">中断于 08:14 · 已写入 7 个文件</span>
+    </div>
+    <div class="run-card-actions">
+      <button class="btn btn-primary btn-sm">继续</button>
+      <button class="btn btn-ghost btn-sm">忽略</button>
+      <button class="run-cs-entry" id="entry" aria-expanded="true" aria-controls="panel">
+        <span class="chev">▶</span> 审阅改动 <span class="run-cs-entry-count">7</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- panel -->
+  <div class="run-cs-panel" id="panel" role="region" aria-label="本次运行的改动">
+    <div class="run-cs-head">
+      <div>
+        <div class="run-cs-title">≡ 本次运行的改动</div>
+        <div class="run-cs-sub">季度报告生成 · run-7</div>
+      </div>
+      <button class="run-cs-collapse" id="collapse">全部收起</button>
+    </div>
+
+    <div class="run-cs-tabs" role="tablist">
+      <button class="run-cs-tab" role="tab" data-tab="product" aria-selected="false">产物 <span class="run-cs-tab-count">3</span></button>
+      <button class="run-cs-tab" role="tab" data-tab="change" aria-selected="true">变更 <span class="run-cs-tab-count">2</span></button>
+    </div>
+
+    <!-- products list -->
+    <div class="run-cs-list" id="list-product" role="tabpanel" hidden>
+      <div class="run-cs-row">
+        <div class="run-cs-row-main">
+          <span class="run-cs-file-icon">▣</span>
+          <div class="run-cs-file-meta"><span class="run-cs-file-name">report-2026Q2.html</span><span class="run-cs-file-sub">HTML · 24.3 KB</span></div>
+          <div class="run-cs-actions">
+            <button class="run-cs-act">👁 预览</button>
+            <button class="run-cs-act">⟳ 版本 v2</button>
+            <button class="run-cs-act danger">↶ 回滚</button>
+          </div>
+        </div>
+      </div>
+      <div class="run-cs-row">
+        <div class="run-cs-row-main">
+          <span class="run-cs-file-icon">▤</span>
+          <div class="run-cs-file-meta"><span class="run-cs-file-name">summary.md</span><span class="run-cs-file-sub">文本 · 3.1 KB</span></div>
+          <div class="run-cs-actions">
+            <button class="run-cs-act">👁 预览</button>
+            <button class="run-cs-act">↶ 回滚</button>
+          </div>
+        </div>
+      </div>
+      <div class="run-cs-row">
+        <div class="run-cs-row-main">
+          <span class="run-cs-file-icon">🖼</span>
+          <div class="run-cs-file-meta"><span class="run-cs-file-name">chart.png</span><span class="run-cs-file-sub">图片 · 58.7 KB</span></div>
+          <div class="run-cs-actions">
+            <button class="run-cs-act">👁 预览</button>
+            <button class="run-cs-act danger">↶ 回滚</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- changes list -->
+    <div class="run-cs-list" id="list-change" role="tabpanel">
+      <!-- change row 1 (open) -->
+      <div class="run-cs-row is-open">
+        <div class="run-cs-row-main">
+          <button class="run-cs-expand" aria-label="收起 diff"><span class="chev">▶</span></button>
+          <span class="run-cs-file-icon">✎</span>
+          <div class="run-cs-file-meta"><span class="run-cs-file-name">config.yaml</span></div>
+          <div class="run-cs-summary">
+            <span class="run-cs-sum add">+2</span><span class="run-cs-sum mod">~4</span><span class="run-cs-sum del">−2</span>
+          </div>
+          <div class="run-cs-actions">
+            <button class="run-cs-act">⟳ 版本</button>
+            <button class="run-cs-act danger">↶ 回滚</button>
+          </div>
+        </div>
+        <div class="run-cs-diff">
+          <div class="run-cs-versions" role="group">
+            <button class="run-cs-ver">v1</button>
+            <button class="run-cs-ver">v2</button>
+            <button class="run-cs-ver" aria-pressed="true">v3 <span class="run-cs-ver-dot"></span></button>
+          </div>
+          <div class="run-cs-diff-summary"><span>共 6 行改动</span><span class="run-cs-sum add">+2</span><span class="run-cs-sum del">−2</span></div>
+          <div class="run-cs-code">
+            <div class="run-cs-line del"><span class="g">−</span><span>model: deepseek-v3</span></div>
+            <div class="run-cs-line add"><span class="g">+</span><span>model: deepseek-v4-flash</span></div>
+            <div class="run-cs-line ctx"><span class="g"> </span><span>temperature: 0.7</span></div>
+            <div class="run-cs-line del"><span class="g">−</span><span>debug: true</span></div>
+            <div class="run-cs-line add"><span class="g">+</span><span>debug: false</span></div>
+            <div class="run-cs-line add"><span class="g">+</span><span>max_retries: 3</span></div>
+          </div>
+        </div>
+        <div class="run-cs-confirm" role="alertdialog">
+          <span class="run-cs-confirm-text">将恢复为改动前内容。确定？</span>
+          <div class="run-cs-confirm-actions">
+            <button class="btn btn-ghost btn-sm">取消</button>
+            <button class="btn btn-danger btn-sm">回滚</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- change row 2 -->
+      <div class="run-cs-row">
+        <div class="run-cs-row-main">
+          <button class="run-cs-expand" aria-label="展开 diff"><span class="chev">▶</span></button>
+          <span class="run-cs-file-icon">✎</span>
+          <div class="run-cs-file-meta"><span class="run-cs-file-name">src/app.ts</span></div>
+          <div class="run-cs-summary">
+            <span class="run-cs-sum add">+2</span><span class="run-cs-sum mod">~3</span><span class="run-cs-sum del">−1</span>
+          </div>
+          <div class="run-cs-actions">
+            <button class="run-cs-act">⟳ 版本</button>
+            <button class="run-cs-act danger">↶ 回滚</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    样例说明：本页为静态 HTML 预览，对应 <code>src/components/tasks/RunChangesetPanel.sample.tsx</code> + <code>run-changeset-sample.css</code>。
+    交互（tab 切换 / 展开 diff / 回滚确认）在 TSX 样例中已接 state；此处仅展示形态。
+    形态要点：入口收敛为单按钮「审阅改动 ▸ N」；面板内 segmented tab 用黑字+600（禁 accent 蓝）；
+    产物卡片 hover 浮出操作；变更行摘要 +N/~M/−K 双通道（符号+着色）；diff 红绿等宽；版本胶囊 v3 标「存档」琥珀点；回滚内联确认条（危险操作，不弹窗）。
+  </div>
+</div>
+
+<script>
+  // 主题切换
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    toggle.textContent = dark ? '🌓 切换暗色' : '☀️ 切换亮色';
+  });
+  // tab 切换
+  document.querySelectorAll('.run-cs-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.run-cs-tab').forEach(t => t.setAttribute('aria-selected', 'false'));
+      tab.setAttribute('aria-selected', 'true');
+      const isProduct = tab.dataset.tab === 'product';
+      document.getElementById('list-product').hidden = !isProduct;
+      document.getElementById('list-change').hidden = isProduct;
+    });
+  });
+  // 入口 / 收起
+  document.getElementById('entry').addEventListener('click', () => {
+    const p = document.getElementById('panel');
+    const hidden = p.style.display === 'none';
+    p.style.display = hidden ? '' : 'none';
+    document.getElementById('entry').setAttribute('aria-expanded', String(hidden));
+  });
+  document.getElementById('collapse').addEventListener('click', () => {
+    document.getElementById('panel').style.display = 'none';
+    document.getElementById('entry').setAttribute('aria-expanded', 'false');
+  });
+  // 展开 diff（样例：仅切换 is-open 类与图标）
+  document.querySelectorAll('.run-cs-expand').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('.run-cs-row');
+      row.classList.toggle('is-open');
+    });
+  });
+</script>
+</body>
+</html>
