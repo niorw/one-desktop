@@ -5,6 +5,7 @@
 [![Rust](https://img.shields.io/badge/Rust-2021-ed2024)](https://www.rust-lang.org/)
 [![Tauri](https://img.shields.io/badge/Tauri-2.x-24c8db)](https://tauri.app/)
 [![React](https://img.shields.io/badge/React-18-61dafb)](https://react.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
 
@@ -113,9 +114,11 @@ onedesktop/
 - **操作系统**：macOS / Linux / Windows（Tauri 2 支持）
 - 首次编译 Rust 依赖需联网（如处于内网，可设置代理：`export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890`）
 
-### 安装依赖
+### 克隆与安装依赖
 
 ```bash
+git clone https://github.com/niorw/one-desktop.git
+cd one-desktop
 npm install
 ```
 
@@ -205,13 +208,13 @@ npm run tauri build
 - **Rust**：`cargo check` 通过，零错误零警告。
 - **前端**：`tsc --noEmit` 通过，零错误。
 - **内核纯净度**：`npm run check:kernel` 通过——内核层（`agent`/`group`/`scheduler`）禁止直接 `use tauri::` 或 Tauri 运行时泛型 `<R: Runtime>` / `AppHandle<R>`，仅适配层 `agent/ports.rs`（`TauriObserver` / `TauriEventBus`）允许。
-- **依赖**：已安装完成。
+- **测试**：`cargo test --lib` 与 Playwright E2E 均通过；一键门禁 `npm run check`（`check:kernel` + `check:rust` + `check:ts`）。
 
 ---
 
 ## 📝 许可证
 
-私有项目，仅供个人使用。
+[MIT](LICENSE) © 2026 niorw
 
 ---
 
