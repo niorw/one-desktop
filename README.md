@@ -5,6 +5,7 @@
 [![Rust](https://img.shields.io/badge/Rust-2021-ed2024)](https://www.rust-lang.org/)
 [![Tauri](https://img.shields.io/badge/Tauri-2.x-24c8db)](https://tauri.app/)
 [![React](https://img.shields.io/badge/React-18-61dafb)](https://react.dev/)
+[![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey)](#平台支持)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 OneDesktop 把 LLM 从聊天窗口扩展为一个可编排的工作台：单个 Agent 走 ReAct 循环调用工具，
@@ -122,7 +123,19 @@ UI (React)  ──invoke──▶  Commands（路由层，无业务逻辑）
 
 ## 快速开始
 
-环境要求：Node.js ≥ 18、Rust 稳定版（含 `cargo`）。首次编译 Rust 依赖需联网。
+### 平台支持
+
+| 平台 | 状态 |
+|---|---|
+| **macOS** | 已支持 —— 当前开发与验证环境 |
+| Windows / Linux | **未适配，未验证** |
+
+窗口层使用 macOS 专属配置（交通灯重定位、窗口样式），且构建依赖含 macOS-only 的 cocoa 实现，
+非 macOS 平台需先完成平台适配才能构建运行。以下步骤仅针对 macOS。
+
+### 环境要求
+
+Node.js ≥ 18、Rust 稳定版（含 `cargo`）；首次编译 Rust 依赖需联网。
 
 ```bash
 git clone https://github.com/niorw/one-desktop.git
